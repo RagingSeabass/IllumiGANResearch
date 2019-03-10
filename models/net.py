@@ -79,7 +79,7 @@ class UNet(nn.Module):
 
         return nn.Sequential(*sequence)
 
-    def conv_3x3_2x(self, in_channels, out_channels, batch_norm=True):
+    def conv_3x3_2x(self, in_channels, out_channels, batch_norm=False):
         # 3x3 convolutional layer with stide 1 and padding 1
         
         # That is, when F=3, then using P=1 will retain the original size of the input.
@@ -88,13 +88,13 @@ class UNet(nn.Module):
         if batch_norm:
             sequence.append(nn.BatchNorm2d(out_channels))
 
-        sequence.append(nn.LeakyReLU(0.1))
+        sequence.append(nn.LeakyReLU(0.2))
         sequence.append(nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1))
 
         if batch_norm:
             sequence.append(nn.BatchNorm2d(out_channels))
 
-        sequence.append(nn.LeakyReLU(0.1))
+        sequence.append(nn.LeakyReLU(0.2))
         
         return nn.Sequential(*sequence)
 

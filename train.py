@@ -27,14 +27,18 @@ device = torch.device('cuda:0' if cuda_avail else 'cpu')
 #Create model, optimizer and loss function
 model = UNet()
 
-# Move model before constructing optimizer 
-if cuda_avail:
-    model.cuda()
-
-optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
 with open('log.txt', 'a') as f:
     f.write("New training \n")
+
+# Move model before constructing optimizer 
+if torch.cuda.device_count() > 1:
+    print("Running in parrallel: " + str(torch.cuda.device_count()) + " GPU's",file=sys.stderr, flush=True )
+    model = nn.DataParallel(model,  device_ids=[0, 1]).cuda()
+else if cuda_avail:
+    model.cuda()
+
+optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
 for epoch in range(epochs):
 
