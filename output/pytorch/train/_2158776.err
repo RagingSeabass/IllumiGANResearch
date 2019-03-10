@@ -1,0 +1,13 @@
+Loaded module: python3/3.6.2
+Loaded module: cuda/9.2
+Loaded module: cudnn/v7.4.2.24-prod-cuda-9.2
+Cache entry deserialization failed, entry ignored
+Loading data into memory
+Loaded 0 ids 
+Loaded 10 ids 
+Traceback (most recent call last):
+  File "train.py", line 19, in <module>
+    dataset = LearningToSeeInTheDarkDataset("/work3/s164440/shared/Learning-to-See-in-the-Dark/dataset/sony/")
+  File "/work3/s164440/shared/IllumiGANResearch/models/data_loader.py", line 71, in __init__
+    im = long_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
+KeyboardInterrupt

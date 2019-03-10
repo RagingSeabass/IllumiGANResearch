@@ -36,7 +36,6 @@ optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 with open('log.txt', 'a') as f:
     f.write("New training \n")
 
-
 for epoch in range(epochs):
 
     if epoch > 500:
