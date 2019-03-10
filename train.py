@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 import torch
-import os, time
+import os, time, sys
 
 batch_size = 1
 epochs = 1000
@@ -36,9 +36,8 @@ if cuda_avail:
 
 # Move model before constructing optimizer 
 if torch.cuda.device_count() > 1:
-    print("Running in parrallel: " + str(torch.cuda.device_count()) + " GPU's",file=sys.stderr, flush=True )
+    print("Running in parrallel: " + str(torch.cuda.device_count()) + " GPU's")
     model = nn.DataParallel(model,  device_ids=[0, 1]).cuda()
-
 
 optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
