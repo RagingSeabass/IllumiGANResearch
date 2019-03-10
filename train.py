@@ -3,6 +3,7 @@ from models.data_loader import LearningToSeeInTheDarkDataset
 from models.net import UNet
 from torch.utils.data import DataLoader
 import torch.optim as optim
+import torch.nn as nn
 import torch
 import os, time
 
