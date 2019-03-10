@@ -1,3 +1,5 @@
+module load python3/3.6.2
+
 # Setup virtual env
 export PYTHONPATH=
 python3 -m venv mlpy3env
