@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import math
 
 class LSID(nn.Module):
     def __init__(self, inchannel=4, block_size=2):
