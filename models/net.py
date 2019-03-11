@@ -1,6 +1,34 @@
 import torch
 import torch.nn as nn
 
+
+##############################
+#   Initialize weights 
+##############################
+
+def weights_init_normal(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm2d') != -1:
+        torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
+        torch.nn.init.constant_(m.bias.data, 0.0)
+
+##############################
+#   UNet Generator 
+##############################
+
+class GeneratorUNet(nn.Module):
+    def __init__(self):
+        super(GeneratorUNet, self).__init__()
+
+        model = [
+            
+        ]
+
+
+
+
 class UNet(nn.Module):
     def __init__(self):
         super(UNet, self).__init__()
