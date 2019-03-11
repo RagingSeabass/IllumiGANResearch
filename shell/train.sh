@@ -8,7 +8,7 @@
 #BSUB -q gpuv100
 
 ### -- set the job Name --
-#BSUB -J LTS_Original
+#BSUB -J LTS_Original1
 
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 2
