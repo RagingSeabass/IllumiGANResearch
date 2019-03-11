@@ -26,15 +26,17 @@ class LearningToSeeInTheDarkDataset(Dataset):
 ### Contains two folders 
 ### - short (x)
 ### - long  (y)
-    def __init__(self, path_to_data, patch_size=512):
+    def __init__(self, path_to_data, patch_size=512, debug=False):
         super(LearningToSeeInTheDarkDataset, self).__init__()
 
         self.patch_size = patch_size
 
         # Lets prepare to load all images into memory for fast training.
-        data_short  = glob.glob(f'{path_to_data}short/0*.ARW')
-        #data_short  = glob.glob(f'{path_to_data}short/00001*.ARW')
-        
+        if debug:
+            data_short  = glob.glob(f'{path_to_data}short/000[0-4][0-9]*.ARW')
+        else:
+            data_short  = glob.glob(f'{path_to_data}short/0*.ARW')
+
         self.short_ids = np.unique([int(os.path.basename(res)[0:5]) for res in data_short])
         self.short_ids.sort()
 
