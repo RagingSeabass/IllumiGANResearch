@@ -12,6 +12,9 @@ data/val/
 
 checkpoint/sony/
 
+output/
+mlpy3env/
+
 .DS_Store
 
 # Distribution / packaging
