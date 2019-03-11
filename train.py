@@ -36,7 +36,7 @@ model.train()
 
 criterion = nn.L1Loss()
 
-with open('log_1.txt', 'a') as f:
+with open('log_2.txt', 'a') as f:
     f.write("New training \n")
 
 if cuda_avail:
@@ -82,7 +82,7 @@ for epoch in range(epochs):
             'optimizer_state': optimizer.state_dict()
             }, checkpoint_dir + 'sony_epoch_%04d.pth' % epoch)
 
-    with open('log_1.txt', 'a') as f:
+    with open('log_2.txt', 'a') as f:
         f.write("%d Loss=%.3f Time=%.3f \n" % (epoch, running_loss.average(), time.time() - st))
     
 
