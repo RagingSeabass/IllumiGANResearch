@@ -1,32 +1,24 @@
 import torch
 import torch.nn as nn
 
-
 class UNet(nn.Module):
     def __init__(self):
         super(UNet, self).__init__()
 
         self.maxpool   = self.max_pool()
 
-        self.conv1  = self.conv_3x3_2x(4, 32)
-        
+        self.conv1  = self.conv_3x3_2x(4, 32)        
         self.conv2  = self.conv_3x3_2x(32, 64)
-
         self.conv3  = self.conv_3x3_2x(64, 128)
-
         self.conv4  = self.conv_3x3_2x(128, 256)
-        
         self.conv5  = self.conv_3x3_2x(256, 512)
 
         self.up6    = self.conv_up_2x2(512, 256)
         self.conv6  = self.conv_3x3_2x(512, 256)   
-
         self.up7    = self.conv_up_2x2(256, 128)
         self.conv7  = self.conv_3x3_2x(256, 128) 
-
         self.up8    = self.conv_up_2x2(128, 64)
         self.conv8  = self.conv_3x3_2x(128, 64)     
-
         self.up9    = self.conv_up_2x2(64, 32)
         self.conv9  = self.conv_3x3_2x(64, 32) 
 
@@ -70,7 +62,7 @@ class UNet(nn.Module):
     def conv_up_2x2(self, in_channels, out_channels):
         return nn.Sequential(nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2,stride=2))
 
-    def conv_1x1(self, in_channels, out_channels, batch_norm=True):
+    def conv_1x1(self, in_channels, out_channels, batch_norm=False):
         
         sequence = [nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1)]
 
@@ -83,18 +75,18 @@ class UNet(nn.Module):
         # 3x3 convolutional layer with stide 1 and padding 1
         
         # That is, when F=3, then using P=1 will retain the original size of the input.
-        sequence = [nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1)]
+        sequence = [nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True)]
         
         if batch_norm:
             sequence.append(nn.BatchNorm2d(out_channels))
 
-        sequence.append(nn.LeakyReLU(0.2))
-        sequence.append(nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1))
+        sequence.append(nn.LeakyReLU(negative_slope=0.2, inplace=True))
+        sequence.append(nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True))
 
         if batch_norm:
             sequence.append(nn.BatchNorm2d(out_channels))
 
-        sequence.append(nn.LeakyReLU(0.2))
+        sequence.append(nn.LeakyReLU(negative_slope=0.2, inplace=True))
         
         return nn.Sequential(*sequence)
 
