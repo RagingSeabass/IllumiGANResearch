@@ -1,0 +1,11 @@
+{
+    "train_dir": "./data/train",
+    "test_dir": "./data/test",
+    "validation_dir": "./data/validation",
+    "num_workers": 4,
+    "max_dataset_size": 5,
+    "save": 250,
+    "images": true,
+    "gpu_ids": [0],
+    "debug": true
+}

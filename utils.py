@@ -3,14 +3,14 @@ import logging
 import os 
 
 # Load json parameters into models 
-class Hyperparameters():
+class Parameters():
     """Load params file into dict"""
     
     params = {}
 
     def __init__(self, path):
         with open(path, 'r') as f:
-            self.params.update(json.load(f))
+            self.params = json.load(f)
 
     def update(self, path):
         "Load new config"
@@ -26,51 +26,52 @@ class Hyperparameters():
         try: 
             return self.params[name]
         except:
-            return None
+            raise Exception(f"Error: Parameter is not found '{name}'")
 
     def get_string(self):
-        s = '|'
+        s = 'Loaded \n'
         for key in self.params:
-            s += f" {key}: {self.params[key]} |"
+            s += f"| {key} | {self.params[key]} |\n"
         return s
 
 class BaseManager():
     """ Base manager class for runnning a training, testing, validation"""
     loggers = {}
-    base_save_dir = ''
+
     model_checkpoints   = 'checkpoints/'
     images              = 'images/'
     reports             = 'reports/'
 
-    h_params = None
+    is_train = False
 
-    def __init__(self, base_dir, param_dir, debug=False):
+    def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
         # Perform sanity checks 
         if not isinstance(base_dir, str):
             raise Exception("Base dir must be a string")
         if len(base_dir) == 0:
             raise Exception(f"Base dir cannot be {base_dir}")
-
-        if not isinstance(param_dir, str):
-            raise Exception("Params file must be a string")
-        if len(param_dir) == 0:
-            raise Exception(f"Params file cannot be {param_dir}")
-        if not os.path.isfile(param_dir):
-            raise Exception(f"Params file not found: {param_dir}")
-
+        
         if base_dir[-1] != '/':
             base_dir += '/' 
 
         if not os.path.isdir('./output/' + base_dir):
             os.makedirs('./output/' + base_dir)
 
+        self.check_param_file(options_f_dir)
+        self.check_param_file(hyperparams_f_dir)
+
         self.base_save_dir = './output/' + base_dir
         print(f"Directory: {self.base_save_dir}")
 
-        self.h_params = Hyperparameters(param_dir)
+        self.hyper_params = Parameters(hyperparams_f_dir)
+        self.options = Parameters(options_f_dir)
+
+        # Do some sanity checks 
+
+        if self.options.get('max_dataset_size') < self.hyper_params.get('batch_size'):
+            raise Exception("Batch size must be smaller than dataset size")
 
         # Create folders
-
         if not os.path.isdir(self.base_save_dir + self.model_checkpoints):
             os.makedirs(self.base_save_dir + self.model_checkpoints)
 
@@ -80,17 +81,33 @@ class BaseManager():
         if not os.path.isdir(self.base_save_dir + self.reports):
             os.makedirs(self.base_save_dir + self.reports)
 
-        self.create_logger(name='system', debug=debug)
-        self.create_logger(name='hyparam', debug=debug)
+        self.create_logger(name='system', debug=self.options.get("debug"))
+        self.create_logger(name='hyparam', debug=self.options.get("debug"))
         
-        # Log initial hyper 
-        self.get_logger('hyparam').info("Loaded hyperparameters")
-        self.get_logger('hyparam').info(self.h_params.get_string())
+        # Log initial settings 
+        #self.get_logger('hyparam').info("Loaded hyperparameters")
+        self.get_logger('hyparam').info(self.hyper_params.get_string())
 
-    def get_params(self) -> Hyperparameters:
-        """Get a hyperparameter"""
-        return self.h_params
+        #self.get_logger('system').info("Loaded options")
+        self.get_logger('system').info(self.options.get_string())
+
+    def check_param_file(self, file_path):
+        """Checks that the provided file path is ok"""
+        if not isinstance(file_path, str):
+            raise Exception("Params file must be a string")
+        if len(file_path) == 0:
+            raise Exception(f"Params file cannot be {file_path}")
+        if not os.path.isfile(file_path):
+            raise Exception(f"Params file not found: {file_path}")
+
+    def get_hyperparams(self) -> Parameters:
+        """Get the hyperparameters"""
+        return self.hyper_params
     
+    def get_options(self) -> Parameters:
+        """Get the options"""
+        return self.options
+
     def get_cp_dir(self) -> str:
         """Get checkpoint dir"""
         return self.base_save_dir + self.model_checkpoints
@@ -135,13 +152,15 @@ class TrainManager(BaseManager):
     
     data_dir = ''
 
-    def __init__(self, base_dir, param_dir, debug=False):
-        super().__init__(base_dir=base_dir, param_dir=param_dir, debug=debug)
+    def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
+        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir, hyperparams_f_dir=hyperparams_f_dir)
+
+        self.is_train = True
 
         # Create a special log for training
-        self.create_logger(name='train', debug=debug)  
+        self.create_logger(name='train', debug=self.options.get("debug"))  
 
-        data_dir = self.h_params.get('train_dir')
+        data_dir = self.options.get('train_dir')
 
         if not isinstance(data_dir, str):
             raise Exception("data_dir must be a string")

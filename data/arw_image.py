@@ -6,10 +6,11 @@ class ARW():
 
     path = ''
     data = None
-    black_level = 512
+    
     
     def __init__(self, path):
         self.path = path
+        self.black_level = 512
 
     def postprocess(self):
         raw = rawpy.imread(self.path)

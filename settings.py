@@ -4,9 +4,11 @@ import os
 import rawpy
 import numpy as np
 
-m = TrainManager(base_dir='test', param_dir='./experiments/base_model/params.json')
+m = TrainManager(base_dir='test', 
+                options_f_dir='./experiments/base_model/options.json',  
+                hyperparams_f_dir='./experiments/base_model/params.json')
 
-data = ARWDataset(m.get_params(), m.get_data_dir(), 'short', 'long')
+data = ARWDataset(m, 'short', 'long')
 
 for i in range(len(data)):
     sample = data[i]

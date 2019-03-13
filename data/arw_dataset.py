@@ -1,11 +1,12 @@
 import os.path
 import glob
-from data.base_dataset import BaseDataset
-from data.arw_image import ARW
+from torch.utils.data import Dataset
+from .arw_image import ARW
 import numpy as np
+import torch
 
 
-class ARWDataset(BaseDataset):
+class ARWDataset(Dataset):
     """ 
         ARW Dataset. 
         Dataset with a pair of images
@@ -24,26 +25,34 @@ class ARWDataset(BaseDataset):
 
     number_of_pairs = 0
 
-    def __init__(self, opt, data_dir, x_folder, y_folder):
-        BaseDataset.__init__(self, opt, data_dir)
+    def __init__(self, manager, x_folder, y_folder):
+        super().__init__()
+
+        self.manager = manager
+        self.data_dir = manager.get_data_dir()
+
+        self.patch_size = manager.get_hyperparams().get("patch_size")
 
         # Sanity checks 
         if not isinstance(x_folder, str):
             raise Exception("x_path must be a string")
         if not isinstance(y_folder, str):
             raise Exception("y_path must be a string")
-        if not os.path.isdir(data_dir+x_folder):
-            raise Exception(f"x_path not found: {data_dir+x_folder}")
-        if not os.path.isdir(data_dir+y_folder):
-            raise Exception(f"x_path not found: {data_dir+y_folder}")
+        if not os.path.isdir(self.data_dir+x_folder):
+            raise Exception(f"x_path not found: {self.data_dir+x_folder}")
+        if not os.path.isdir(self.data_dir+y_folder):
+            raise Exception(f"x_path not found: {self.data_dir+y_folder}")
 
-        self.x_path = f"{data_dir}{x_folder}/"
-        self.y_path = f"{data_dir}{y_folder}/"
+        self.x_path = f"{self.data_dir}{x_folder}/"
+        self.y_path = f"{self.data_dir}{y_folder}/"
 
         x_data = glob.glob(f'{self.x_path}0*.ARW')
         self.x_ids = np.unique([int(os.path.basename(res)[0:5]) for res in x_data])
 
-        max_size = opt.get("max_dataset_size")
+        y_data = glob.glob(f'{self.y_path}0*.ARW')
+        self.y_ids = np.unique([int(os.path.basename(res)[0:5]) for res in y_data])
+
+        max_size = manager.get_options().get("max_dataset_size")
         if max_size != None and not isinstance(max_size, int):
             raise Exception("Max size must be int")
 
@@ -63,6 +72,11 @@ class ARWDataset(BaseDataset):
         
         self.load()    
 
+        
+        if len(self.y_ids) < manager.get_hyperparams().get('batch_size'):
+            raise Exception('Batch size must not be larger than number of data points!')
+
+        manager.get_logger("system").info(f"Loaded ARW dataset | {self.number_of_pairs} image pairs")
 
     def load(self):
         """
@@ -71,6 +85,9 @@ class ARWDataset(BaseDataset):
         """
         self.number_of_pairs = 0
         for index, x_id in enumerate(self.x_ids):
+            
+            print(index)
+
             x_files = glob.glob(self.x_path + '%05d_00*.ARW'%x_id)
             y_files = glob.glob(self.y_path + '%05d_00*.ARW'%x_id)
 
@@ -109,11 +126,12 @@ class ARWDataset(BaseDataset):
         """Return a data point and its metadata information."""
         
         pair = self.xy_pairs[index]
+        # returns X, Y
         return self.get_image_patch(pair.index, pair.ratio_key)        
 
     def get_image_patch(self, index, ratio_key):
         """Get an image patch"""
-        # crop
+        
         x_image = self.x_images[ratio_key][index].get()
         y_image = self.y_images[index].get()
         
@@ -140,7 +158,7 @@ class ARWDataset(BaseDataset):
         y_patch  = np.maximum(y_patch, 0.0)
 
         # Unpack before returning
-        return x_patch[0], y_patch[0]
+        return x_patch, y_patch
 
     def __len__(self):
         """We return the total number of counted pairs"""

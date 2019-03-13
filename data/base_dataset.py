@@ -1,27 +1,13 @@
 from torch.utils.data import Dataset
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 class BaseDataset(Dataset):
-    
-    options = None
-    data_dir = ''
-
-    patch_size = 0
-        
-    def __init__(self, options, data_dir):
+    """Base dataset"""
+    def __init__(self, manager):
         super().__init__()
-        self.options = options
-        self.data_dir = data_dir        
+        self.manager = manager
+        self.data_dir = manager.get_data_dir()
 
-        self.patch_size = self.options.get("patch_size")
-
-    @abstractmethod
-    def __len__(self):
-        return 0
-
-    @abstractmethod
-    def __getitem__(self, index):
-        pass
-
+        self.patch_size = manager.get_hyperparams().get("patch_size")
 
     

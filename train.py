@@ -8,76 +8,59 @@ from models.data_loader import LearningToSeeInTheDarkDataset
 from models.net import UNet
 from models.net_test import LSID
 
+from utils import TrainManager
+from data.arw_dataset import ARWDataset
+from models.illumigan_model import IllumiganModel
 
-checkpoint_dir = './checkpoint/sony/'
+base_dir = "_default"
 
-if not os.path.isdir(checkpoint_dir):
-    os.makedirs(checkpoint_dir)
+if sys.argv[1] != None:
+        base_dir = str(sys.argv[1])
 
-dataset = LearningToSeeInTheDarkDataset("/work3/s164440/shared/Learning-to-See-in-the-Dark/dataset/sony/", debug=True)
-#dataset = LearningToSeeInTheDarkDataset("/Users/groenbech/Desktop/Software/Python/LearnToSeeInTheDark/dataset/sony/")
-data_generator = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
-#Check if gpu support is available
-cuda_avail = torch.cuda.is_available()
-device = torch.device('cuda:0' if cuda_avail else 'cpu')
+manager = TrainManager(base_dir=base_dir, 
+                options_f_dir='./experiments/base_model/options.json',  
+                hyperparams_f_dir='./experiments/base_model/params.json')
 
-#Create model, optimizer and loss function
-#model = UNet()
-#model._initialize_weights()
+dataset = ARWDataset(manager, 'short', 'long')
 
-model = LSID()
-model.train()
+# TODO: CHECK IF THE NUM WORKERS CAN BE IMPLEMENTED. IT STALLS THE DATA LOADER FOR SOME REASON
+dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
-criterion = nn.L1Loss()
+model = IllumiganModel(manager=manager)
 
-with open('log_2.txt', 'a') as f:
-    f.write("New training \n")
+total_iterations = 0    # total iterations
 
-if cuda_avail:
-    print("Cuda available", file=sys.stderr, flush=True)
-    model.cuda()
-
-optimizer = optim.Adam(model.parameters(), lr = learning_rate)
-
-for epoch in range(epochs):
-
-    if epoch > 500:
-        for g in optimizer.param_groups:
-            g['lr'] = 1e-5
+for epoch in range(manager.get_hyperparams().get('epoch'),              # Starting epoch
+    manager.get_hyperparams().get('epoch_iterations') +                 # epochs without decaying lr
+    manager.get_hyperparams().get('epoch_decaying_iterations') + 1):    # epochs with decaying lr
     
-    running_loss = AverageMeter()
+    epoch_start_time = time.time()  # timer for entire epoch
+    iterations = 0                  # the number of training iterations in current epoch
+
+    for x,y in dataloader:
+
+        data_start_time = time.time()
+        t_data = data_start_time - epoch_start_time
+
+        total_iterations    += manager.get_hyperparams().get('batch_size')
+        iterations          += manager.get_hyperparams().get('batch_size')
+
+        # Get the only element in the batch
+        x = x[0]
+        y = y[0]
+
+        model.set_input(x,y)
+        model.optimize_parameters()
+
+    manager.get_logger("train").info(f"Epoch {epoch} | Loss {model.get_current_losses()['G_L1']} | Time {time.time() - epoch_start_time}")
+
+    if epoch % manager.options.get("save") == 0:              # cache our model every <save_epoch_freq> epochs
+            manager.get_logger("system").info(f"Saving model at end of Epoch {epoch} | Iteration {iterations}")
+            model.save_networks('latest')
+            model.save_networks(epoch)        
+
+    model.update_learning_rate()
     
-    st = time.time()
-    for short_patch, long_patch in data_generator:
-        
-        # Transfer to GPU
-        if cuda_avail:
-            short_patch = short_patch.permute(0,3,1,2).cuda(device=device)
-            long_patch = long_patch.permute(0,3,1,2).cuda(device=device)
-        else:
-            short_patch = short_patch.permute(0,3,1,2).to(device)
-            long_patch = long_patch.permute(0,3,1,2).to(device)
-        
-        model.zero_grad()
-        out = model(short_patch)
 
-        loss = criterion(out, long_patch) 
-        
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        running_loss.update(loss.item())
-        
-    if epoch % save_freq == 0:
-        torch.save({
-            'model_state': model.state_dict(),
-            'epoch' : epoch,
-            'optimizer_state': optimizer.state_dict()
-            }, checkpoint_dir + 'sony_epoch_%04d.pth' % epoch)
-
-    with open('log_2.txt', 'a') as f:
-        f.write("%d Loss=%.3f Time=%.3f \n" % (epoch, running_loss.average(), time.time() - st))
-    
 

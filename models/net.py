@@ -19,12 +19,16 @@ def weights_init_normal(m):
 ##############################
 
 class GeneratorUNet(nn.Module):
-    def __init__(self):
+    def __init__(self, norm_layer=nn.BatchNorm2d, use_dropout=False):
         super(GeneratorUNet, self).__init__()
+
 
         model = [
             
         ]
+
+
+
 
 
 

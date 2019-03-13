@@ -8,7 +8,7 @@
 #BSUB -q gpuv100
 
 ### -- set the job Name --
-#BSUB -J LTS_Original1
+#BSUB -J LTS_Pytorch
 
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 2
@@ -39,10 +39,12 @@
 ### -- send notification at completion--
 #BSUB -N
 
+NEW_UUID=$(cat /dev/random | tr -dc "[:alpha:]" | head -c 4)
+echo $NEW_UUID
 ### -- Specify the output and error file. %J is the job-id --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o ./output/pytorch/train/_%J.out
-#BSUB -e ./output/pytorch/train/_%J.err
+#BSUB -o ./output/%J/reports/info.out
+#BSUB -e ./output/%J/reports/info.err
 # -- end of LSF options --
 
 module unload cuda
@@ -56,11 +58,11 @@ nvidia-smi
 
 /appl/cuda/9.2/samples/bin/x86_64/linux/release/deviceQuery
 
-rm -rf mlpy3env
+rm -rf env
 
 export PYTHONPATH=
-python3 -m venv mlpy3env
-source mlpy3env/bin/activate
+python3 -m venv env
+source env/bin/activate
 
 #
 # Upgrade pip
@@ -70,4 +72,4 @@ pip3 install -U pip
 # install 
 pip3 install -r requirements.txt
 
-python train.py
+python train.py NEW_UUID

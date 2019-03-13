@@ -41,3 +41,17 @@ test.py   ->
     (different losses),
     (some test images for visualization)
 
+
+
+Notes 
+You can use Multi-GPU training by setting --gpu_ids (e.g., --gpu_ids 0,1,2,3 for the first four GPUs on your machine.) 
+To fully utilize all the GPUs, you need to increase your batch size. Try --batch_size 4, --batch_size 16, or even a larger batch_size. 
+Each GPU will process batch_size/#GPUs images. T
+he optimal batch size depends on the number of GPUs you have, GPU memory per GPU, and the resolution of your training images.
+
+Noise z 
+The current pix2pix/CycleGAN model does not take z as input. 
+In both pix2pix and CycleGAN, we tried to add z to the generator: e.g., adding z to a latent state, concatenating with a latent state, applying dropout, etc., 
+but often found the output did not vary significantly as a function of z. 
+Conditional GANs do not need noise as long as the input is sufficiently complex so that the input can kind of play the role of noise. 
+Without noise, the mapping is deterministic.

@@ -3,3 +3,4 @@ rawpy==0.13.1
 torch==1.0.1.post2
 torchsummary
 pillow
+visdom
