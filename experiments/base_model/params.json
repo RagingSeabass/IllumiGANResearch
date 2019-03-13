@@ -2,8 +2,8 @@
     "lr": 1e-3,
     "lr_policy": "linear",
     "batch_size": 1,
-    "epoch_iterations": 1,
-    "epoch_decaying_iterations": 0,
+    "epoch_iterations": 100,
+    "epoch_decaying_iterations": 100,
     "epoch": 0,    
     "patch_size": 512
 }
