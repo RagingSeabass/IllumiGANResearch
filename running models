@@ -2,3 +2,42 @@
 2172016
 
 
+
+We want to call a shell script to run our model when we are working on DTU cluster 
+
+We want to run our model directly from python when we are working on laptops 
+ 
+
+We want a very verbose logging system, as we will run many different models, 
+and thus it can easy be difficult to know when what happend
+
+Input to shell files:
+    None - All generated 
+
+shell/train.sh  -> 
+    (error file, out file), 
+    (model archictectures), 
+    (hyper parameter settings), 
+    (epoch / different losses),
+    (some training images for visualization)
+shell/test.sh   -> 
+    (error file, out file), 
+    (model archictectures tested), 
+    (hyper parameter settings used), 
+    (different losses),
+    (some test images for visualization)
+
+Input to python files:
+    Some ID for grouping 
+
+train.py  -> 
+    (model archictectures), 
+    (hyper parameter settings), 
+    (epoch / different losses),
+    (some training images for visualization)
+test.py   -> 
+    (model archictectures tested), 
+    (hyper parameter settings used), 
+    (different losses),
+    (some test images for visualization)
+

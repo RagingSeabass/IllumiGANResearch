@@ -1,5 +1,14 @@
 {
     "lr": 1e-3,
-    "batch_size": 32,
-    "epochs": 100
+    "batch_size": 1,
+    "epochs": 1000,
+    "epoch": 0,
+    "save": 250,
+    "images": true,
+    "max_dataset_size": 2,
+    "patch_size": 512,
+    "num_workers": 4,
+    "train_dir": "./data/train",
+    "test_dir": "./data/test",
+    "validation_dir": "./data/validation"
 }

@@ -6,8 +6,7 @@ import rawpy
 
 
 class LearningToSeeInTheDarkImagePair():
-### Save the mapping from short to long exposure
-### We have a many to one 
+    """Save the mapping from short to long exposure"""
     
     ratio_key   = 0
     short_index = 0

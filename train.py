@@ -1,18 +1,13 @@
-
-from models.data_loader import LearningToSeeInTheDarkDataset
-from models.net import UNet
-from models.net_test import LSID
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 import torch
 import os, time, sys
 from utils import AverageMeter
+from models.data_loader import LearningToSeeInTheDarkDataset
+from models.net import UNet
+from models.net_test import LSID
 
-batch_size = 1
-epochs = 1000
-learning_rate = 1e-4
-save_freq = 250
 
 checkpoint_dir = './checkpoint/sony/'
 

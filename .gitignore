@@ -10,8 +10,11 @@ data/test/
 data/train/
 data/val/
 
+env/
+
 .vscode/
 
+_checkpoint/
 checkpoint/sony/
 
 output/
