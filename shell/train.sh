@@ -39,12 +39,14 @@
 ### -- send notification at completion--
 #BSUB -N
 
+LC_CTYPE=C
 NEW_UUID=$(cat /dev/random | tr -dc "[:alpha:]" | head -c 4)
 echo $NEW_UUID
+
 ### -- Specify the output and error file. %J is the job-id --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o ./output/%J/reports/info.out
-#BSUB -e ./output/%J/reports/info.err
+#BSUB -o ./output/_bsub/reports/%J.out
+#BSUB -e ./output/_bsub/reports/%J.err
 # -- end of LSF options --
 
 module unload cuda
@@ -72,4 +74,4 @@ pip3 install -U pip
 # install 
 pip3 install -r requirements.txt
 
-python train.py NEW_UUID
+python train.py $NEW_UUID
