@@ -68,7 +68,7 @@ class BaseManager():
 
         # Do some sanity checks 
 
-        if self.options.get('max_dataset_size') < self.hyper_params.get('batch_size'):
+        if self.options.get('max_dataset_size') < self.hyper_params.get('batch_size') and self.options.get('max_dataset_size') > 0:
             raise Exception("Batch size must be smaller than dataset size")
 
         # Create folders

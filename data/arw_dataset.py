@@ -53,9 +53,9 @@ class ARWDataset(Dataset):
         self.y_ids = np.unique([int(os.path.basename(res)[0:5]) for res in y_data])
 
         max_size = manager.get_options().get("max_dataset_size")
-        if max_size != None and not isinstance(max_size, int):
+        if max_size != 0 and not isinstance(max_size, int):
             raise Exception("Max size must be int")
-
+        
         if max_size:
             self.x_ids = np.random.choice(self.x_ids, max_size)
             self.y_images = np.array([None] * max_size)
