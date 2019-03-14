@@ -1,6 +1,6 @@
-numpy==1.16.2
-rawpy==0.13.1
-torch==1.0.1.post2
+numpy
+rawpy
+torch
 torchsummary
 pillow
 visdom

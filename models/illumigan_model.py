@@ -22,6 +22,9 @@ class IllumiganModel(BaseModel):
             self.criterionL1 = torch.nn.L1Loss()
             self.G_optimizer = torch.optim.Adam(self.G_net.parameters(), lr=manager.get_hyperparams().get('lr'), betas=(0.5, 0.999))
             self.optimizers.append(self.G_optimizer)
+
+            self.schedulers = [utils.get_learning_rate_scheduler(optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
+
     
     def set_input(self, x, y):
         """Takes input of form X Y"""
@@ -35,10 +38,13 @@ class IllumiganModel(BaseModel):
     def forward(self):
         self.fake_y = self.G_net(self.x)  # G(X) = fake_y
 
-
+    
     def g_backward(self):
         self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
         self.loss_G_L1.backward()
+
+    def get_loss(self):
+        return self.loss_G_L1.item()
 
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights"""

@@ -42,9 +42,10 @@ class BaseManager():
     images              = 'images/'
     reports             = 'reports/'
 
-    is_train = False
-
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
+        
+        self.is_train = False
+        
         # Perform sanity checks 
         if not isinstance(base_dir, str):
             raise Exception("Base dir must be a string")
@@ -155,8 +156,6 @@ class TrainManager(BaseManager):
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
         super().__init__(base_dir=base_dir, options_f_dir=options_f_dir, hyperparams_f_dir=hyperparams_f_dir)
 
-        self.is_train = True
-
         # Create a special log for training
         self.create_logger(name='train', debug=self.options.get("debug"))  
 
@@ -175,11 +174,13 @@ class TrainManager(BaseManager):
         self.data_dir = data_dir
         self.get_logger('train').info(f"Data directory: {self.data_dir}")
 
+        self.is_train = True
+
     def get_data_dir(self) -> str: 
         return self.data_dir
 
 
-class AverageMeter(object):
+class Average(object):
     """Computes and stores the average and current value"""
     def __init__(self):
         self.reset()

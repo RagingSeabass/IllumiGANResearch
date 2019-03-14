@@ -28,9 +28,6 @@ class BaseModel(ABC):
         self.visual_names = []
         self.optimizers = []
         
-        if manager.is_train:
-            self.schedulers = [utils.get_learning_rate_scheduler(optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
-
 
     def update_learning_rate(self):
         """Update learning rates for all the networks"""
@@ -40,6 +37,7 @@ class BaseModel(ABC):
         if self.manager.is_train:
             self.manager.get_logger('system').info(f"lr update | {self.optimizers[0].param_groups[0]['lr']}")
     
+
     def get_current_losses(self):
         """Return traning losses / errors. train.py will print out these errors on console, and save them to a file"""
         errors_ret = OrderedDict()

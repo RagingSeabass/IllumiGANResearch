@@ -59,7 +59,7 @@ nvidia-smi
 
 /appl/cuda/9.2/samples/bin/x86_64/linux/release/deviceQuery
 
-rm -rf env
+#rm -rf env
 
 export PYTHONPATH=
 python3 -m venv env

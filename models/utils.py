@@ -10,10 +10,11 @@ def get_learning_rate_scheduler(optim, hyperparameters):
         def lamda_(epoch):
             """Define lamda function for scheduler"""
             return 1.0 - max(0, epoch - hyperparameters.get("epoch_iterations")) / float(hyperparameters.get("epoch_decaying_iterations") + 1)     
-        return lr_scheduler.LambdaLR(optimizer=optim, lr_lambda=lamda_)
+        scheduler = lr_scheduler.LambdaLR(optimizer=optim, lr_lambda=lamda_)
     else:
         return NotImplementedError('lr_policy not implemented')
 
+    return scheduler
 
 def init_weights(net):
     """Initialize weights in a network"""

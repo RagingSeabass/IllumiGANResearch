@@ -3,18 +3,16 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 import os, time, sys
-from utils import AverageMeter
-from models.data_loader import LearningToSeeInTheDarkDataset
-from models.net import UNet
-from models.net_test import LSID
+
 
 from utils import TrainManager
 from data.arw_dataset import ARWDataset
 from models.illumigan_model import IllumiganModel
+from utils import Average
 
 base_dir = "_default"
 
-if sys.argv[1] != None:
+if len(sys.argv) > 1:
         base_dir = str(sys.argv[1])
 
 manager = TrainManager(base_dir=base_dir, 
@@ -29,6 +27,7 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch
 model = IllumiganModel(manager=manager)
 
 total_iterations = 0    # total iterations
+epoch_loss = Average()
 
 for epoch in range(manager.get_hyperparams().get('epoch'),              # Starting epoch
     manager.get_hyperparams().get('epoch_iterations') +                 # epochs without decaying lr
@@ -36,6 +35,8 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     
     epoch_start_time = time.time()  # timer for entire epoch
     iterations = 0                  # the number of training iterations in current epoch
+
+    epoch_loss.reset()
 
     for x,y in dataloader:
 
@@ -52,7 +53,9 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         model.set_input(x,y)
         model.optimize_parameters()
 
-    manager.get_logger("train").info(f"Epoch {epoch} | Loss {model.get_current_losses()['G_L1']} | Time {time.time() - epoch_start_time}")
+        epoch_loss.update(model.get_loss())
+
+    manager.get_logger("train").info(f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time}")
 
     if epoch % manager.options.get("save") == 0:              # cache our model every <save_epoch_freq> epochs
             manager.get_logger("system").info(f"Saving model at end of Epoch {epoch} | Iteration {iterations}")
