@@ -88,8 +88,6 @@ class ARWDataset(Dataset):
         self.number_of_pairs = 0
         for index, x_id in enumerate(self.x_ids):
             
-            print(index)
-
             x_files = glob.glob(self.x_path + '%05d_00*.ARW'%x_id)
             y_files = glob.glob(self.y_path + '%05d_00*.ARW'%x_id)
 
@@ -106,7 +104,7 @@ class ARWDataset(Dataset):
                 ratio = min(y_exposure/x_exposure, 300)
                 ratio_key = str(ratio)[0:3]
 
-                self.xy_pairs[self.number_of_pairs] = ExposureImagePair(index, ratio_key)
+                self.xy_pairs[self.number_of_pairs] = ExposureImagePair(x_path, index, ratio_key)
 
                 # Pack image into 4 channels
                 arw = ARW(x_path)
@@ -129,7 +127,7 @@ class ARWDataset(Dataset):
         
         pair = self.xy_pairs[index]
         # returns X, Y
-        return self.get_image_patch(pair.index, pair.ratio_key)        
+        return pair.x_path, self.get_image_patch(pair.index, pair.ratio_key)        
 
     def get_image_patch(self, index, ratio_key):
         """Get an image patch"""
@@ -169,6 +167,11 @@ class ARWDataset(Dataset):
         """We return the total number of counted pairs"""
         return self.number_of_pairs
 
+    def get_x_image(x_path):
+        """Returns postprocessed version of x"""
+        arw = ARW(x_path)
+        return arw.postprocess()
+
 
     def to_png_from_matrix(self, id, matrix): 
         scipy.misc.toimage(matrix * 255, high=255, low=0, cmin=0, cmax=255).save(
@@ -179,13 +182,15 @@ class ExposureImagePair():
     
     ratio_key   = 0
     index = 0
+    x_path = 0
 
-    def __init__(self, index, ratio_key):
+    def __init__(self, path, index, ratio_key):
         self.index      = index
         self.ratio_key  = ratio_key
+        self.x_path = path
 
     def __str__(self):
-        return f"Long ID {self.long_id} - Short ID {self.short_id}/{self.ratio_key}"
+        return f"Long ID {self.index} - Short ID {self.index}/{self.ratio_key}"
     
 
 

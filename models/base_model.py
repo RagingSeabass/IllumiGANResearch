@@ -5,6 +5,7 @@ from . import utils
 from collections import OrderedDict
 import os
 import scipy.io
+from data.arw_image import ARW
 
 class BaseModel(ABC):
     
@@ -53,19 +54,25 @@ class BaseModel(ABC):
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
 
-    def save_visuals(self, img_number, epoch):
+    def save_visuals(self, img_number, x_path, epoch):
         
         if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
             os.makedirs(self.manager.get_img_dir() + str(epoch) + '/')
 
         for i, y in enumerate(self.y):
+            x = x_path[i]
             real_y_rgb = y.cpu().data.numpy()               # 3, 1024, 1024
             fake_y_rgb = self.fake_y[i].cpu().data.numpy()  # 3, 1024, 1024
 
+            arw = ARW(x)
+            arw.postprocess()
+
+            scipy.misc.toimage(arw.get() * 255, high=255, low=0, cmin=0, cmax=255).save(
+            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_x.png")
             scipy.misc.toimage(real_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
-            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_real.png")
+            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_y.png")
             scipy.misc.toimage(fake_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
-            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_fake.png")
+            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_y_pred.png")
             
 
     @abstractmethod

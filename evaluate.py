@@ -49,7 +49,7 @@ for i, (x,y) in enumerate(dataloader):
 
     manager.get_logger("test").info(f"Image {i} | Loss {model.get_L1_loss()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
 
-manager.get_logger("test").info(f"Total Loss {epoch_loss.average()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
+manager.get_logger("test").info(f"Average Loss {epoch_loss.average()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
 
     
 

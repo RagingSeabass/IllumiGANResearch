@@ -16,7 +16,7 @@ if len(sys.argv) > 1:
         base_dir = str(sys.argv[1])
 
 manager = TrainManager(base_dir=base_dir, 
-                options_f_dir='./experiments/base_model/options.json',  
+                options_f_dir='./experiments/base_model/local_options.json',  
                 hyperparams_f_dir='./experiments/base_model/params.json')
 
 dataset = ARWDataset(manager, 'short', 'long')
@@ -36,7 +36,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
 
     epoch_loss.reset()
 
-    for i, (x,y) in enumerate(dataloader):
+    for i, (x_path, (x,y)) in enumerate(dataloader):
 
         data_start_time = time.time()
         t_data = data_start_time - epoch_start_time
@@ -53,19 +53,19 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
 
         # Save previes of model images
         if manager.options.get("images") and epoch % manager.options.get("save") == 0:
-            model.save_visuals(i, epoch)
+            model.save_visuals(i, x_path, epoch)
 
         
     manager.get_logger("train").info(f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time} | Iteration {iterations}")
 
     if epoch % manager.options.get("save") == 0:              # cache our model every <save_epoch_freq> epochs
-            manager.get_logger("system").info(f"Saved model for Epoch {epoch} | Iteration {iterations}")
+        manager.get_logger("system").info(f"Saved model for Epoch {epoch} | Iteration {iterations}")
 
-            if manager.options.get('images'):
-                manager.get_logger("system").info(f"Saved images for Epoch {epoch} | Iteration {iterations}")
+        if manager.options.get('images'):
+            manager.get_logger("system").info(f"Saved images for Epoch {epoch} | Iteration {iterations}")
 
-            model.save_networks('latest')
-            model.save_networks(epoch)        
+        model.save_networks('latest')
+        model.save_networks(epoch)        
 
 
     model.update_learning_rate()

@@ -59,6 +59,11 @@ class IllumiganModel(BaseModel):
         self.G_optimizer.step()        
     
 
+    def test(self):
+        pass
+
+
+
         
 
 
