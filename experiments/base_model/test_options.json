@@ -1,0 +1,14 @@
+{
+    "train_dir": "./data/train",
+    "test_dir": "./data/test",
+    "validation_dir": "./data/validation",
+    "num_workers": 4,
+    "max_dataset_size": 80,
+    "save": 500,
+    "images": true,
+    "gpu_ids": [0],
+    "debug": true,
+    "load": true,
+    "load_model": 4000,
+    "load_model_dir": "/work3/s164440/shared/IllumiGANResearch/output/..."
+}

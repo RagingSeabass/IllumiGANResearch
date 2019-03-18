@@ -16,7 +16,11 @@ class IllumiganModel(BaseModel):
 
         norm = 'instance' if manager.get_hyperparams().get('batch_size') == 1 else 'batch'
         
-        self.G_net = init_network(GeneratorUNetV1(norm_layer=norm, use_dropout=False), gpu_ids=self.gpus)
+        if manager.get_options().get('load'):
+            d = manager.get_cp_dir()
+            self.G_net = model.load_state_dict(torch.load(f"{d}{manager.get_options().get('load_model')}_net_G.pth")['model_state'])
+        else:
+            self.G_net = init_network(GeneratorUNetV1(norm_layer=norm, use_dropout=False), gpu_ids=self.gpus)
         
         if manager.is_train:
             self.criterionL1 = torch.nn.L1Loss()
@@ -60,7 +64,10 @@ class IllumiganModel(BaseModel):
     
 
     def test(self):
-        pass
+        with torch.no_grad(): #disable back prop
+            self.forward()
+            self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
+
 
 
 

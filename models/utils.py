@@ -44,5 +44,3 @@ def init_network(net, gpu_ids=[]):
 
 
 
-
-
