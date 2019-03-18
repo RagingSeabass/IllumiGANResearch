@@ -148,6 +148,7 @@ class BaseManager():
 
         self.loggers[name] = logger 
 
+
 class TrainManager(BaseManager):
     """ Train manager """ 
     

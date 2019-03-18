@@ -16,12 +16,13 @@ if len(sys.argv) > 1:
         base_dir = str(sys.argv[1])
 
 manager = TrainManager(base_dir=base_dir, 
-                options_f_dir='./experiments/base_model/options.json',  
+                options_f_dir='./experiments/base_model/local_options.json',  
                 hyperparams_f_dir='./experiments/base_model/params.json')
 
 dataset = ARWDataset(manager, 'short', 'long')
 
 # TODO: CHECK IF THE NUM WORKERS CAN BE IMPLEMENTED. IT STALLS THE DATA LOADER FOR SOME REASON
+
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
@@ -47,8 +48,6 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         iterations          += manager.get_hyperparams().get('batch_size')
 
         # Get the only element in the batch
-        x = x[0]
-        y = y[0]
 
         model.set_input(x,y)
         model.optimize_parameters()

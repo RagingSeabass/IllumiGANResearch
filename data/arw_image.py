@@ -1,6 +1,8 @@
 import rawpy
 import numpy as np
 
+
+
 class ARW():
     """"""
 
@@ -19,7 +21,8 @@ class ARW():
         img = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
 
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
-        self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
+        #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
+        self.data = np.float32( img / 65535.0 )
 
     def pack(self, ratio):
         raw = rawpy.imread(self.path)
@@ -75,9 +78,10 @@ class ARW():
 
         # Shape: (1424, 2128, 4)
         image_matrix = np.concatenate((red, green1, blue, green2), axis=2)
-
-        self.data = np.expand_dims(image_matrix, axis=0) * ratio
-
-
+        
+        #self.data = np.expand_dims(image_matrix, axis=0) * ratio
+        # Lets not expand the dimention as we want batch handling done by pytorch
+        self.data = image_matrix * ratio
+        
     def get(self):
         return self.data

@@ -55,3 +55,14 @@ In both pix2pix and CycleGAN, we tried to add z to the generator: e.g., adding z
 but often found the output did not vary significantly as a function of z. 
 Conditional GANs do not need noise as long as the input is sufficiently complex so that the input can kind of play the role of noise. 
 Without noise, the mapping is deterministic.
+
+
+
+TODO: 
+
+- Check that max datasize is randomized 
+- Setup testing manager class 
+- Make training manager output images to folders 
+DONE - Check that batches can be loaded 
+
+

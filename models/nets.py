@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.functional
 
 ##############################
 #           U-NET
@@ -43,7 +44,6 @@ class DoubleConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
         super(DoubleConvBlock, self).__init__()
         
-
         if normalize == 'batch':
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias)]
             model.append(nn.BatchNorm2d(out_ch))
@@ -111,4 +111,20 @@ class OutConvBLock(nn.Module):
     def forward(self, x):
         x = self.f(x)
         return x
+
+
+
+class MiniModel(nn.Module):
+    """Test model for batching"""
+    def __init__(self, D_in, H, D_out):
+        super(MiniModel, self).__init__()
+
+        self.model = torch.nn.Sequential(
+            torch.nn.Conv2d(D_in, H, kernel_size=3, stride=1, padding=1, bias=True),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(H, D_out, kernel_size=3, stride=1, padding=1, bias=True),
+        )
+
+    def forward(self, x):
+        return self.model(x)
 

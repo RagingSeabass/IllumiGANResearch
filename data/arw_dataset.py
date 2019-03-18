@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from .arw_image import ARW
 import numpy as np
 import torch
+import scipy.io
 
 
 class ARWDataset(Dataset):
@@ -135,13 +136,18 @@ class ARWDataset(Dataset):
         x_image = self.x_images[ratio_key][index].get()
         y_image = self.y_images[index].get()
         
-        _, H, W, D = x_image.shape
+        #_, H, W, D = x_image.shape
+        H, W, D = x_image.shape
 
         xx = np.random.randint(0, W - self.patch_size)
         yy = np.random.randint(0, H - self.patch_size)
 
-        x_patch = x_image[:, yy:yy + self.patch_size, xx:xx + self.patch_size, :]
-        y_patch  = y_image[:, yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        # We dont have the same shape, remove first indexing 
+        #x_patch = x_image[:, yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        #y_patch  = y_image[:, yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        
+        x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
         # Data augmentations
         if np.random.randint(2) == 1:  # random flip
@@ -150,10 +156,12 @@ class ARWDataset(Dataset):
         if np.random.randint(2) == 1:
             x_patch = np.flip(x_patch, axis=2)
             y_patch = np.flip(y_patch, axis=2)
+
+        # Rotate image 90 deg
         if np.random.randint(2) == 1:  # random transpose
-            x_patch = np.transpose(x_patch, (0, 2, 1, 3))
-            y_patch = np.transpose(y_patch, (0, 2, 1, 3))
-        
+            x_patch = np.transpose(x_patch, (1, 0, 2))
+            y_patch = np.transpose(y_patch, (1, 0, 2))
+
         x_patch = np.minimum(x_patch,1.0)
         y_patch  = np.maximum(y_patch, 0.0)
 
@@ -164,6 +172,10 @@ class ARWDataset(Dataset):
         """We return the total number of counted pairs"""
         return self.number_of_pairs
 
+
+    def to_png_from_matrix(self, id, matrix): 
+        scipy.misc.toimage(matrix * 255, high=255, low=0, cmin=0, cmax=255).save(
+            self.manager.get_img_dir() + '%05d_00_train_scale.jpg' % id)
 
 class ExposureImagePair():
     """Save the mapping from short to long exposure"""

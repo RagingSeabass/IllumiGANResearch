@@ -1,5 +1,5 @@
 from models.base_model import BaseModel
-from models.nets import GeneratorUNetV1
+from models.nets import GeneratorUNetV1, MiniModel
 from models.utils import init_network
 from . import utils
 import torch
@@ -38,7 +38,6 @@ class IllumiganModel(BaseModel):
     def forward(self):
         self.fake_y = self.G_net(self.x)  # G(X) = fake_y
 
-    
     def g_backward(self):
         self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
         self.loss_G_L1.backward()
