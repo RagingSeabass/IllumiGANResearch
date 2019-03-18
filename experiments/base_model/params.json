@@ -1,7 +1,7 @@
 {
     "lr": 0.0002,
     "lr_policy": "linear",
-    "batch_size": 4,
+    "batch_size": 32,
     "epoch_iterations": 2000,
     "epoch_decaying_iterations": 2000,
     "epoch": 0,    

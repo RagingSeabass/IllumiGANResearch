@@ -1,11 +1,11 @@
 {
-    "train_dir": "/work3/s164440/shared/Learning-to-See-in-the-Dark/dataset/sony",
+    "train_dir": "/data/train",
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
     "num_workers": 4,
     "max_dataset_size": 0,
     "save": 500,
     "images": true,
-    "gpu_ids": [0,1],
+    "gpu_ids": [0],
     "debug": true
 }
