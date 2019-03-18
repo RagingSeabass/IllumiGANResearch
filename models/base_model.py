@@ -4,6 +4,7 @@ import torch.nn as nn
 from . import utils
 from collections import OrderedDict
 import os
+import scipy.io
 
 class BaseModel(ABC):
     
@@ -59,6 +60,21 @@ class BaseModel(ABC):
                     net.cuda(self.gpus[0])
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
+
+    def save_visuals(self, img_number, epoch):
+        
+        if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
+            os.makedirs(self.manager.get_img_dir() + str(epoch) + '/')
+
+        for i, y in enumerate(self.y):
+            real_y_rgb = y.cpu().data.numpy()               # 3, 1024, 1024
+            fake_y_rgb = self.fake_y[i].cpu().data.numpy()  # 3, 1024, 1024
+
+            scipy.misc.toimage(real_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
+            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_real.png")
+            scipy.misc.toimage(fake_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
+            self.manager.get_img_dir() + f"{epoch}/{img_number}_{i}_fake.png")
+            
 
     @abstractmethod
     def forward(self):

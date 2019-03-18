@@ -177,6 +177,8 @@ class TrainManager(BaseManager):
 
         self.is_train = True
 
+    
+
     def get_data_dir(self) -> str: 
         return self.data_dir
 

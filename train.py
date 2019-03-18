@@ -39,7 +39,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
 
     epoch_loss.reset()
 
-    for x,y in dataloader:
+    for i, (x,y) in enumerate(dataloader):
 
         data_start_time = time.time()
         t_data = data_start_time - epoch_start_time
@@ -54,12 +54,19 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
 
         epoch_loss.update(model.get_loss())
 
+        # Save previes of model images
+        if manager.options.get("images") and epoch % manager.options.get("save") == 0:
+                model.save_visuals(i, epoch)
+        
     manager.get_logger("train").info(f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time}")
 
     if epoch % manager.options.get("save") == 0:              # cache our model every <save_epoch_freq> epochs
             manager.get_logger("system").info(f"Saving model at end of Epoch {epoch} | Iteration {iterations}")
+
             model.save_networks('latest')
             model.save_networks(epoch)        
+
+
 
     model.update_learning_rate()
     

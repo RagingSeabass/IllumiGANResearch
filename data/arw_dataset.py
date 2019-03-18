@@ -57,6 +57,8 @@ class ARWDataset(Dataset):
         if max_size != 0 and not isinstance(max_size, int):
             raise Exception("Max size must be int")
         
+        # If there is a max limit to the data size, we randomly pick an amount of them 
+
         if max_size:
             self.x_ids = np.random.choice(self.x_ids, max_size)
             self.y_images = np.array([None] * max_size)
@@ -73,7 +75,6 @@ class ARWDataset(Dataset):
         
         self.load()    
 
-        
         if len(self.y_ids) < manager.get_hyperparams().get('batch_size'):
             raise Exception('Batch size must not be larger than number of data points!')
 
@@ -136,16 +137,12 @@ class ARWDataset(Dataset):
         x_image = self.x_images[ratio_key][index].get()
         y_image = self.y_images[index].get()
         
-        #_, H, W, D = x_image.shape
         H, W, D = x_image.shape
 
         xx = np.random.randint(0, W - self.patch_size)
         yy = np.random.randint(0, H - self.patch_size)
 
-        # We dont have the same shape, remove first indexing 
-        #x_patch = x_image[:, yy:yy + self.patch_size, xx:xx + self.patch_size, :]
-        #y_patch  = y_image[:, yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
-        
+
         x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
         y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
