@@ -1,78 +1,147 @@
-from models.base_model import BaseModel
-from models.nets import GeneratorUNetV1, MiniModel
-from models.utils import init_network
-from . import utils
+import os
+
+import scipy.io
 import torch
 import torch.optim as optim
+from torchsummary import summary
+
+from data.arw_image import ARW
+from models.base_model import BaseModel
+from models.nets import GeneratorUNetV1
+from models.utils import get_lr_scheduler, init_network
 
 
 class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
-        self.loss_names = ['G_L1']
-        
-        self.model_names = ['G']
+        generator_net = GeneratorUNetV1(
+            norm_layer=self.norm_layer, use_dropout=False)
+        generator_opt = torch.optim.Adam(
+            generator_net.parameters(),
+            lr=manager.get_hyperparams().get('lr'),
+            betas=(0.5, 0.999))
+        generator_l1 = torch.nn.L1Loss()
 
-        norm = 'instance' if manager.get_hyperparams().get('batch_size') == 1 else 'batch'
-        
-        if manager.get_options().get('load'):
-            d = manager.get_cp_dir()
-            self.G_net = model.load_state_dict(torch.load(f"{d}{manager.get_options().get('load_model')}_net_G.pth")['model_state'])
-        else:
-            self.G_net = init_network(GeneratorUNetV1(norm_layer=norm, use_dropout=False), gpu_ids=self.gpus)
-        
         if manager.is_train:
-            self.criterionL1 = torch.nn.L1Loss()
-            self.G_optimizer = torch.optim.Adam(self.G_net.parameters(), lr=manager.get_hyperparams().get('lr'), betas=(0.5, 0.999))
-            self.optimizers.append(self.G_optimizer)
+            
+            generator_net = init_network(generator_net, gpu_ids=self.gpus)
 
-            self.schedulers = [utils.get_learning_rate_scheduler(optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
+            # We initialize a network to be trained
+            if manager.get_options().get("load") > 0:
+
+                epoch = manager.get_options().get("load")
+
+                checkpoint = torch.load('')
+                generator_net.load_state_dict(
+                    checkpoint['generator_net_state_dict'])
+                generator_opt.load_state_dict(
+                    checkpoint['generator_opt_state_dict'])
+
+
+            self.optimizers.append(generator_opt)
+            self.schedulers = [get_lr_scheduler(
+                optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
+            generator_net.train()
+
+        else:
+
+            epoch = manager.get_options().get("load")
+            checkpoint = torch.load('')
+            generator_net.load_state_dict(
+                checkpoint['generator_net_state_dict'])
+            generator_opt.load_state_dict(
+                checkpoint['generator_opt_state_dict'])
+
+        self.generator_net = generator_net
+        self.generator_opt = generator_opt
+        self.generator_l1 = generator_l1
+
+        summary(generator_net, input_size=(4, 512, 512))
+
+    def save_networks(self, epochs):
+        """Save the different models into the same"""
+        save_filename_gn = f"{epochs}_generator_net.pth"
+        save_filename_go = f"{epochs}_generator_opt.pth"
+        save_gn = os.path.join(self.cp_dir, save_filename_gn)
+        save_go = os.path.join(self.cp_dir, save_filename_go)
+
+        # Load from data parallelize
+        if len(self.gpus) > 0 and self.is_cuda_ready:
+            generator_net = self.generator_net.module.cpu()
+        else:
+            generator_net = self.generator_net.cpu()
+        
+        generator_opt = self.generator_opt
+
+        torch.save({
+            'generator_net_state_dict': generator_net.state_dict(),
+        }, save_gn)
+
+        torch.save({
+            'generator_opt_state_dict': generator_opt.state_dict(),
+        }, save_go)
+
+        # Move models back to gpu after save
+        if self.is_cuda_ready:
+            self.generator_net.cuda()
+
+    def save_visuals(self, num, x_path, epoch):
+        if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
+            os.makedirs(self.manager.get_img_dir() + str(epoch) + '/')
+
+        for i, y in enumerate(self.y):
+            # path to original img
+            x = x_path[i]
+            real_y_rgb = y.cpu().data.numpy()               # 3, 1024, 1024 (Crop)
+            # 3, 1024, 1024 (Crop)
+            fake_y_rgb = self.fake_y[i].cpu().data.numpy()
+
+            arw = ARW(x)
+            arw.postprocess()
+
+            scipy.misc.toimage(arw.get() * 255, high=255, low=0, cmin=0, cmax=255).save(
+                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_x.png")
+            scipy.misc.toimage(real_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
+                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_y.png")
+            scipy.misc.toimage(fake_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
+                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_y_pred.png")
 
     def set_input(self, x, y):
-        """Takes input of form X Y"""
+        """Takes input of form X Y and sends it to the GPU"""
 
-        x = x.permute(0,3,1,2).to(self.device)
-        y = y.permute(0,3,1,2).to(self.device)
+        x = x.permute(0, 3, 1, 2).to(self.device)
+        y = y.permute(0, 3, 1, 2).to(self.device)
 
         self.x = x
         self.y = y
-    
+
     def forward(self):
-        self.fake_y = self.G_net(self.x)  # G(X) = fake_y
+        """Make generator"""
+        self.fake_y = self.generator_net(self.x)  # G(X) = fake_y
 
     def g_backward(self):
-        self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
-        self.loss_G_L1.backward()
+        self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
+        self.generator_l1_loss.backward()
 
     def get_L1_loss(self):
-        return self.loss_G_L1.item()
+        return self.generator_l1_loss.item()
 
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights"""
         # Calc G(x)
         self.forward()
-        
+
         # set G's gradients to zero
-        self.G_optimizer.zero_grad()        
+        self.generator_opt.zero_grad()
 
         # back propagate
         self.g_backward()
 
         # Update weights
-        self.G_optimizer.step()        
-    
+        self.generator_opt.step()
 
     def test(self):
-        with torch.no_grad(): #disable back prop
+        with torch.no_grad():  # disable back prop
             self.forward()
-            self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
-
-
-
-
-        
-
-
-
-
+            self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)

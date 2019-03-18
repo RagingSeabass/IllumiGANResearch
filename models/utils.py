@@ -1,9 +1,8 @@
 from torch.optim import lr_scheduler
 from torch.nn import init
 import torch
-from .net import GeneratorUNet
 
-def get_learning_rate_scheduler(optim, hyperparameters):
+def get_lr_scheduler(optim, hyperparameters):
     """Returns the learning rate scheduler"""
 
     if hyperparameters.get("lr_policy") == 'linear':

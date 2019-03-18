@@ -6,6 +6,9 @@
     "max_dataset_size": 80,
     "save": 500,
     "images": true,
-    "gpu_ids": [0],
-    "debug": true
+    "gpu_ids": [
+        0
+    ],
+    "debug": true,
+    "load": 0
 }

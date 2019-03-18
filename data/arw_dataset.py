@@ -167,16 +167,6 @@ class ARWDataset(Dataset):
         """We return the total number of counted pairs"""
         return self.number_of_pairs
 
-    def get_x_image(x_path):
-        """Returns postprocessed version of x"""
-        arw = ARW(x_path)
-        return arw.postprocess()
-
-
-    def to_png_from_matrix(self, id, matrix): 
-        scipy.misc.toimage(matrix * 255, high=255, low=0, cmin=0, cmax=255).save(
-            self.manager.get_img_dir() + '%05d_00_train_scale.jpg' % id)
-
 class ExposureImagePair():
     """Save the mapping from short to long exposure"""
     

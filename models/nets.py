@@ -1,16 +1,17 @@
 import torch
-import torch.nn as nn
 import torch.functional
+import torch.nn as nn
 
 ##############################
 #           U-NET
 ##############################
 
+
 class GeneratorUNetV1(nn.Module):
     def __init__(self, norm_layer='instance', use_dropout=False):
         super(GeneratorUNetV1, self).__init__()
 
-        #TODO: Look at dropout implementation 
+        # TODO: Look at dropout implementation
 
         self.norm = norm_layer
         self.inc = DoubleConvBlock(4, 32, normalize=norm_layer)
@@ -37,37 +38,44 @@ class GeneratorUNetV1(nn.Module):
         x = self.u4(x, x1)
         x = self.outc(x)
         x = nn.functional.pixel_shuffle(x, 2)
-        
+
         return x
+
 
 class DoubleConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
         super(DoubleConvBlock, self).__init__()
-        
+
         if normalize == 'batch':
-            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias)]
+            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
+                               stride=1, padding=1, bias=bias)]
             model.append(nn.BatchNorm2d(out_ch))
             model.append(nn.LeakyReLU(0.2))
-            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias))
+            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
+                                   stride=1, padding=1, bias=bias))
             model.append(nn.BatchNorm2d(out_ch))
             model.append(nn.LeakyReLU(0.2))
 
         elif normalize == 'instance':
-            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias)]
+            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
+                               stride=1, padding=1, bias=bias)]
             model.append(nn.InstanceNorm2d(out_ch))
             model.append(nn.LeakyReLU(0.2))
-            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias))
+            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
+                                   stride=1, padding=1, bias=bias))
             model.append(nn.InstanceNorm2d(out_ch))
             model.append(nn.LeakyReLU(0.2))
         else:
-            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias)]
+            model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
+                               stride=1, padding=1, bias=bias)]
             model.append(nn.LeakyReLU(0.2))
-            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=bias))
+            model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
+                                   stride=1, padding=1, bias=bias))
             model.append(nn.LeakyReLU(0.2))
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
-        
+
         self.model = nn.Sequential(*model)
 
     def forward(self, x):
@@ -80,13 +88,13 @@ class DownBlock(nn.Module):
         super(DownBlock, self).__init__()
         self.f = nn.Sequential(
             nn.MaxPool2d(2),
-            DoubleConvBlock(in_ch, out_ch, normalize=normalize, bias=bias, dropout=dropout),
+            DoubleConvBlock(in_ch, out_ch, normalize=normalize,
+                            bias=bias, dropout=dropout),
         )
 
     def forward(self, x):
         x = self.f(x)
         return x
-
 
 
 class UpBlock(nn.Module):
@@ -94,8 +102,10 @@ class UpBlock(nn.Module):
 
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
         super(UpBlock, self).__init__()
-        self.upsample = nn.ConvTranspose2d(in_ch, out_ch, kernel_size=2, stride=2, padding=0, bias=bias)
-        self.conv = DoubleConvBlock(in_ch, out_ch, normalize=normalize, bias=bias, dropout=dropout)
+        self.upsample = nn.ConvTranspose2d(
+            in_ch, out_ch, kernel_size=2, stride=2, padding=0, bias=bias)
+        self.conv = DoubleConvBlock(
+            in_ch, out_ch, normalize=normalize, bias=bias, dropout=dropout)
 
     def forward(self, x1, x2):
         x1 = self.upsample(x1)
@@ -103,28 +113,13 @@ class UpBlock(nn.Module):
         x = self.conv(x)
         return x
 
+
 class OutConvBLock(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(OutConvBLock, self).__init__()
-        self.f = nn.Conv2d(in_ch, out_ch, kernel_size=1, stride=1, padding=0, bias=True)
-        
+        self.f = nn.Conv2d(in_ch, out_ch, kernel_size=1,
+                           stride=1, padding=0, bias=True)
+
     def forward(self, x):
         x = self.f(x)
         return x
-
-
-
-class MiniModel(nn.Module):
-    """Test model for batching"""
-    def __init__(self, D_in, H, D_out):
-        super(MiniModel, self).__init__()
-
-        self.model = torch.nn.Sequential(
-            torch.nn.Conv2d(D_in, H, kernel_size=3, stride=1, padding=1, bias=True),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(H, D_out, kernel_size=3, stride=1, padding=1, bias=True),
-        )
-
-    def forward(self, x):
-        return self.model(x)
-

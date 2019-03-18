@@ -1,11 +1,12 @@
 import json
-import logging 
-import os 
+import logging
+import os
 
-# Load json parameters into models 
+
+# Load json parameters into models
 class Parameters():
     """Load params file into dict"""
-    
+
     params = {}
 
     def __init__(self, path):
@@ -19,11 +20,11 @@ class Parameters():
 
     def save(self, path):
         with open(path, 'r+') as f:
-            json.dump(self.params, f, indent=4) 
-    
+            json.dump(self.params, f, indent=4)
+
     def get(self, name):
         """Returns param value. Returns None if not found"""
-        try: 
+        try:
             return self.params[name]
         except:
             raise Exception(f"Error: Parameter is not found '{name}'")
@@ -34,26 +35,27 @@ class Parameters():
             s += f"| {key} | {self.params[key]} |\n"
         return s
 
+
 class BaseManager():
     """ Base manager class for runnning a training, testing, validation"""
     loggers = {}
 
-    model_checkpoints   = 'checkpoints/'
-    images              = 'images/'
-    reports             = 'reports/'
+    model_checkpoints = 'checkpoints/'
+    images = 'images/'
+    reports = 'reports/'
 
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
-        
+
         self.is_train = False
-        
-        # Perform sanity checks 
+
+        # Perform sanity checks
         if not isinstance(base_dir, str):
             raise Exception("Base dir must be a string")
         if len(base_dir) == 0:
             raise Exception(f"Base dir cannot be {base_dir}")
-        
+
         if base_dir[-1] != '/':
-            base_dir += '/' 
+            base_dir += '/'
 
         if not os.path.isdir('./output/' + base_dir):
             os.makedirs('./output/' + base_dir)
@@ -67,7 +69,7 @@ class BaseManager():
         self.hyper_params = Parameters(hyperparams_f_dir)
         self.options = Parameters(options_f_dir)
 
-        # Do some sanity checks 
+        # Do some sanity checks
 
         if self.options.get('max_dataset_size') < self.hyper_params.get('batch_size') and self.options.get('max_dataset_size') > 0:
             raise Exception("Batch size must be smaller than dataset size")
@@ -84,13 +86,13 @@ class BaseManager():
 
         self.create_logger(name='system', debug=self.options.get("debug"))
         self.create_logger(name='hyparam', debug=self.options.get("debug"))
-        
-        # Log initial settings 
-        #self.get_logger('hyparam').info("Loaded hyperparameters")
+
+        # Log initial settings
         self.get_logger('hyparam').info(self.hyper_params.get_string())
 
-        #self.get_logger('system').info("Loaded options")
         self.get_logger('system').info(self.options.get_string())
+        
+
 
     def check_param_file(self, file_path):
         """Checks that the provided file path is ok"""
@@ -104,7 +106,7 @@ class BaseManager():
     def get_hyperparams(self) -> Parameters:
         """Get the hyperparameters"""
         return self.hyper_params
-    
+
     def get_options(self) -> Parameters:
         """Get the options"""
         return self.options
@@ -120,7 +122,7 @@ class BaseManager():
     def get_rt_dir(self) -> str:
         """Get reporting dir"""
         return self.base_save_dir + self.reports
-    
+
     def get_logger(self, name) -> logging:
         """Return a logger"""
         try:
@@ -139,26 +141,28 @@ class BaseManager():
         else:
             logger.setLevel(logging.INFO)
             fh.setLevel(logging.INFO)
-    
-        fm = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        fm = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(fm)
-    
+
         logger.addHandler(fh)
         logger.info('Created')
 
-        self.loggers[name] = logger 
+        self.loggers[name] = logger
 
 
 class TrainManager(BaseManager):
-    """Train manager""" 
-    
+    """Train manager"""
+
     data_dir = ''
 
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
-        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir, hyperparams_f_dir=hyperparams_f_dir)
+        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir,
+                         hyperparams_f_dir=hyperparams_f_dir)
 
         # Create a special log for training
-        self.create_logger(name='train', debug=self.options.get("debug"))  
+        self.create_logger(name='train', debug=self.options.get("debug"))
 
         data_dir = self.options.get('train_dir')
 
@@ -170,29 +174,28 @@ class TrainManager(BaseManager):
             raise Exception(f"data_dir not found: {data_dir}")
 
         if data_dir[-1] != '/':
-            data_dir += '/' 
+            data_dir += '/'
 
         self.data_dir = data_dir
         self.get_logger('train').info(f"Data directory: {self.data_dir}")
 
         self.is_train = True
 
-    
-
-    def get_data_dir(self) -> str: 
+    def get_data_dir(self) -> str:
         return self.data_dir
 
 
 class TestManager(BaseManager):
-    """Test manager""" 
-    
+    """Test manager"""
+
     data_dir = ''
 
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
-        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir, hyperparams_f_dir=hyperparams_f_dir)
+        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir,
+                         hyperparams_f_dir=hyperparams_f_dir)
 
         # Create a special log for training
-        self.create_logger(name='test', debug=self.options.get("debug"))  
+        self.create_logger(name='test', debug=self.options.get("debug"))
 
         data_dir = self.options.get('test_dir')
 
@@ -204,19 +207,20 @@ class TestManager(BaseManager):
             raise Exception(f"data_dir not found: {data_dir}")
 
         if data_dir[-1] != '/':
-            data_dir += '/' 
+            data_dir += '/'
 
         self.data_dir = data_dir
         self.get_logger('train').info(f"Data directory: {self.data_dir}")
 
         self.is_train = False
 
-    def get_data_dir(self) -> str: 
+    def get_data_dir(self) -> str:
         return self.data_dir
 
 
 class Average(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 
