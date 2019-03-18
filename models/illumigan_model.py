@@ -25,7 +25,6 @@ class IllumiganModel(BaseModel):
 
             self.schedulers = [utils.get_learning_rate_scheduler(optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
 
-    
     def set_input(self, x, y):
         """Takes input of form X Y"""
 
@@ -42,7 +41,7 @@ class IllumiganModel(BaseModel):
         self.loss_G_L1 = self.criterionL1(self.fake_y, self.y)
         self.loss_G_L1.backward()
 
-    def get_loss(self):
+    def get_L1_loss(self):
         return self.loss_G_L1.item()
 
     def optimize_parameters(self):

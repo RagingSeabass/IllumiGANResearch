@@ -21,9 +21,7 @@ manager = TrainManager(base_dir=base_dir,
 
 dataset = ARWDataset(manager, 'short', 'long')
 
-# TODO: CHECK IF THE NUM WORKERS CAN BE IMPLEMENTED. IT STALLS THE DATA LOADER FOR SOME REASON
-
-dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
+dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=manager.get_options().get('num_workers'), pin_memory=True)
 
 model = IllumiganModel(manager=manager)
 
@@ -52,20 +50,23 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         model.set_input(x,y)
         model.optimize_parameters()
 
-        epoch_loss.update(model.get_loss())
+        epoch_loss.update(model.get_L1_loss())
 
         # Save previes of model images
         if manager.options.get("images") and epoch % manager.options.get("save") == 0:
-                model.save_visuals(i, epoch)
+            model.save_visuals(i, epoch)
+
         
-    manager.get_logger("train").info(f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time}")
+    manager.get_logger("train").info(f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time} | Iteration {iterations}")
 
     if epoch % manager.options.get("save") == 0:              # cache our model every <save_epoch_freq> epochs
-            manager.get_logger("system").info(f"Saving model at end of Epoch {epoch} | Iteration {iterations}")
+            manager.get_logger("system").info(f"Saved model for Epoch {epoch} | Iteration {iterations}")
+
+            if manager.options.get('images'):
+                manager.get_logger("system").info(f"Saved images for Epoch {epoch} | Iteration {iterations}")
 
             model.save_networks('latest')
             model.save_networks(epoch)        
-
 
 
     model.update_learning_rate()
