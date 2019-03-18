@@ -209,7 +209,7 @@ class TestManager(BaseManager):
         self.data_dir = data_dir
         self.get_logger('train').info(f"Data directory: {self.data_dir}")
 
-        self.is_train = True
+        self.is_train = False
 
     def get_data_dir(self) -> str: 
         return self.data_dir

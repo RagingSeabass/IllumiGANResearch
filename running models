@@ -61,7 +61,7 @@ Without noise, the mapping is deterministic.
 TODO: 
 
 DONE - Check that max datasize is randomized 
-- Setup testing manager class 
+DONE - Setup testing manager class 
 DONE - Make training manager output images to folders 
 DONE - Check that batches can be loaded 
 - Remove use of getattr
