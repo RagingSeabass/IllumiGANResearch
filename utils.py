@@ -150,7 +150,7 @@ class BaseManager():
 
 
 class TrainManager(BaseManager):
-    """ Train manager """ 
+    """Train manager""" 
     
     data_dir = ''
 
@@ -178,6 +178,38 @@ class TrainManager(BaseManager):
         self.is_train = True
 
     
+
+    def get_data_dir(self) -> str: 
+        return self.data_dir
+
+
+class TestManager(BaseManager):
+    """Test manager""" 
+    
+    data_dir = ''
+
+    def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
+        super().__init__(base_dir=base_dir, options_f_dir=options_f_dir, hyperparams_f_dir=hyperparams_f_dir)
+
+        # Create a special log for training
+        self.create_logger(name='test', debug=self.options.get("debug"))  
+
+        data_dir = self.options.get('test_dir')
+
+        if not isinstance(data_dir, str):
+            raise Exception("data_dir must be a string")
+        if len(data_dir) == 0:
+            raise Exception(f"data_dir cannot be {data_dir}")
+        if not os.path.isdir(data_dir):
+            raise Exception(f"data_dir not found: {data_dir}")
+
+        if data_dir[-1] != '/':
+            data_dir += '/' 
+
+        self.data_dir = data_dir
+        self.get_logger('train').info(f"Data directory: {self.data_dir}")
+
+        self.is_train = True
 
     def get_data_dir(self) -> str: 
         return self.data_dir
