@@ -17,8 +17,9 @@ class BaseModel(ABC):
         self.is_cuda_ready = torch.cuda.is_available()
         self.device = torch.device('cuda:{}'.format(self.gpus[0])) if self.is_cuda_ready else torch.device('cpu')  # get device name: CPU or GPU
         
-        self.cp_dir = manager.get_cp_dir()
-        
+        self.save_dir = manager.get_save_dir()
+        self.load_dir = manager.get_load_dir()
+                
         # When batch size is 1, we use instance normalization else batch
         if manager.get_hyperparams().get("batch_size") == 1:
             self.norm_layer = 'instance'

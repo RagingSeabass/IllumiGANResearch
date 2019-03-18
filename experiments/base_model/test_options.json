@@ -10,7 +10,5 @@
         0
     ],
     "debug": true,
-    "load": true,
-    "load_model": 4000,
-    "load_model_dir": "/work3/s164440/shared/IllumiGANResearch/output/..."
+    "load": 5
 }

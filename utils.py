@@ -74,6 +74,9 @@ class BaseManager():
         if self.options.get('max_dataset_size') < self.hyper_params.get('batch_size') and self.options.get('max_dataset_size') > 0:
             raise Exception("Batch size must be smaller than dataset size")
 
+
+        self.load_dir = self.options.get("load_dir")
+
         # Create folders
         if not os.path.isdir(self.base_save_dir + self.model_checkpoints):
             os.makedirs(self.base_save_dir + self.model_checkpoints)
@@ -89,9 +92,10 @@ class BaseManager():
 
         # Log initial settings
         self.get_logger('hyparam').info(self.hyper_params.get_string())
-
         self.get_logger('system').info(self.options.get_string())
         
+
+
 
 
     def check_param_file(self, file_path):
@@ -111,7 +115,10 @@ class BaseManager():
         """Get the options"""
         return self.options
 
-    def get_cp_dir(self) -> str:
+    def get_load_dir(self) -> str:
+        return self.load_dir
+
+    def get_save_dir(self) -> str:
         """Get checkpoint dir"""
         return self.base_save_dir + self.model_checkpoints
 
@@ -210,7 +217,7 @@ class TestManager(BaseManager):
             data_dir += '/'
 
         self.data_dir = data_dir
-        self.get_logger('train').info(f"Data directory: {self.data_dir}")
+        self.get_logger('test').info(f"Data directory: {self.data_dir}")
 
         self.is_train = False
 

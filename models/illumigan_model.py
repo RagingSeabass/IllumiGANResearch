@@ -15,56 +15,68 @@ class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
-        generator_net = GeneratorUNetV1(
+        self.generator_net = GeneratorUNetV1(
             norm_layer=self.norm_layer, use_dropout=False)
-        generator_opt = torch.optim.Adam(
-            generator_net.parameters(),
+        self.generator_opt = torch.optim.Adam(
+            self.generator_net.parameters(),
             lr=manager.get_hyperparams().get('lr'),
             betas=(0.5, 0.999))
-        generator_l1 = torch.nn.L1Loss()
+        self.generator_l1 = torch.nn.L1Loss()
 
         if manager.is_train:
             
-            generator_net = init_network(generator_net, gpu_ids=self.gpus)
+            self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
 
             # We initialize a network to be trained
-            if manager.get_options().get("load") > 0:
+            if manager.get_hyperparams().get("epoch") > 0:
 
-                epoch = manager.get_options().get("load")
+                epoch = manager.get_hyperparams().get("epoch")
+                self.load_network(epoch)
 
-                checkpoint = torch.load('')
-                generator_net.load_state_dict(
-                    checkpoint['generator_net_state_dict'])
-                generator_opt.load_state_dict(
-                    checkpoint['generator_opt_state_dict'])
+                self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
 
-
-            self.optimizers.append(generator_opt)
+            self.optimizers.append(self.generator_opt)
             self.schedulers = [get_lr_scheduler(
                 optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
-            generator_net.train()
+            self.generator_net.train()
 
         else:
 
-            epoch = manager.get_options().get("load")
-            checkpoint = torch.load('')
-            generator_net.load_state_dict(
-                checkpoint['generator_net_state_dict'])
-            generator_opt.load_state_dict(
-                checkpoint['generator_opt_state_dict'])
+            epoch = manager.get_hyperparams().get("epoch")
+            self.load_network(epoch)
 
-        self.generator_net = generator_net
-        self.generator_opt = generator_opt
-        self.generator_l1 = generator_l1
+            self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
 
-        summary(generator_net, input_size=(4, 512, 512))
+        summary(self.generator_net, input_size=(4, 512, 512))
+
+    def load_network(self, epochs):
+        
+        filename_gn = f"{epochs}_generator_net.pth"
+        filename_go = f"{epochs}_generator_opt.pth"
+
+        load_gn = os.path.join(self.load_dir, filename_gn)
+        load_go = os.path.join(self.load_dir, filename_go)
+
+        generator_net_checkpoint = torch.load(load_gn)
+        generator_opt_checkpoint = torch.load(load_go)
+
+        self.generator_net.load_state_dict(
+                    generator_net_checkpoint['generator_net_state_dict'])
+        self.generator_opt.load_state_dict(
+                    generator_opt_checkpoint['generator_opt_state_dict'])
+
+        # Move models back to gpu after save
+        if len(self.gpus) > 0:
+            if self.is_cuda_ready:
+                self.generator_net.to(gpu_ids[0])
+            self.generator_net = torch.nn.DataParallel(self.generator_net, self.gpus)  # multi-GPUs
 
     def save_networks(self, epochs):
         """Save the different models into the same"""
         save_filename_gn = f"{epochs}_generator_net.pth"
         save_filename_go = f"{epochs}_generator_opt.pth"
-        save_gn = os.path.join(self.cp_dir, save_filename_gn)
-        save_go = os.path.join(self.cp_dir, save_filename_go)
+        save_gn = os.path.join(self.save_dir, save_filename_gn)
+        save_go = os.path.join(self.save_dir, save_filename_go)
 
         # Load from data parallelize
         if len(self.gpus) > 0 and self.is_cuda_ready:

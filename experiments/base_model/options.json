@@ -10,5 +10,5 @@
         0
     ],
     "debug": true,
-    "load": 0
+    "load_dir": "./output/_default/checkpoints/"
 }
