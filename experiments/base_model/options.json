@@ -1,5 +1,5 @@
 {
-    "train_dir": "/data/train",
+    "train_dir": "./data/train",
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
     "num_workers": 4,
