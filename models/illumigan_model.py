@@ -43,9 +43,10 @@ class IllumiganModel(BaseModel):
         else:
 
             epoch = manager.get_hyperparams().get("epoch")
+            self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
             self.load_network(epoch)
 
-            self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
+            self.manager.get_logger('test').info(f"Loaded model at checkpoint {epoch}")
 
         summary(self.generator_net, input_size=(4, 512, 512))
 

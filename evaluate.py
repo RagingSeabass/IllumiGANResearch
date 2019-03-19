@@ -42,14 +42,14 @@ for i, (x_path, (x, y)) in enumerate(dataloader):
     model.set_input(x, y)
     model.test()
 
-    epoch_loss.update(model.get_L1_loss())
+    loss.update(model.get_L1_loss())
 
     # Save previes of model images
     if manager.options.get("images"):
-        model.save_visuals(i, x_path, epoch)
+        model.save_visuals(i, x_path, 'test')
 
     manager.get_logger("test").info(
         f"Image {i} | Loss {model.get_L1_loss()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
 
 manager.get_logger("test").info(
-    f"Average Loss {epoch_loss.average()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
+    f"Average Loss {loss.average()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")

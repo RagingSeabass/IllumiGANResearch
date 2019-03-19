@@ -1,9 +1,9 @@
 {
-    "lr": 0.0002,
+    "lr": 0.0001,
     "lr_policy": "linear",
     "batch_size": 1,
     "epoch_iterations": 2000,
     "epoch_decaying_iterations": 2000,
-    "epoch": 20,    
+    "epoch": 0,    
     "patch_size": 512
 }

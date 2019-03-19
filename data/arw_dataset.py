@@ -47,10 +47,10 @@ class ARWDataset(Dataset):
         self.x_path = f"{self.data_dir}{x_folder}/"
         self.y_path = f"{self.data_dir}{y_folder}/"
 
-        x_data = glob.glob(f'{self.x_path}0*.ARW')
+        x_data = glob.glob(f'{self.x_path}*.ARW')
         self.x_ids = np.unique([int(os.path.basename(res)[0:5]) for res in x_data])
 
-        y_data = glob.glob(f'{self.y_path}0*.ARW')
+        y_data = glob.glob(f'{self.y_path}*.ARW')
         self.y_ids = np.unique([int(os.path.basename(res)[0:5]) for res in y_data])
 
         max_size = manager.get_options().get("max_dataset_size")
