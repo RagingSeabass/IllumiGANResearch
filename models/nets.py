@@ -42,6 +42,65 @@ class GeneratorUNetV1(nn.Module):
         return x
 
 
+class Discriminator(nn.Module):
+    def __init__(self, norm_layer='instance'):
+        super().__init__()
+
+        self.c1 = SingleConvBlock(4, 64, kernel_size=4, stride=2, bias=False)
+        self.c2 = SingleConvBlock(64, 128, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
+        self.c3 = SingleConvBlock(128, 256, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
+        self.c4 = SingleConvBlock(256, 512, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
+        self.c5 = SingleConvBlock(512, 1, kernel_size=4, stride=1, padding=0, bias=False)
+        self.out = nn.Sigmoid()
+
+    def forward():
+        x = self.c1(x)
+        x = self.c2(x)
+        x = self.c3(x)
+        x = self.c4(x)
+        x = self.c5(x)
+        x = self.out(x)
+
+        return x
+
+class SingleConvBlock(nn.Module):
+    def __init__(
+        self,
+        in_ch, 
+        out_ch, 
+        normalize=None, 
+        bias=True, 
+        dropout=0, 
+        kernel_size=3, 
+        stride=1, 
+        padding=1
+     ):
+        super(SingleConvBlock, self).__init__()
+        
+        model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
+                                   stride=1, padding=1, bias=bias)]
+        if normalize == 'batch':
+                model.append(nn.BatchNorm2d(out_ch))
+                model.append(nn.LeakyReLU(0.2))
+
+        elif normalize == 'instance':
+            model.append(nn.InstanceNorm2d(out_ch))
+            model.append(nn.LeakyReLU(0.2))
+        else:
+            model.append(nn.LeakyReLU(0.2))
+
+        if dropout > 0:
+            model.append(nn.Dropout(dropout))
+
+        self.model = nn.Sequential(*model)
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
+
+
+
+
 class DoubleConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
         super(DoubleConvBlock, self).__init__()
