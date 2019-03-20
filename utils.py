@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-
+import torch
 
 # Load json parameters into models
 class Parameters():
@@ -47,6 +47,7 @@ class BaseManager():
     def __init__(self, base_dir, options_f_dir, hyperparams_f_dir):
 
         self.is_train = False
+        self.resume_training = False
 
         # Perform sanity checks
         if not isinstance(base_dir, str):
@@ -189,6 +190,9 @@ class TrainManager(BaseManager):
         self.get_logger('train').info(f"Data directory: {self.data_dir}")
 
         self.is_train = True
+        if self.hyper_params.get('epoch') > 0:
+            self.resume_training = True
+
 
     def get_data_dir(self) -> str:
         return self.data_dir

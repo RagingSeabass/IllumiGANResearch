@@ -21,11 +21,10 @@ if len(sys.argv) > 1:
 
 cudnn.benchmark = True
 
-
 # ------- 
 
 manager = TrainManager(base_dir=base_dir,
-                       options_f_dir='./experiments/base_model/options.json',
+                       options_f_dir='./experiments/base_model/local_options.json',
                        hyperparams_f_dir='./experiments/base_model/params.json')
 
 dataset = ARWDataset(manager, 'short', 'long')
@@ -58,7 +57,6 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         total_iterations += manager.get_hyperparams().get('batch_size')
 
         # Get the only element in the batch
-
         model.set_input(x, y)
         model.optimize_parameters()
 
