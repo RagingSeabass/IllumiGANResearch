@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 import scipy.io
 import torch
@@ -64,8 +65,15 @@ class IllumiganModel(BaseModel):
         generator_net_checkpoint = torch.load(load_gn)
         generator_opt_checkpoint = torch.load(load_go)
 
+        
+        new_state_dict = OrderedDict()
+        for k, v in generator_net_checkpoint['generator_net_state_dict'].items():
+            name = k[7:] # remove `module.`
+            new_state_dict[name] = v
+        # load params
+
         self.generator_net.load_state_dict(
-                    generator_net_checkpoint['generator_net_state_dict'])
+                    new_state_dict)
         self.generator_opt.load_state_dict(
                     generator_opt_checkpoint['generator_opt_state_dict'])
 
