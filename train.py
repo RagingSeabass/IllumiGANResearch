@@ -13,9 +13,14 @@ from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
 
 base_dir = "_default/"
+server = False
 
 if len(sys.argv) > 1:
     base_dir = str(sys.argv[1])
+
+if len(sys.argv) > 2:
+    base_dir = str(sys.argv[1])
+    server = True
 
 # Temporary defined options
 
@@ -23,9 +28,17 @@ cudnn.benchmark = True
 
 # ------- 
 
+options = './experiments/base_model/local_options.json'
+hyperparams = './experiments/base_model/local_params.json'
+
+if server:
+    options = './experiments/base_model/options.json'
+    hyperparams = './experiments/base_model/params.json'
+    
+
 manager = TrainManager(base_dir=base_dir,
-                       options_f_dir='./experiments/base_model/options.json',
-                       hyperparams_f_dir='./experiments/base_model/params.json')
+                       options_f_dir=options,
+                       hyperparams_f_dir=hyperparams)
 
 dataset = ARWDataset(manager, 'short', 'long')
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(

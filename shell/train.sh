@@ -72,4 +72,4 @@ pip3 install -U pip
 # install 
 pip3 install -r requirements.txt
 
-python train.py $NEW_UUID
+python train.py $NEW_UUID "server"
