@@ -71,6 +71,11 @@ class IllumiganModel(BaseModel):
         self.generator_opt.load_state_dict(
                     generator_opt_checkpoint['generator_opt_state_dict'], map_location='cpu')
 
+        for state in self.generator_opt.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.cuda()
+
         # Move models back to gpu after save
         if len(self.gpus) > 0:
             if self.is_cuda_ready:
