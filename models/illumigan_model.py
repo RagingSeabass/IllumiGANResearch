@@ -36,8 +36,10 @@ class IllumiganModel(BaseModel):
                 self.load_network(epoch)
         
                 self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
+            else:
+                self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
             
-            self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
+            
             self.optimizers.append(self.generator_opt)
             self.schedulers = [get_lr_scheduler(
                 optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
