@@ -10,11 +10,19 @@ from torch.utils.data import DataLoader
 from data.arw_dataset import ARWDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
+import torch.backends.cudnn as cudnn
 
 base_dir = "_default/"
 
 if len(sys.argv) > 1:
     base_dir = str(sys.argv[1])
+
+# Temporary defined options
+
+cudnn.benchmark = True
+
+
+# ------- 
 
 manager = TrainManager(base_dir=base_dir,
                        options_f_dir='./experiments/base_model/options.json',
@@ -25,6 +33,7 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
     'batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
+
 
 total_iterations = 0    # total iterations
 epoch_loss = Average()

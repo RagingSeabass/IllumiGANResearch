@@ -94,9 +94,11 @@ class BaseManager():
         self.get_logger('hyparam').info(self.hyper_params.get_string())
         self.get_logger('system').info(self.options.get_string())
         
-
-
-
+        # Pytorch Device Agnostic code
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda')
+        else: 
+            self.device = torch.device('cpu')
 
     def check_param_file(self, file_path):
         """Checks that the provided file path is ok"""

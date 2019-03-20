@@ -3,7 +3,6 @@ from collections import OrderedDict
 
 import scipy.io
 import torch
-import torch.backends.cudnn as cudnn
 import torch.optim as optim
 from torchsummary import summary
 
@@ -17,46 +16,78 @@ class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
-        cudnn.benchmark = True
-
+        # Define generator network
         self.generator_net = GeneratorUNetV1(
             norm_layer=self.norm_layer, use_dropout=False)
-        self.generator_opt = torch.optim.Adam(
-            self.generator_net.parameters(),
-            lr=manager.get_hyperparams().get('lr'),
-            betas=(0.5, 0.999))
-        self.generator_l1 = torch.nn.L1Loss()
+
+        self.generator_net.to(manager.device)
+
+        # Define generator optimzer
+        lr = manager.get_hyperparams().get('lr')
+        betas = (manager.get_hyperparams.get('b1'),
+                 manager.get_hyperparams.get('b2'))
+
+        self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                              lr=lr,
+                                              betas=betas)
 
         if manager.is_train:
-            
+
             # We initialize a network to be trained
             if manager.get_hyperparams().get("epoch") > 0:
                 
-                epoch = manager.get_hyperparams().get("epoch")
-                self.load_network(epoch)
-        
-                self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
+                # Load model and send it to device 
+                self.generator_net = GeneratorUNetV1(
+                    norm_layer=self.norm_layer, use_dropout=False)
+
+                self.load_network(manager)
+
+                self.manager.get_logger('train').info(
+                    f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
+            
             else:
-                self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
-            
-            
+                
+                # Create new model and send it to device 
+                self.generator_net = init_network(GeneratorUNetV1(norm_layer=self.norm_layer, use_dropout=False), gpu_ids=self.gpus)
+                self.generator_net.to(manager.device)
+
+                # Define generator optimzer
+                lr = manager.get_hyperparams().get('lr')
+                betas = (manager.get_hyperparams.get('b1'),
+                        manager.get_hyperparams.get('b2'))
+
+                self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                                    lr=lr,
+                                                    betas=betas)   
+
+                self.manager.get_logger('train').info(f"Created new model")
+
+
             self.optimizers.append(self.generator_opt)
             self.schedulers = [get_lr_scheduler(
                 optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
             self.generator_net.train()
 
         else:
+            
+            # Load model and send it to device 
+            self.generator_net = GeneratorUNetV1(
+                norm_layer=self.norm_layer, use_dropout=False)
 
-            epoch = manager.get_hyperparams().get("epoch")
-            self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
-            self.load_network(epoch)
+            self.load_network(manager)
 
-            self.manager.get_logger('test').info(f"Loaded model at checkpoint {epoch}")
+            self.manager.get_logger('test').info(
+                f"Loaded model at checkpoint {epoch}")
+
+        # Define loss function
+        self.generator_l1 = torch.nn.L1Loss()
 
         summary(self.generator_net, input_size=(4, 512, 512))
+
+    def load_network(self, manager):
         
-    def load_network(self, epochs):
-        
+        epochs = manager.get_hyperparams().get("epoch")
+
         filename_gn = f"{epochs}_generator_net.pth"
         filename_go = f"{epochs}_generator_opt.pth"
 
@@ -69,20 +100,22 @@ class IllumiganModel(BaseModel):
         # load params
 
         self.generator_net.load_state_dict(
-                    generator_net_checkpoint['generator_net_state_dict'])
+            generator_net_checkpoint['generator_net_state_dict'], map_location=manager.device)
+
         self.generator_opt.load_state_dict(
-                    generator_opt_checkpoint['generator_opt_state_dict'])
+            generator_opt_checkpoint['generator_opt_state_dict'], map_location=manager.device)
 
         for state in self.generator_opt.state.values():
             for k, v in state.items():
                 if isinstance(v, torch.Tensor):
-                    state[k] = v.to(self.gpus[0])
+                    state[k] = v.to(manager.device)
 
         # Move models back to gpu after save
         if len(self.gpus) > 0:
             if self.is_cuda_ready:
                 self.generator_net.to(self.gpus[0])
-            self.generator_net = torch.nn.DataParallel(self.generator_net, self.gpus)  # multi-GPUs
+            self.generator_net = torch.nn.DataParallel(
+                self.generator_net, self.gpus)  # multi-GPUs
 
     def save_networks(self, epochs):
         """Save the different models into the same"""
@@ -92,15 +125,15 @@ class IllumiganModel(BaseModel):
         save_go = os.path.join(self.save_dir, save_filename_go)
 
         # Load from data parallelize
-        if len(self.gpus) > 0 and self.is_cuda_ready:
-            generator_net = self.generator_net.module.cpu()
+        if len(self.gpus) > 1:
+            generator_net = self.generator_net.module
         else:
-            generator_net = self.generator_net.cpu()
-        
+            generator_net = self.generator_net
+
         generator_opt = self.generator_opt
 
         torch.save({
-            'generator_net_state_dict': generator_net.state_dict(),
+            'net_state_dict': generator_net.state_dict()
         }, save_gn)
 
         torch.save({
