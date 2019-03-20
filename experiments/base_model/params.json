@@ -1,5 +1,5 @@
 {
-    "lr": 0.0001,
+    "lr": 0.00002,
     "lr_policy": "linear",
     "batch_size": 1,
     "epoch_iterations": 2000,
