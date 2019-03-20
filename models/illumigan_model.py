@@ -2,6 +2,7 @@ import os
 
 import scipy.io
 import torch
+import torch.backends.cudnn as cudnn
 import torch.optim as optim
 from torchsummary import summary
 
@@ -14,6 +15,8 @@ from models.utils import get_lr_scheduler, init_network
 class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
+
+        cudnn.benchmark = True
 
         self.generator_net = GeneratorUNetV1(
             norm_layer=self.norm_layer, use_dropout=False)
@@ -49,7 +52,7 @@ class IllumiganModel(BaseModel):
             self.manager.get_logger('test').info(f"Loaded model at checkpoint {epoch}")
 
         summary(self.generator_net, input_size=(4, 512, 512))
-
+        
     def load_network(self, epochs):
         
         filename_gn = f"{epochs}_generator_net.pth"
