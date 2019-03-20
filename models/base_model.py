@@ -47,7 +47,7 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    def save_visuals(self, img_number, x_path, epoch):
+    def save_visuals(self, img_number, epoch):
         """Save the network"""
         pass
 

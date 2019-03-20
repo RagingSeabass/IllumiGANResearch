@@ -5,6 +5,7 @@ import scipy.io
 import torch
 import torch.optim as optim
 from torchsummary import summary
+import numpy as np
 
 from data.arw_image import ARW
 from models.base_model import BaseModel
@@ -124,26 +125,25 @@ class IllumiganModel(BaseModel):
         if self.is_cuda_ready:
             self.generator_net.cuda()
 
-    def save_visuals(self, num, x_path, epoch):
+    def save_visuals(self, num, epoch):
         if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
             os.makedirs(self.manager.get_img_dir() + str(epoch) + '/')
 
         for i, y in enumerate(self.y):
             # path to original img
-            x = x_path[i]
-            real_y_rgb = y.cpu().data.numpy()               # 3, 1024, 1024 (Crop)
             # 3, 1024, 1024 (Crop)
-            fake_y_rgb = self.fake_y[i].cpu().data.numpy()
+            real_y_rgb = y.data.cpu().numpy()               
 
-            arw = ARW(x)
-            arw.postprocess()
+            # 3, 1024, 1024 (Crop)
+            fake_y_rgb = self.fake_y[i].data.cpu().numpy()
 
-            scipy.misc.toimage(arw.get() * 255, high=255, low=0, cmin=0, cmax=255).save(
-                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_x.png")
-            scipy.misc.toimage(real_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
-                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_y.png")
-            scipy.misc.toimage(fake_y_rgb * 255, high=255, low=0, cmin=0, cmax=255).save(
-                self.manager.get_img_dir() + f"{epoch}/{num}_{i}_y_pred.png")
+            real_y_rgb = real_y_rgb.transpose(1, 2, 0) * 225
+            fake_y_rgb = fake_y_rgb.transpose(1, 2, 0) * 225
+
+            temp = np.concatenate(
+                (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
+            scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
+                self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
 
     def set_input(self, x, y):
         """Takes input of form X Y and sends it to the GPU"""
@@ -182,8 +182,8 @@ class IllumiganModel(BaseModel):
     def update_learning_rate(self):
         """Update learning rate"""
         self.generator_schedular.step()
-        self.manager.get_logger('system').info(f"lr update | {self.generator_opt.param_groups[0]['lr']}")
-
+        self.manager.get_logger('system').info(
+            f"lr update | {self.generator_opt.param_groups[0]['lr']}")
 
     def test(self):
         with torch.no_grad():  # disable back prop

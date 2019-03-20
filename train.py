@@ -76,8 +76,9 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         epoch_loss.update(model.get_L1_loss())
 
         # Save previes of model images
-        if manager.options.get("images") and epoch % manager.options.get("save") == 0:
-            model.save_visuals(i, x_path, epoch)
+    
+        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
+            model.save_visuals(i, epoch)
 
     manager.get_logger("train").info(
         f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
