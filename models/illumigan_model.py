@@ -74,6 +74,7 @@ class IllumiganModel(BaseModel):
         # Move models back to gpu after save
         if len(self.gpus) > 0:
             if self.is_cuda_ready:
+                self.generator_opt.cuda()
                 self.generator_net.to(self.gpus[0])
             self.generator_net = torch.nn.DataParallel(self.generator_net, self.gpus)  # multi-GPUs
 
