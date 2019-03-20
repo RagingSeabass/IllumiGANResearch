@@ -22,7 +22,7 @@ manager = TrainManager(base_dir=base_dir,
 
 dataset = ARWDataset(manager, 'short', 'long')
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
-    'batch_size'), shuffle=True, num_workers=manager.get_options().get('num_workers'), pin_memory=True)
+    'batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
 
