@@ -8,7 +8,7 @@
 #BSUB -q gpuv100
 
 ### -- set the job Name --
-#BSUB -J LTS_Pytorch
+#BSUB -J LTS_PYT2x
 
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 2
@@ -20,10 +20,10 @@
 #BSUB -R "select[gpu32gb]"
 
 ### Ask for NVLINK - Meaning: 
-### BSUB -R "select[sxm2]"
+#BSUB -R "select[sxm2]"
 
 ### -- Select the resources: 1 gpu in exclusive proce   ss mode --
-#BSUB -gpu "num=1:mode=exclusive_process"
+#BSUB -gpu "num=2:mode=exclusive_process"
 
 ### -- set walltime limit: hh:mm --  maximum 24 hours for GPU-queues right now
 #BSUB -W 24:00
@@ -72,4 +72,4 @@ pip3 install -U pip
 # install 
 pip3 install -r requirements.txt
 
-python train.py $NEW_UUID
+python train.py $NEW_UUID "server"
