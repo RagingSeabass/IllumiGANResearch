@@ -69,12 +69,11 @@ class IllumiganModel(BaseModel):
         self.generator_net.load_state_dict(
                     generator_net_checkpoint['generator_net_state_dict'])
         self.generator_opt.load_state_dict(
-                    generator_opt_checkpoint['generator_opt_state_dict'])
+                    generator_opt_checkpoint['generator_opt_state_dict'], map_location='cpu')
 
         # Move models back to gpu after save
         if len(self.gpus) > 0:
             if self.is_cuda_ready:
-                self.generator_opt.cuda()
                 self.generator_net.to(self.gpus[0])
             self.generator_net = torch.nn.DataParallel(self.generator_net, self.gpus)  # multi-GPUs
 
