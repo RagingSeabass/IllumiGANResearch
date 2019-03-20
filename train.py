@@ -24,7 +24,7 @@ cudnn.benchmark = True
 # ------- 
 
 manager = TrainManager(base_dir=base_dir,
-                       options_f_dir='./experiments/base_model/local_options.json',
+                       options_f_dir='./experiments/base_model/options.json',
                        hyperparams_f_dir='./experiments/base_model/params.json')
 
 dataset = ARWDataset(manager, 'short', 'long')
