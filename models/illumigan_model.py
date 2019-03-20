@@ -29,16 +29,17 @@ class IllumiganModel(BaseModel):
 
         if manager.is_train:
             
-            self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
-
             # We initialize a network to be trained
             if manager.get_hyperparams().get("epoch") > 0:
                 
                 epoch = manager.get_hyperparams().get("epoch")
                 self.load_network(epoch)
-
+        
                 self.manager.get_logger('train').info(f"Loaded model at checkpoint {epoch}")
-
+            else:
+                self.generator_net = init_network(self.generator_net, gpu_ids=self.gpus)
+            
+            
             self.optimizers.append(self.generator_opt)
             self.schedulers = [get_lr_scheduler(
                 optimizer, manager.get_hyperparams()) for optimizer in self.optimizers]
@@ -65,22 +66,22 @@ class IllumiganModel(BaseModel):
         generator_net_checkpoint = torch.load(load_gn)
         generator_opt_checkpoint = torch.load(load_go)
 
-        
-        new_state_dict = OrderedDict()
-        for k, v in generator_net_checkpoint['generator_net_state_dict'].items():
-            name = k[7:] # remove `module.`
-            new_state_dict[name] = v
         # load params
 
         self.generator_net.load_state_dict(
-                    new_state_dict)
+                    generator_net_checkpoint['generator_net_state_dict'])
         self.generator_opt.load_state_dict(
                     generator_opt_checkpoint['generator_opt_state_dict'])
+
+        for state in self.generator_opt.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(self.gpus[0])
 
         # Move models back to gpu after save
         if len(self.gpus) > 0:
             if self.is_cuda_ready:
-                self.generator_net.to(gpu_ids[0])
+                self.generator_net.to(self.gpus[0])
             self.generator_net = torch.nn.DataParallel(self.generator_net, self.gpus)  # multi-GPUs
 
     def save_networks(self, epochs):

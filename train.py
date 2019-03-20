@@ -29,6 +29,9 @@ model = IllumiganModel(manager=manager)
 total_iterations = 0    # total iterations
 epoch_loss = Average()
 
+manager.get_logger("train").info(f"Started training | Iteration {total_iterations}")
+
+
 for epoch in range(manager.get_hyperparams().get('epoch'),              # Starting epoch
                    # epochs without decaying lr
                    manager.get_hyperparams().get('epoch_iterations') +
@@ -37,7 +40,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     epoch_start_time = time.time()  # timer for entire epoch
 
     epoch_loss.reset()
-
+    
     for i, (x_path, (x, y)) in enumerate(dataloader):
 
         data_start_time = time.time()
