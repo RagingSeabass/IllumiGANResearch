@@ -32,7 +32,7 @@ class IllumiganModel(BaseModel):
 
             # We initialize a network to be trained
             if manager.get_hyperparams().get("epoch") > 0:
-
+                
                 epoch = manager.get_hyperparams().get("epoch")
                 self.load_network(epoch)
 
