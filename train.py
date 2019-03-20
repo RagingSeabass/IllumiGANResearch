@@ -88,7 +88,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         manager.get_logger("system").info(
             f"Saved model for Epoch {epoch} | Iteration {total_iterations}")
 
-        if manager.options.get('images'):
+        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
             manager.get_logger("system").info(
                 f"Saved images for Epoch {epoch} | Iteration {total_iterations}")
 
