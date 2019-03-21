@@ -37,13 +37,15 @@ class IllumiganModel(BaseModel):
                                               lr=lr,
                                               betas=betas)
 
-        self.generator_schedular = get_lr_scheduler(
-            self.generator_opt, manager.get_hyperparams())
+        
 
         if manager.is_train:
 
             # We initialize a network to be trained
             if manager.resume_training:
+
+                self.generator_schedular = get_lr_scheduler(
+                    self.generator_opt, manager.get_hyperparams())
 
                 self.load_network(manager)
 
@@ -65,6 +67,9 @@ class IllumiganModel(BaseModel):
                 self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
                                                       lr=lr,
                                                       betas=betas)
+
+                self.generator_schedular = get_lr_scheduler(
+                    self.generator_opt, manager.get_hyperparams())
 
                 self.manager.get_logger('train').info(f"Created new model")
 
