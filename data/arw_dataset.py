@@ -127,7 +127,7 @@ class ARWDataset(Dataset):
         
         pair = self.xy_pairs[index]
         # returns X, Y
-        return pair.x_path, self.get_image_patch(pair.index, pair.ratio_key)        
+        return self.get_image_patch(pair.index, pair.ratio_key)        
 
     def get_image_patch(self, index, ratio_key):
         """Get an image patch"""

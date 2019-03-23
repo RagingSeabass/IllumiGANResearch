@@ -17,6 +17,9 @@ class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
+
+        self.norm_layer = ""
+
         # Define generator network
         self.generator_net = GeneratorUNetV1(
             norm_layer=self.norm_layer, use_dropout=False)
@@ -183,6 +186,15 @@ class IllumiganModel(BaseModel):
 
         # Update weights
         self.generator_opt.step()
+
+    def update_lr(self, epoch):
+
+        if epoch > self.manager.get_hyperparams().get('epoch_iterations'):
+            for g in self.generator_opt.param_groups:
+                g['lr'] = 1e-5
+
+        self.manager.get_logger('system').info(
+            f"lr update | {self.generator_opt.param_groups[0]['lr']}")
 
     def update_learning_rate(self):
         """Update learning rate"""
