@@ -81,10 +81,6 @@ class IllumiganModel(BaseModel):
 
         else:
 
-            # Load model and send it to device
-            self.generator_net = GeneratorUNetV1(
-                norm_layer=self.norm_layer, use_dropout=False)
-
             self.load_network(manager)
 
             self.manager.get_logger('test').info(
