@@ -18,7 +18,7 @@ if len(sys.argv) > 1:
 
 manager = TestManager(base_dir=base_dir,
                       options_f_dir='./experiments/base_model/test_options.json',
-                      hyperparams_f_dir='./experiments/base_model/params.json')
+                      hyperparams_f_dir='./experiments/base_model/test_params.json')
 
 dataset = ARWDataset(manager, 'short', 'long')
 
