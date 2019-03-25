@@ -86,7 +86,7 @@ class IllumiganModel(BaseModel):
             self.load_network(manager)
 
             self.manager.get_logger('test').info(
-                f"Loaded model at checkpoint {epoch}")
+                f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
         summary(self.generator_net, input_size=(4, 512, 512))
 
