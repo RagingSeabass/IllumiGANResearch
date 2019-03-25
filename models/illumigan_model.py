@@ -80,7 +80,9 @@ class IllumiganModel(BaseModel):
             self.generator_net.train()
 
         else:
-
+            # not used in testing, but needed for load network
+            self.generator_schedular = get_lr_scheduler(
+                    self.generator_opt, manager.get_hyperparams())
             self.load_network(manager)
 
             self.manager.get_logger('test').info(
