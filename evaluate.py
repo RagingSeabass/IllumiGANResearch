@@ -33,7 +33,7 @@ loss = Average()
 train_start_time = time.time()  # timer for entire epoch
 loss.reset()
 
-for i, (x_path, (x, y)) in enumerate(dataloader):
+for i, (x, y) in enumerate(dataloader):
 
     total_iterations += 1
 
@@ -46,7 +46,7 @@ for i, (x_path, (x, y)) in enumerate(dataloader):
 
     # Save previes of model images
     if manager.options.get("images"):
-        model.save_visuals(i, x_path, 'test')
+        model.save_visuals(i, 'test')
 
     manager.get_logger("test").info(
         f"Image {i} | Loss {model.get_L1_loss()} | Time {time.time() - train_start_time} | Iteration {total_iterations}")
