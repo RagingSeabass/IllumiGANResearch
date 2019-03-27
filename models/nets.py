@@ -201,11 +201,11 @@ class GAN_loss(nn.Module):
         t_target.expand(size)
         return target
 
-    def compute(self, t_prediction):
+    def compute(self, t_prediction, target):
         # Size of prediction tensor
         size = t_prediction.size()
         # Get target tensor of same size
-        t_target = self.create_target(size)
+        t_target = self.create_target(size, target)
         # Compute loss
         loss = self.loss(t_prediction, t_target)
         return loss

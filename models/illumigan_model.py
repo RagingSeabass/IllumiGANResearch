@@ -24,6 +24,9 @@ class IllumiganModel(BaseModel):
         self.generator_net = GeneratorUNetV1(
             norm_layer=self.norm_layer, use_dropout=False)
 
+        # Define discriminator network
+        self.discriminator_net = Discriminator()
+
         if self.is_cuda_ready:
             self.generator_net = torch.nn.DataParallel(
                 self.generator_net).cuda()
@@ -43,7 +46,9 @@ class IllumiganModel(BaseModel):
                                               lr=lr,
                                               betas=betas)
 
-
+        self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                              lr=lr,
+                                              betas=betas)
 
         if manager.is_train:
 
@@ -168,36 +173,69 @@ class IllumiganModel(BaseModel):
         self.fake_y = self.generator_net(self.x)  # G(X) = fake_y
 
     def g_backward(self):
+        # GAN Loss
+        fake_pair = torch.cat((self.x, self.fake_y), 1)
+        fake_prediction = self.discriminator_net(fake_pair)
+        self.GAN_loss_generator = self.GAN_loss(fake_prediction, True)
+
+        # L1 Loss
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
-        self.generator_l1_loss.backward()
+
+        # Overall loss of generator_net
+        self.generator_loss = self.GAN_loss_generator + self.generator_l1_loss
+        # Compute gradients
+        self.generator_loss.backward()
 
     def d_backward(self):
+        # Calculate loss on pair of real images
+        real_pair = torch.cat((self.x, self.y), 1)
+        real_prediction = self.discriminator_net(real_pair)
+        real_loss = self.GAN_loss.compute(real_prediction, 1)
 
-        # Real image(s) through D
-        # BCE_Loss(real)
-        # Real image(s) through G
-        # Fake images from G through D
-        # BCE_Loss(fake)
-        # d_loss = BCE_loss(real) + BCE_Loss(fake) (alternatively mean of the two)
-        # Train G
+        # Calculate loss on pair of real input and fake output image
+        fake_pair = torch.cat((self.x, self.fake_y), 1)
+        # Detatch to prevent backprop on generator_net
+        fake_pair = fake_pair.detach()
+        fake_prediction = self.discriminator_net(fake_pair)
+        fake_loss = self.GAN_loss.compute(fake_prediction, 0)
+
+        # Overall loss of discriminator_net
+        self.discriminator_loss = real_loss + fake_loss
+        # Compute gradients
+        self.discriminator_loss.backward()
 
 
-        pass
+    def get_generator_loss(self):
+        return self.generator_loss.item()
 
-    def get_L1_loss(self):
-        return self.generator_l1_loss.item()
+    def get_discriminator_loss(self):
+        return self.discriminator_loss.item()
 
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights"""
-        # Calc G(x)
+        
+        # Calc G(x) (fake_y)
         self.forward()
+
+        # Train Discriminator
+
+        # Allow backpropogation of discriminator
+        set_requires_grad(self.discriminator_net, True)
+        # Set D's gradients to zero
+        self.discriminator_opt.zero_grad()
+        # Backpropagate
+        self.d_backward()
+        # Update weights
+        self.discriminator_opt.step()
+        # Disable backpropogation of discriminator when training G
+        set_requires_grad(self.discriminator_net, False)
+
+        # Train Generator
 
         # set G's gradients to zero
         self.generator_opt.zero_grad()
-
-        # back propagate
+        # backpropagate
         self.g_backward()
-
         # Update weights
         self.generator_opt.step()
 
