@@ -18,6 +18,7 @@ class ARWDataset(Dataset):
 
     x_ids = None
     x_images = {}
+    x_images_processed = {}
     y_images = None
 
     # Define how many pair types we have 
@@ -64,13 +65,19 @@ class ARWDataset(Dataset):
             self.y_images = np.array([None] * max_size)
             self.x_images['100'] = np.array([None] * max_size)
             self.x_images['250'] = np.array([None] * max_size)
-            self.x_images['300'] = np.array([None] * max_size) 
+            self.x_images['300'] = np.array([None] * max_size)
+            self.x_images_processed['100'] = np.array([None] * max_size)
+            self.x_images_processed['250'] = np.array([None] * max_size)
+            self.x_images_processed['300'] = np.array([None] * max_size) 
             self.xy_pairs = np.array([None] * (max_size*self.pair_types))
         else:
             self.y_images = np.array([None] * len(self.x_ids)) 
             self.x_images['100'] = np.array([None] * len(self.x_ids))
             self.x_images['250'] = np.array([None] * len(self.x_ids))
-            self.x_images['300'] = np.array([None] * len(self.x_ids)) 
+            self.x_images['300'] = np.array([None] * len(self.x_ids))
+            self.x_images_processed['100'] = np.array([None] * len(self.x_ids))
+            self.x_images_processed['250'] = np.array([None] * len(self.x_ids))
+            self.x_images_processed['300'] = np.array([None] * len(self.x_ids)) 
             self.xy_pairs = np.array([None] * (len(self.x_ids)*self.pair_types))
         
         self.load()    
@@ -111,6 +118,13 @@ class ARWDataset(Dataset):
                 arw.pack(ratio)
 
                 self.x_images[ratio_key][index] = arw
+
+                # Postprocessed x-image used for discriminator training
+                arw = ARW(x_path)
+                arw.postprocess()
+
+                self.x_images_processed[ratio_key][index] = arw
+
                 self.number_of_pairs += 1
 
     def get_exposure(self, path):
@@ -146,37 +160,42 @@ class ARWDataset(Dataset):
 
     def get_image_patch(self, index, ratio_key):
         """Get an image patch"""
-        
+
         x_image = self.x_images[ratio_key][index].get()
+        x_images_processed = self.x_images_processed[ratio_key][index].get()
         y_image = self.y_images[index].get()
-        
+    
         H, W, D = x_image.shape
 
         xx = np.random.randint(0, W - self.patch_size)
         yy = np.random.randint(0, H - self.patch_size)
 
-
         x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
         y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
         # Data augmentations
         if np.random.randint(2) == 1:  # random flip
             x_patch = np.flip(x_patch, axis=1)
+            x_patch_processed = np.flip(x_patch_processed, axis=1)
             y_patch = np.flip(y_patch, axis=1)
         if np.random.randint(2) == 1:
             x_patch = np.flip(x_patch, axis=2)
+            x_patch_processed = np.flip(x_patch_processed, axis=2)
             y_patch = np.flip(y_patch, axis=2)
 
         # Rotate image 90 deg
         if np.random.randint(2) == 1:  # random transpose
             x_patch = np.transpose(x_patch, (1, 0, 2))
+            x_patch_processed = np.transpose(x_patch_processed, (1, 0, 2))
             y_patch = np.transpose(y_patch, (1, 0, 2))
 
         x_patch = np.minimum(x_patch,1.0)
+        x_patch_processed = np.minimum(x_patch_processed, 1.0)
         y_patch  = np.maximum(y_patch, 0.0)
 
         # Unpack before returning
-        return x_patch, y_patch
+        return x_patch, x_patch_processed, y_patch
 
     def __len__(self):
         """We return the total number of counted pairs"""

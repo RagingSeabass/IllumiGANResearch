@@ -97,6 +97,7 @@ class IllumiganModel(BaseModel):
                 f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
         summary(self.generator_net, input_size=(4, 512, 512))
+        summary(self.discriminator_net, input_size=(6, 1024, 1024))
 
     def load_network(self, manager):
 
@@ -108,10 +109,15 @@ class IllumiganModel(BaseModel):
 
         checkpoint = torch.load(load_gn, map_location=manager.device)
 
-        self.generator_net.load_state_dict(checkpoint['net_state_dict'])
-        self.generator_opt.load_state_dict(checkpoint['opt_state_dict'])
+        self.generator_net.load_state_dict(checkpoint['gen_state_dict'])
+        self.generator_opt.load_state_dict(checkpoint['gen_opt_state_dict'])
+
+        self.generator_net.load_state_dict(checkpoint['disc_state_dict'])
+        self.generator_opt.load_state_dict(checkpoint['disc_opt_state_dict'])
+        
         self.generator_schedular.load_state_dict(
             checkpoint['schedular_state_dict'])
+            
 
         # for state in self.generator_opt.state.values():
         #     for k, v in state.items():
@@ -130,8 +136,10 @@ class IllumiganModel(BaseModel):
             generator_net = self.generator_net
 
         torch.save({
-            'net_state_dict': generator_net.state_dict(),
-            'opt_state_dict': self.generator_opt.state_dict(),
+            'gen_state_dict': generator_net.state_dict(),
+            'gen_opt_state_dict': self.generator_opt.state_dict(),
+            'disc_state_dict': discriminator_net.state_dict(),
+            'disc_opt_state_dict': self.discriminator_opt.state_dict(),
             'schedular_state_dict': self.generator_schedular.state_dict()
         }, save_gn)
 
@@ -159,13 +167,15 @@ class IllumiganModel(BaseModel):
             scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
                 self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
 
-    def set_input(self, x, y):
+    def set_input(self, x, x_processed, y):
         """Takes input of form X Y and sends it to the GPU"""
 
         x = x.permute(0, 3, 1, 2).to(self.manager.device)
+        x_processed = x_processed.permute(0, 3, 1, 2).to(self.manager.device)
         y = y.permute(0, 3, 1, 2).to(self.manager.device)
 
         self.x = x
+        self.x_processed = x_processed
         self.y = y
 
     def forward(self):
@@ -174,7 +184,7 @@ class IllumiganModel(BaseModel):
 
     def g_backward(self):
         # GAN Loss
-        fake_pair = torch.cat((self.x, self.fake_y), 1)
+        fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         fake_prediction = self.discriminator_net(fake_pair)
         self.GAN_loss_generator = self.GAN_loss(fake_prediction, True)
 
@@ -188,12 +198,12 @@ class IllumiganModel(BaseModel):
 
     def d_backward(self):
         # Calculate loss on pair of real images
-        real_pair = torch.cat((self.x, self.y), 1)
+        real_pair = torch.cat((self.x_processed, self.y), 1)
         real_prediction = self.discriminator_net(real_pair)
         real_loss = self.GAN_loss.compute(real_prediction, 1)
 
         # Calculate loss on pair of real input and fake output image
-        fake_pair = torch.cat((self.x, self.fake_y), 1)
+        fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         # Detatch to prevent backprop on generator_net
         fake_pair = fake_pair.detach()
         fake_prediction = self.discriminator_net(fake_pair)
@@ -220,7 +230,8 @@ class IllumiganModel(BaseModel):
         # Train Discriminator
 
         # Allow backpropogation of discriminator
-        set_requires_grad(self.discriminator_net, True)
+        for param in self.discriminator_net.parameters():
+            param.requires_grad = True
         # Set D's gradients to zero
         self.discriminator_opt.zero_grad()
         # Backpropagate
@@ -228,7 +239,8 @@ class IllumiganModel(BaseModel):
         # Update weights
         self.discriminator_opt.step()
         # Disable backpropogation of discriminator when training G
-        set_requires_grad(self.discriminator_net, False)
+        for param in self.discriminator_net.parameters():
+            param.requires_grad = False
 
         # Train Generator
 

@@ -16,10 +16,8 @@ class ARW():
 
     def postprocess(self):
         raw = rawpy.imread(self.path)
-        
         # Spits out a 16 bit image! 
         img = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
-
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
         #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
         self.data = np.float32( img / 65535.0 )
@@ -37,6 +35,7 @@ class ARW():
         img_shape = raw_matix.shape
         H = img_shape[0]
         W = img_shape[1]
+        D = img_shape[2]
 
         # We will now use the knowledge of bayers sensors 
         # We split by the colors into seperate matrixes 

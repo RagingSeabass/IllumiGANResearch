@@ -46,7 +46,7 @@ class Discriminator(nn.Module):
     def __init__(self, norm_layer='instance'):
         super().__init__()
 
-        self.c1 = SingleConvBlock(4, 64, kernel_size=4, stride=2, bias=False)
+        self.c1 = SingleConvBlock(6, 64, kernel_size=4, stride=2, bias=False)
         self.c2 = SingleConvBlock(64, 128, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
         self.c3 = SingleConvBlock(128, 256, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
         self.c4 = SingleConvBlock(256, 512, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
