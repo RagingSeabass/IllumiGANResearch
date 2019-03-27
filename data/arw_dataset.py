@@ -127,7 +127,22 @@ class ARWDataset(Dataset):
         
         pair = self.xy_pairs[index]
         # returns X, Y
-        return pair.x_path, self.get_image_patch(pair.index, pair.ratio_key)        
+
+        if self.manager.is_train:
+            return self.get_image_patch(pair.index, pair.ratio_key)        
+        else:
+            return self.get_image(pair.index, pair.ratio_key)
+
+    def get_image(self, index, ratio_key):
+        
+        x_image = self.x_images[ratio_key][index].get()
+        y_image = self.y_images[index].get()
+        
+        x_patch = np.minimum(x_image,1.0)
+        y_patch  = np.maximum(y_image, 0.0)
+
+        # Unpack before returning
+        return x_patch, y_patch
 
     def get_image_patch(self, index, ratio_key):
         """Get an image patch"""

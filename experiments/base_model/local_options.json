@@ -6,6 +6,7 @@
     "max_dataset_size": 0,
     "save": 5,
     "images": false,
+    "save_images": 5,
     "gpu_ids": [
         0
     ],
