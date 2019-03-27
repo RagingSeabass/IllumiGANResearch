@@ -58,11 +58,14 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
                    manager.get_hyperparams().get('epoch_iterations') +
                    manager.get_hyperparams().get('epoch_decaying_iterations') + 1):    # epochs with decaying lr
 
+    # update lr
+    model.update_lr(epoch)
+
     epoch_start_time = time.time()  # timer for entire epoch
 
     epoch_loss.reset()
     
-    for i, (x_path, (x, y)) in enumerate(dataloader):
+    for i, (x, y) in enumerate(dataloader):
 
         data_start_time = time.time()
         t_data = data_start_time - epoch_start_time
@@ -76,8 +79,9 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         epoch_loss.update(model.get_L1_loss())
 
         # Save previes of model images
-        if manager.options.get("images") and epoch % manager.options.get("save") == 0:
-            model.save_visuals(i, x_path, epoch)
+    
+        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
+            model.save_visuals(i, epoch)
 
     manager.get_logger("train").info(
         f"Epoch {epoch} | Loss {epoch_loss.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
@@ -87,11 +91,11 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         manager.get_logger("system").info(
             f"Saved model for Epoch {epoch} | Iteration {total_iterations}")
 
-        if manager.options.get('images'):
+        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
             manager.get_logger("system").info(
                 f"Saved images for Epoch {epoch} | Iteration {total_iterations}")
 
         model.save_networks('latest')
         model.save_networks(epoch)
 
-    model.update_learning_rate()
+    #model.update_learning_rate()

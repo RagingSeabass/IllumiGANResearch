@@ -8,7 +8,7 @@ import torch.nn as nn
 
 
 class GeneratorUNetV1(nn.Module):
-    def __init__(self, norm_layer='instance', use_dropout=False):
+    def __init__(self, norm_layer=None, use_dropout=False):
         super(GeneratorUNetV1, self).__init__()
 
         # TODO: Look at dropout implementation
