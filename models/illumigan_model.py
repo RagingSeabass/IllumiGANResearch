@@ -9,7 +9,7 @@ import numpy as np
 
 from data.arw_image import ARW
 from models.base_model import BaseModel
-from models.nets import GeneratorUNetV1
+from models.nets import GeneratorUNetV1, Discriminator, GAN_loss
 from models.utils import get_lr_scheduler, init_network
 
 
@@ -31,6 +31,9 @@ class IllumiganModel(BaseModel):
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
 
+        # Define GAN loss
+        self.GAN_loss = GAN_loss(loss='BCE')
+
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
         betas = (manager.get_hyperparams().get('b1'),
@@ -40,7 +43,7 @@ class IllumiganModel(BaseModel):
                                               lr=lr,
                                               betas=betas)
 
-        
+
 
         if manager.is_train:
 
@@ -167,6 +170,19 @@ class IllumiganModel(BaseModel):
     def g_backward(self):
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
         self.generator_l1_loss.backward()
+
+    def d_backward(self):
+
+        # Real image(s) through D
+        # BCE_Loss(real)
+        # Real image(s) through G
+        # Fake images from G through D
+        # BCE_Loss(fake)
+        # d_loss = BCE_loss(real) + BCE_Loss(fake) (alternatively mean of the two)
+        # Train G
+
+
+        pass
 
     def get_L1_loss(self):
         return self.generator_l1_loss.item()

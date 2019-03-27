@@ -181,3 +181,34 @@ class OutConvBLock(nn.Module):
     def forward(self, x):
         x = self.f(x)
         return x
+
+
+class GAN_loss(nn.Module):
+    """ Compute GAN loss """
+
+    def __init__(self, loss):
+        super().__init__()
+
+        if loss == 'BCE':
+            self.loss = nn.BCELoss()
+        else:
+            self.loss = nn.BCEWithLogitsLoss()
+
+
+    def create_target(self, size, target):
+        # Create target tensor of size
+        t_target = target
+        t_target.expand(size)
+        return target
+
+    def compute(self, t_prediction):
+        # Size of prediction tensor
+        size = t_prediction.size()
+        # Get target tensor of same size
+        t_target = self.create_target(size)
+        # Compute loss
+        loss = self.loss(t_prediction, t_target)
+        return loss
+
+
+
