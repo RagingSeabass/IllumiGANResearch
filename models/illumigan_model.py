@@ -35,7 +35,7 @@ class IllumiganModel(BaseModel):
         self.generator_l1 = torch.nn.L1Loss()
 
         # Define GAN loss
-        self.GAN_loss = GAN_loss(loss='BCE')
+        self.GAN_loss = GAN_loss(loss='BCE', device=manager.device)
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
@@ -70,6 +70,11 @@ class IllumiganModel(BaseModel):
                     self.generator_net, gpu_ids=self.gpus)
                 self.generator_net.to(manager.device)
 
+                self.discriminator_net = init_network(
+                    self.discriminator_net, gpu_ids=self.gpus)
+                self.discriminator_net.to(manager.device)
+
+
                 # Define generator optimzer
                 lr = manager.get_hyperparams().get('lr')
                 betas = (manager.get_hyperparams().get('b1'),
@@ -97,26 +102,29 @@ class IllumiganModel(BaseModel):
                 f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
         summary(self.generator_net, input_size=(4, 512, 512))
-        summary(self.discriminator_net, input_size=(6, 1024, 1024))
+        #summary(self.discriminator_net, input_size=(6, 1024, 1024))
 
     def load_network(self, manager):
 
         epochs = manager.get_hyperparams().get("epoch")
 
         filename_gn = f"{epochs}_generator_net.pth"
+        filename_ds = f"{epochs}_discriminator_net.pth"
 
         load_gn = os.path.join(self.load_dir, filename_gn)
+        load_ds = os.path.join(self.load_dir, filename_ds)
 
-        checkpoint = torch.load(load_gn, map_location=manager.device)
+        checkpoint_gn = torch.load(load_gn, map_location=manager.device)
+        checkpoint_ds = torch.load(load_ds, map_location=manager.device)
 
-        self.generator_net.load_state_dict(checkpoint['gen_state_dict'])
-        self.generator_opt.load_state_dict(checkpoint['gen_opt_state_dict'])
+        self.generator_net.load_state_dict(checkpoint_gn['gen_state_dict'])
+        self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
 
-        self.generator_net.load_state_dict(checkpoint['disc_state_dict'])
-        self.generator_opt.load_state_dict(checkpoint['disc_opt_state_dict'])
+        self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
+        self.discriminator_opt.load_state_dict(checkpoint_ds['disc_opt_state_dict'])
         
         self.generator_schedular.load_state_dict(
-            checkpoint['schedular_state_dict'])
+            checkpoint_gn['schedular_state_dict'])
             
 
         # for state in self.generator_opt.state.values():
@@ -127,25 +135,33 @@ class IllumiganModel(BaseModel):
     def save_networks(self, epochs):
         """Save the different models into the same"""
         save_filename_gn = f"{epochs}_generator_net.pth"
+        save_filename_ds = f"{epochs}_discriminator_net.pth"
         save_gn = os.path.join(self.save_dir, save_filename_gn)
+        save_ds = os.path.join(self.save_dir, save_filename_ds)
 
         # Load from data parallelize
         if len(self.gpus) > 1:
             generator_net = self.generator_net.module
+            discriminator_net = self.discriminator_net.module
         else:
             generator_net = self.generator_net
+            discriminator_net = self.discriminator_net
 
         torch.save({
             'gen_state_dict': generator_net.state_dict(),
             'gen_opt_state_dict': self.generator_opt.state_dict(),
-            'disc_state_dict': discriminator_net.state_dict(),
-            'disc_opt_state_dict': self.discriminator_opt.state_dict(),
             'schedular_state_dict': self.generator_schedular.state_dict()
         }, save_gn)
+
+        torch.save({
+            'disc_state_dict': discriminator_net.state_dict(),
+            'disc_opt_state_dict': self.discriminator_opt.state_dict()
+        }, save_ds)
 
         # Move models back to gpu after save
         if self.is_cuda_ready:
             self.generator_net.cuda()
+            self.discriminator_net.cuda()
 
     def save_visuals(self, num, epoch):
         if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
@@ -186,7 +202,7 @@ class IllumiganModel(BaseModel):
         # GAN Loss
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         fake_prediction = self.discriminator_net(fake_pair)
-        self.GAN_loss_generator = self.GAN_loss(fake_prediction, True)
+        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, True)
 
         # L1 Loss
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
@@ -200,14 +216,14 @@ class IllumiganModel(BaseModel):
         # Calculate loss on pair of real images
         real_pair = torch.cat((self.x_processed, self.y), 1)
         real_prediction = self.discriminator_net(real_pair)
-        real_loss = self.GAN_loss.compute(real_prediction, 1)
+        real_loss = self.GAN_loss.compute(real_prediction, 1.0)
 
         # Calculate loss on pair of real input and fake output image
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         # Detatch to prevent backprop on generator_net
         fake_pair = fake_pair.detach()
         fake_prediction = self.discriminator_net(fake_pair)
-        fake_loss = self.GAN_loss.compute(fake_prediction, 0)
+        fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
 
         # Overall loss of discriminator_net
         self.discriminator_loss = real_loss + fake_loss
@@ -255,6 +271,8 @@ class IllumiganModel(BaseModel):
 
         if epoch > self.manager.get_hyperparams().get('epoch_iterations'):
             for g in self.generator_opt.param_groups:
+                g['lr'] = 1e-5
+            for g in self.discriminator_opt.param_groups:
                 g['lr'] = 1e-5
 
         self.manager.get_logger('system').info(

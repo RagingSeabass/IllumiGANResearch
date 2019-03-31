@@ -186,7 +186,7 @@ class OutConvBLock(nn.Module):
 class GAN_loss(nn.Module):
     """ Compute GAN loss """
 
-    def __init__(self, loss):
+    def __init__(self, loss, device):
         super().__init__()
 
         if loss == 'BCE':
@@ -194,12 +194,17 @@ class GAN_loss(nn.Module):
         else:
             self.loss = nn.BCEWithLogitsLoss()
 
+        self.targets = {
+            0.0: torch.tensor(0.0).to(device),
+            1.0: torch.tensor(1.0).to(device)
+        }
+
 
     def create_target(self, size, target):
         # Create target tensor of size
-        t_target = target
-        t_target.expand(size)
-        return target
+        t_target = self.targets[target]
+        t_target = t_target.expand(size)
+        return t_target
 
     def compute(self, t_prediction, target):
         # Size of prediction tensor

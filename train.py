@@ -79,7 +79,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         model.optimize_parameters()
 
         epoch_loss_generator.update(model.get_generator_loss())
-        epoch_loss_discriminator.update(model.get_discriminator_loss)
+        epoch_loss_discriminator.update(model.get_discriminator_loss())
 
         # Save previes of model images
     

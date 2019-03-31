@@ -1,0 +1,10 @@
+Loaded module: python3/3.6.2
+Loaded module: cuda/9.2
+Loaded module: cudnn/v7.4.2.24-prod-cuda-9.2
+Error: [Errno 1] Operation not permitted: '/work3/s164440/shared/IllumiGANResearch/env/bin/activate.fish'
+Traceback (most recent call last):
+  File "train.py", line 82, in <module>
+    epoch_loss_discriminator.update(model.get_discriminator_loss)
+  File "/work3/s164440/shared/IllumiGANResearch/utils.py", line 248, in update
+    self.sum += val * n
+TypeError: unsupported operand type(s) for *: 'method' and 'int'
