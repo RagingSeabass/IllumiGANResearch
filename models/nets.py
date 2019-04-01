@@ -98,7 +98,7 @@ class SingleConvBlock(nn.Module):
         elif normalize == 'instance':
             model.append(nn.InstanceNorm2d(out_ch))
 
-        model.append(nn.LeakyReLU(0.2))
+        model.append(nn.ELU())
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
@@ -118,28 +118,28 @@ class DoubleConvBlock(nn.Module):
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
 
         elif normalize == 'instance':
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
         else:
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
