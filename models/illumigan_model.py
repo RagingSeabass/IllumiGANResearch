@@ -195,50 +195,54 @@ class IllumiganModel(BaseModel):
 
     def g_backward(self):
         # GAN Loss
-        #self.manager.get_logger("train").info('G fake_loss 1')
+        self.manager.get_logger("train").info('G fake_loss 1')
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
-        #self.manager.get_logger("train").info('G fake_loss 2')
+        self.manager.get_logger("train").info('G fake_loss 2')
         fake_prediction = self.discriminator_net(fake_pair)
-        #self.manager.get_logger("train").info('G fake_loss 3')
-        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
-        #self.manager.get_logger("train").info('G fake_loss 4')
+        self.manager.get_logger("train").info('G fake_loss 3')
+        self.GAN_loss_generator = self.GAN_loss.compute(self.manager, fake_prediction, 1) # SLOW ~0.7s
+        self.manager.get_logger("train").info('G fake_loss 4')
+
 
         # L1 Loss
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
-        #self.manager.get_logger("train").info('G l1_loss')
+        self.manager.get_logger("train").info('G l1_loss')
         # Overall loss of generator_net
         self.generator_loss = self.GAN_loss_generator + self.generator_l1_loss
         # Compute gradients
         self.generator_loss.backward()
-        #self.manager.get_logger("train").info('G combined loss')
+        self.manager.get_logger("train").info('G combined loss')
 
     def d_backward(self):
         # Calculate loss on pair of real images
-        #self.manager.get_logger("train").info('D real_loss 1')
+        self.manager.get_logger("train").info('D real_loss 1')
         real_pair = torch.cat((self.x_processed, self.y), 1)
-        #self.manager.get_logger("train").info('D real_loss 2')
+        self.manager.get_logger("train").info(f'{real_pair.shape}')
+        self.manager.get_logger("train").info('D real_loss 2')
         real_prediction = self.discriminator_net(real_pair)
-        #self.manager.get_logger("train").info('D real_loss 3')
-        real_loss = self.GAN_loss.compute(real_prediction, 1.0)
-        #self.manager.get_logger("train").info('D real_loss 4')
+        self.manager.get_logger("train").info('D real_loss 3')
+        real_loss = self.GAN_loss.compute(self.manager, real_prediction, 1)
+        self.manager.get_logger("train").info('D real_loss 4')
 
         # Calculate loss on pair of real input and fake output image
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         # Detatch to prevent backprop on generator_net
         fake_pair = fake_pair.detach()
-        #self.manager.get_logger("train").info('D fake_loss 1')
+        self.manager.get_logger("train").info('D fake_loss 1')
         fake_prediction = self.discriminator_net(fake_pair)
-        #self.manager.get_logger("train").info('D fake_loss 2')
-        fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
 
-        #self.manager.get_logger("train").info('D fake_loss 4')
+        self.manager.get_logger("train").info('D fake_loss 2')
+        fake_loss = self.GAN_loss.compute(self.manager, fake_prediction, 0)
+
+
+        self.manager.get_logger("train").info('D fake_loss 3')
 
         # Overall loss of discriminator_net
         self.discriminator_loss = real_loss + fake_loss
         # Compute gradients
         self.discriminator_loss.backward()
 
-        #self.manager.get_logger("train").info('D combined loss')
+        self.manager.get_logger("train").info('D combined loss')
 
 
     def get_generator_loss(self):
