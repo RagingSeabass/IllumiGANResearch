@@ -127,11 +127,6 @@ class IllumiganModel(BaseModel):
             checkpoint_gn['schedular_state_dict'])
             
 
-        # for state in self.generator_opt.state.values():
-        #     for k, v in state.items():
-        #         if isinstance(v, torch.Tensor):
-        #             state[k] = v.to(manager.device)
-
     def save_networks(self, epochs):
         """Save the different models into the same"""
         save_filename_gn = f"{epochs}_generator_net.pth"
@@ -202,11 +197,12 @@ class IllumiganModel(BaseModel):
         # GAN Loss
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         fake_prediction = self.discriminator_net(fake_pair)
-        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, True)
+        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
+        self.manager.get_logger("train").info('G fake_loss')
 
         # L1 Loss
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
-
+        self.manager.get_logger("train").info('G l1_loss')
         # Overall loss of generator_net
         self.generator_loss = self.GAN_loss_generator + self.generator_l1_loss
         # Compute gradients
@@ -218,12 +214,16 @@ class IllumiganModel(BaseModel):
         real_prediction = self.discriminator_net(real_pair)
         real_loss = self.GAN_loss.compute(real_prediction, 1.0)
 
+        self.manager.get_logger("train").info('D real_loss')
+
         # Calculate loss on pair of real input and fake output image
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         # Detatch to prevent backprop on generator_net
         fake_pair = fake_pair.detach()
         fake_prediction = self.discriminator_net(fake_pair)
         fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
+
+        self.manager.get_logger("train").info('D fake_loss')
 
         # Overall loss of discriminator_net
         self.discriminator_loss = real_loss + fake_loss
@@ -242,18 +242,23 @@ class IllumiganModel(BaseModel):
         
         # Calc G(x) (fake_y)
         self.forward()
-
+        self.manager.get_logger("train").info('fake_y = G(x)')
         # Train Discriminator
 
         # Allow backpropogation of discriminator
         for param in self.discriminator_net.parameters():
             param.requires_grad = True
+
         # Set D's gradients to zero
         self.discriminator_opt.zero_grad()
+        self.manager.get_logger("train").info('D zero graded')
+        
         # Backpropagate
         self.d_backward()
+        self.manager.get_logger("train").info('D backwarded')
         # Update weights
         self.discriminator_opt.step()
+        self.manager.get_logger("train").info('D steped')
         # Disable backpropogation of discriminator when training G
         for param in self.discriminator_net.parameters():
             param.requires_grad = False
@@ -262,10 +267,13 @@ class IllumiganModel(BaseModel):
 
         # set G's gradients to zero
         self.generator_opt.zero_grad()
+        self.manager.get_logger("train").info('G zero graded')
         # backpropagate
         self.g_backward()
+        self.manager.get_logger("train").info('G backwarded')
         # Update weights
         self.generator_opt.step()
+        self.manager.get_logger("train").info('G steped')
 
     def update_lr(self, epoch):
 
