@@ -205,26 +205,22 @@ class GAN_loss(nn.Module):
             self.loss = nn.BCEWithLogitsLoss()
 
         self.targets = {
-            0: torch.tensor(0.0).to(device),
-            1: torch.tensor(1.0).to(device)
+            0.0: torch.tensor(0.0).to(device),
+            1.0: torch.tensor(1.0).to(device)
         }
 
 
-    def create_target(self, size, target, manager):
+    def create_target(self, size, target):
         # Create target tensor of size
         t_target = self.targets[target]
-        self.manager.get_logger("train").info('--- GAN 3')
         t_target = t_target.expand(size)
         return t_target
 
-    def compute(self, manager, t_prediction, target):
-        manager.get_logger("train").info('--- GAN 1')
+    def compute(self, t_prediction, target):
         # Size of prediction tensor
         size = t_prediction.size()
-        manager.get_logger("train").info('--- GAN 2')
         # Get target tensor of same size
-        t_target = self.create_target(size, target, manager)
-        manager.get_logger("train").info('--- GAN 4')
+        t_target = self.create_target(size, target)
         # Compute loss
         loss = self.loss(t_prediction, t_target)
         return loss
