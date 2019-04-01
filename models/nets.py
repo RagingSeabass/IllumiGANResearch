@@ -205,8 +205,8 @@ class GAN_loss(nn.Module):
             self.loss = nn.BCEWithLogitsLoss()
 
         self.targets = {
-            0.0: torch.tensor(0.0).to(device),
-            1.0: torch.tensor(1.0).to(device)
+            0: torch.tensor(0.0).to(device),
+            1: torch.tensor(1.0).to(device)
         }
 
 

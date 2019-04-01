@@ -200,7 +200,7 @@ class IllumiganModel(BaseModel):
         self.manager.get_logger("train").info('G fake_loss 2')
         fake_prediction = self.discriminator_net(fake_pair)
         self.manager.get_logger("train").info('G fake_loss 3')
-        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
+        self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1) # SLOW ~0.7s
         self.manager.get_logger("train").info('G fake_loss 4')
 
         # L1 Loss
@@ -219,7 +219,7 @@ class IllumiganModel(BaseModel):
         self.manager.get_logger("train").info('D real_loss 2')
         real_prediction = self.discriminator_net(real_pair)
         self.manager.get_logger("train").info('D real_loss 3')
-        real_loss = self.GAN_loss.compute(real_prediction, 1.0)
+        real_loss = self.GAN_loss.compute(real_prediction, 1)
         self.manager.get_logger("train").info('D real_loss 4')
 
         # Calculate loss on pair of real input and fake output image
@@ -229,7 +229,7 @@ class IllumiganModel(BaseModel):
         self.manager.get_logger("train").info('D fake_loss 1')
         fake_prediction = self.discriminator_net(fake_pair)
         self.manager.get_logger("train").info('D fake_loss 2')
-        fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
+        fake_loss = self.GAN_loss.compute(fake_prediction, 0)
 
         self.manager.get_logger("train").info('D fake_loss 4')
 
