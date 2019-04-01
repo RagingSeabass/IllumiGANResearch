@@ -40,7 +40,6 @@ class IllumiganModel(BaseModel):
                                               lr=lr,
                                               betas=betas)
 
-        
 
         if manager.is_train:
 
@@ -165,8 +164,11 @@ class IllumiganModel(BaseModel):
         self.fake_y = self.generator_net(self.x)  # G(X) = fake_y
 
     def g_backward(self):
+        
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
+        self.manager.get_logger("train").info('G l1_loss')
         self.generator_l1_loss.backward()
+        self.manager.get_logger("train").info('G loss')
 
     def get_L1_loss(self):
         return self.generator_l1_loss.item()
@@ -175,15 +177,19 @@ class IllumiganModel(BaseModel):
         """Calculate losses, gradients, and update network weights"""
         # Calc G(x)
         self.forward()
+        self.manager.get_logger("train").info('fake_y = G(x)')
 
         # set G's gradients to zero
         self.generator_opt.zero_grad()
+        self.manager.get_logger("train").info('G zero graded')
 
         # back propagate
         self.g_backward()
+        self.manager.get_logger("train").info('G backwarded')
 
         # Update weights
         self.generator_opt.step()
+        self.manager.get_logger("train").info('G steped')
 
     def update_lr(self, epoch):
 
