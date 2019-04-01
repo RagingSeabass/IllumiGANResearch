@@ -210,21 +210,21 @@ class GAN_loss(nn.Module):
         }
 
 
-    def create_target(self, size, target):
+    def create_target(self, size, target, manager):
         # Create target tensor of size
         t_target = self.targets[target]
         self.manager.get_logger("train").info('--- GAN 3')
         t_target = t_target.expand(size)
         return t_target
 
-    def compute(self, t_prediction, target):
-        self.manager.get_logger("train").info('--- GAN 1')
+    def compute(self, manager, t_prediction, target):
+        manager.get_logger("train").info('--- GAN 1')
         # Size of prediction tensor
         size = t_prediction.size()
-        self.manager.get_logger("train").info('--- GAN 2')
+        manager.get_logger("train").info('--- GAN 2')
         # Get target tensor of same size
-        t_target = self.create_target(size, target)
-        self.manager.get_logger("train").info('--- GAN 4')
+        t_target = self.create_target(size, target, manager)
+        manager.get_logger("train").info('--- GAN 4')
         # Compute loss
         loss = self.loss(t_prediction, t_target)
         return loss
