@@ -213,7 +213,7 @@ class GAN_loss(nn.Module):
     def create_target(self, size, target, manager):
         # Create target tensor of size
         t_target = self.targets[target]
-        self.manager.get_logger("train").info('--- GAN 3')
+        manager.get_logger("train").info('--- GAN 3')
         t_target = t_target.expand(size)
         return t_target
 

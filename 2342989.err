@@ -1,0 +1,17 @@
+Loaded module: python3/3.6.2
+Loaded module: cuda/9.2
+Loaded module: cudnn/v7.4.2.24-prod-cuda-9.2
+Traceback (most recent call last):
+  File "train.py", line 84, in <module>
+    model.optimize_parameters()
+  File "/work3/s164440/shared/christian/IllumiGANResearch/models/illumigan_model.py", line 271, in optimize_parameters
+    self.d_backward()
+  File "/work3/s164440/shared/christian/IllumiGANResearch/models/illumigan_model.py", line 224, in d_backward
+    real_loss = self.GAN_loss.compute(self.manager, real_prediction, 1)
+  File "/work3/s164440/shared/christian/IllumiGANResearch/models/nets.py", line 226, in compute
+    t_target = self.create_target(size, target, manager)
+  File "/work3/s164440/shared/christian/IllumiGANResearch/models/nets.py", line 216, in create_target
+    self.manager.get_logger("train").info('--- GAN 3')
+  File "/work3/s164440/shared/christian/IllumiGANResearch/env/lib/python3.6/site-packages/torch/nn/modules/module.py", line 535, in __getattr__
+    type(self).__name__, name))
+AttributeError: 'GAN_loss' object has no attribute 'manager'
