@@ -63,6 +63,22 @@ class Discriminator(nn.Module):
 
         return x
 
+class DiscriminatorPatch(nn.Module):
+    def __init__(self, num_layers=3, norm_layer=None):
+        super().__init__()
+
+        model = []
+
+        for i in range(1, num_layers):
+
+
+
+
+    def forward(self, x):
+        pass
+
+        return x
+
 
 class SingleConvBlock(nn.Module):
     def __init__(
@@ -82,13 +98,10 @@ class SingleConvBlock(nn.Module):
                                    stride=1, padding=1, bias=bias)]
         if normalize == 'batch':
                 model.append(nn.BatchNorm2d(out_ch))
-                model.append(nn.LeakyReLU(0.2))
-
         elif normalize == 'instance':
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
-        else:
-            model.append(nn.LeakyReLU(0.2))
+
+        model.append(nn.LeakyReLU(0.2))
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
