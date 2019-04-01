@@ -70,12 +70,9 @@ class DiscriminatorPatch(nn.Module):
         model = []
 
         for i in range(1, num_layers):
-
-
-
+            pass
 
     def forward(self, x):
-        pass
 
         return x
 
