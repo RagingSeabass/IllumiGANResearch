@@ -69,7 +69,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     
     for i, (x, x_processed, y) in enumerate(dataloader):
         
-        manager.get_logger("train").info(f'Pair {i} loaded')
+        #manager.get_logger("train").info(f'Pair {i} loaded')
 
         data_start_time = time.time()
         t_data = data_start_time - epoch_start_time
@@ -79,7 +79,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         # Get the only element in the batch
         model.set_input(x, x_processed, y)
         
-        manager.get_logger("train").info(f'Pair {i} send to GPU')
+        #manager.get_logger("train").info(f'Pair {i} send to GPU')
         
         model.optimize_parameters()
 

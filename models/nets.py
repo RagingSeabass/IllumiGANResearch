@@ -98,7 +98,7 @@ class SingleConvBlock(nn.Module):
         elif normalize == 'instance':
             model.append(nn.InstanceNorm2d(out_ch))
 
-        model.append(nn.LeakyReLU(0.2))
+        model.append(nn.ELU())
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
@@ -118,28 +118,28 @@ class DoubleConvBlock(nn.Module):
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
 
         elif normalize == 'instance':
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
         else:
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
-            model.append(nn.LeakyReLU(0.2))
+            model.append(nn.ELU())
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
@@ -213,14 +213,18 @@ class GAN_loss(nn.Module):
     def create_target(self, size, target):
         # Create target tensor of size
         t_target = self.targets[target]
+        self.manager.get_logger("train").info('--- GAN 3')
         t_target = t_target.expand(size)
         return t_target
 
     def compute(self, t_prediction, target):
+        self.manager.get_logger("train").info('--- GAN 1')
         # Size of prediction tensor
         size = t_prediction.size()
+        self.manager.get_logger("train").info('--- GAN 2')
         # Get target tensor of same size
         t_target = self.create_target(size, target)
+        self.manager.get_logger("train").info('--- GAN 4')
         # Compute loss
         loss = self.loss(t_prediction, t_target)
         return loss
