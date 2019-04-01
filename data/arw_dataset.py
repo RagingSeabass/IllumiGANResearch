@@ -172,6 +172,7 @@ class ARWDataset(Dataset):
 
         x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
         x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        
         y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
         # Data augmentations
@@ -192,6 +193,7 @@ class ARWDataset(Dataset):
 
         x_patch = np.minimum(x_patch,1.0)
         x_patch_processed = np.minimum(x_patch_processed, 1.0)
+        
         y_patch  = np.maximum(y_patch, 0.0)
 
         # Unpack before returning
