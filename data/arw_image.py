@@ -29,6 +29,7 @@ class ARW():
         # Subtract the black level
         # 16383 == 2^14 (Raw is 14 bits)
         # 512 is hardware specific to the camera
+        # This normalizes the images!
         raw_matix = np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level)
         raw_matix = np.expand_dims(raw_matix, axis=2)
 
