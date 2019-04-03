@@ -37,10 +37,6 @@ def init_weights(net):
 
 def init_network(net, gpu_ids=[]):
     """Initialize network"""
-        #if len(gpu_ids) > 0:
-        #if torch.cuda.is_available():
-        #    net.to(gpu_ids[0])
-        #net = torch.nn.DataParallel(net, gpu_ids)  # multi-GPUs
     init_weights(net)
     return net
 

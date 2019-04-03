@@ -15,7 +15,7 @@ class BaseModel(ABC):
         self.gpus = manager.get_options().get("gpu_ids")
         
         self.is_cuda_ready = torch.cuda.is_available()
-        #self.device = torch.device('cuda:{}'.format(self.gpus[0])) if self.is_cuda_ready else torch.device('cpu')  # get device name: CPU or GPU
+
         
         self.save_dir = manager.get_save_dir()
         self.load_dir = manager.get_load_dir()
@@ -25,18 +25,7 @@ class BaseModel(ABC):
             self.norm_layer = 'instance'
         else:
             self.norm_layer = 'batch'
-            
-        self.optimizers = []
-        self.schedulers = []
-
-    #def update_learning_rate(self):
-    #    """Update learning rates for all the networks"""
-    #    for sch in self.schedulers:
-    #        sch.step()
-    #    
-    #    self.manager.get_logger('system').info(f"lr update | {self.optimizers[0].param_groups[0]['lr']}")
-    
-
+  
     ##############################
     # METHODS THAT NEEDS TO BE IMPLEMENTED BY ANY MODEL
     ##############################

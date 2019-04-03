@@ -17,12 +17,11 @@ class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
-
         self.norm_layer = ""
 
         # Define generator network
         self.generator_net = GeneratorUNetV1(
-            norm_layer=self.norm_layer, use_dropout=False)
+            norm_layer=self.norm_layer)
 
         # Define discriminator network
         self.discriminator_net = Discriminator()
@@ -42,21 +41,13 @@ class IllumiganModel(BaseModel):
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
 
-        self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
-                                              lr=lr,
-                                              betas=betas)
-
-        self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
-                                              lr=lr,
-                                              betas=betas)
-
         if manager.is_train:
 
             # We initialize a network to be trained
             if manager.resume_training:
 
-                self.generator_schedular = get_lr_scheduler(
-                    self.generator_opt, manager.get_hyperparams())
+                self.generator_schedular = get_lr_scheduler(self.generator_opt, manager.get_hyperparams())
+                self.discriminator_schedular = get_lr_scheduler(self.discriminator_opt, manager.get_hyperparams())
 
                 self.load_network(manager)
 
@@ -73,36 +64,49 @@ class IllumiganModel(BaseModel):
                 self.discriminator_net = init_network(
                     self.discriminator_net, gpu_ids=self.gpus)
                 self.discriminator_net.to(manager.device)
-
-
-                # Define generator optimzer
-                lr = manager.get_hyperparams().get('lr')
-                betas = (manager.get_hyperparams().get('b1'),
-                         manager.get_hyperparams().get('b2'))
-
+                
+                # Get optimizer after we init network
                 self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
                                                       lr=lr,
                                                       betas=betas)
+                
+                self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                              lr=lr,
+                                              betas=betas)
 
                 self.generator_schedular = get_lr_scheduler(
                     self.generator_opt, manager.get_hyperparams())
+                self.discriminator_schedular = get_lr_scheduler(
+                    self.discriminator_opt, manager.get_hyperparams())
 
                 self.manager.get_logger('train').info(f"Created new model")
 
-            self.optimizers.append(self.generator_opt)
             self.generator_net.train()
+            self.discriminator_net.train()
 
         else:
+            
+            # Get optimizer after we init network
+            self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                                    lr=lr,
+                                                    betas=betas)
+            
+            self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                            lr=lr,
+                                            betas=betas)
+
             # not used in testing, but needed for load network
             self.generator_schedular = get_lr_scheduler(
                     self.generator_opt, manager.get_hyperparams())
+            
+            self.discriminator_schedular = get_lr_scheduler(
+                    self.discriminator_opt, manager.get_hyperparams())
+
             self.load_network(manager)
 
             self.manager.get_logger('test').info(
                 f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
-        summary(self.generator_net, input_size=(4, 512, 512))
-        #summary(self.discriminator_net, input_size=(6, 1024, 1024))
 
     def load_network(self, manager):
 
@@ -125,7 +129,8 @@ class IllumiganModel(BaseModel):
         
         self.generator_schedular.load_state_dict(
             checkpoint_gn['schedular_state_dict'])
-            
+        self.discriminator_schedular.load_state_dict(
+            checkpoint_ds['schedular_state_dict'])
 
     def save_networks(self, epochs):
         """Save the different models into the same"""
@@ -150,7 +155,8 @@ class IllumiganModel(BaseModel):
 
         torch.save({
             'disc_state_dict': discriminator_net.state_dict(),
-            'disc_opt_state_dict': self.discriminator_opt.state_dict()
+            'disc_opt_state_dict': self.discriminator_opt.state_dict(),
+            'schedular_state_dict': self.discriminator_schedular.state_dict()
         }, save_ds)
 
         # Move models back to gpu after save
@@ -195,50 +201,35 @@ class IllumiganModel(BaseModel):
 
     def g_backward(self):
         # GAN Loss
-        #self.manager.get_logger("train").info('G fake_loss 1')
+        
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
-        #self.manager.get_logger("train").info('G fake_loss 2')
         fake_prediction = self.discriminator_net(fake_pair)
-        #self.manager.get_logger("train").info('G fake_loss 3')
         self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
-        #self.manager.get_logger("train").info('G fake_loss 4')
 
         # L1 Loss
         self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
-        #self.manager.get_logger("train").info('G l1_loss')
         # Overall loss of generator_net
         self.generator_loss = self.GAN_loss_generator + self.generator_l1_loss
         # Compute gradients
         self.generator_loss.backward()
-        #self.manager.get_logger("train").info('G combined loss')
 
     def d_backward(self):
         # Calculate loss on pair of real images
-        #self.manager.get_logger("train").info('D real_loss 1')
         real_pair = torch.cat((self.x_processed, self.y), 1)
-        #self.manager.get_logger("train").info('D real_loss 2')
         real_prediction = self.discriminator_net(real_pair)
-        #self.manager.get_logger("train").info('D real_loss 3')
         real_loss = self.GAN_loss.compute(real_prediction, 1.0)
-        #self.manager.get_logger("train").info('D real_loss 4')
 
         # Calculate loss on pair of real input and fake output image
         fake_pair = torch.cat((self.x_processed, self.fake_y), 1)
         # Detatch to prevent backprop on generator_net
         fake_pair = fake_pair.detach()
-        #self.manager.get_logger("train").info('D fake_loss 1')
         fake_prediction = self.discriminator_net(fake_pair)
-        #self.manager.get_logger("train").info('D fake_loss 2')
         fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
-
-        #self.manager.get_logger("train").info('D fake_loss 4')
 
         # Overall loss of discriminator_net
         self.discriminator_loss = real_loss + fake_loss
         # Compute gradients
         self.discriminator_loss.backward()
-
-        #self.manager.get_logger("train").info('D combined loss')
 
 
     def get_generator_loss(self):
@@ -252,7 +243,6 @@ class IllumiganModel(BaseModel):
         
         # Calc G(x) (fake_y)
         self.forward()
-        #self.manager.get_logger("train").info('fake_y = G(x)')
         # Train Discriminator
 
         # Allow backpropogation of discriminator
@@ -261,14 +251,11 @@ class IllumiganModel(BaseModel):
 
         # Set D's gradients to zero
         self.discriminator_opt.zero_grad()
-        #self.manager.get_logger("train").info('D zero graded')
         
         # Backpropagate
         self.d_backward()
-        #self.manager.get_logger("train").info('D backwarded')
         # Update weights
         self.discriminator_opt.step()
-        #self.manager.get_logger("train").info('D steped')
         # Disable backpropogation of discriminator when training G
         for param in self.discriminator_net.parameters():
             param.requires_grad = False
@@ -277,13 +264,10 @@ class IllumiganModel(BaseModel):
 
         # set G's gradients to zero
         self.generator_opt.zero_grad()
-        #self.manager.get_logger("train").info('G zero graded')
         # backpropagate
         self.g_backward()
-        #self.manager.get_logger("train").info('G backwarded')
         # Update weights
         self.generator_opt.step()
-        #self.manager.get_logger("train").info('G steped')
 
     def update_lr(self, epoch):
 
@@ -299,6 +283,8 @@ class IllumiganModel(BaseModel):
     def update_learning_rate(self):
         """Update learning rate"""
         self.generator_schedular.step()
+        self.discriminator_schedular.step()
+        
         self.manager.get_logger('system').info(
             f"lr update | {self.generator_opt.param_groups[0]['lr']}")
 

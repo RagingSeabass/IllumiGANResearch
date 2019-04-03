@@ -3,10 +3,10 @@
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
     "num_workers": 2,
-    "max_dataset_size": 20,
-    "save": 225,
+    "max_dataset_size": 50,
+    "save": 250,
     "images": true,
-    "save_images": 300,
+    "save_images": 1000,
     "gpu_ids": [
         0
     ],
