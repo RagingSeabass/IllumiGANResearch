@@ -43,6 +43,15 @@ class IllumiganModel(BaseModel):
 
         if manager.is_train:
 
+             # Get optimizer after we init network
+            self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                                    lr=lr,
+                                                    betas=betas)
+            
+            self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                            lr=lr,
+                                            betas=betas)
+
             # We initialize a network to be trained
             if manager.resume_training:
 
@@ -65,14 +74,6 @@ class IllumiganModel(BaseModel):
                     self.discriminator_net, gpu_ids=self.gpus)
                 self.discriminator_net.to(manager.device)
                 
-                # Get optimizer after we init network
-                self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
-                                                      lr=lr,
-                                                      betas=betas)
-                
-                self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
-                                              lr=lr,
-                                              betas=betas)
 
                 self.generator_schedular = get_lr_scheduler(
                     self.generator_opt, manager.get_hyperparams())
