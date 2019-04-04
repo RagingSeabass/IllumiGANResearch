@@ -55,15 +55,23 @@ class IllumiganModel(BaseModel):
             # We initialize a network to be trained
             if manager.resume_training:
 
-                
-                self.load_network(manager)
-
-                self.generator_net.to(manager.device)
-                self.discriminator_net.to(manager.device)
-
                 self.generator_schedular = get_lr_scheduler(self.generator_opt, manager.get_hyperparams())
                 self.discriminator_schedular = get_lr_scheduler(self.discriminator_opt, manager.get_hyperparams())
 
+                self.load_network(manager)
+
+                for state in self.generator_opt.state.values():
+                    for k, v in state.items():
+                        if isinstance(v, torch.Tensor):
+                            state[k] = v.cuda()
+                
+                for state in self.discriminator_opt.state.values():
+                    for k, v in state.items():
+                        if isinstance(v, torch.Tensor):
+                            state[k] = v.cuda()
+
+                self.generator_net.to(manager.device)
+                self.discriminator_net.to(manager.device)
 
                 self.manager.get_logger('train').info(
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
