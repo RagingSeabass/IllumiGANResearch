@@ -60,6 +60,9 @@ class IllumiganModel(BaseModel):
 
                 self.load_network(manager)
 
+                self.generator_net.to(manager.device)
+                self.discriminator_net.to(manager.device)
+                
                 self.manager.get_logger('train').info(
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
