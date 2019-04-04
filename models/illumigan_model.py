@@ -62,8 +62,8 @@ class IllumiganModel(BaseModel):
 
                 self.generator_net.to(manager.device)
                 self.discriminator_net.to(manager.device)
-                self.generator_opt.to(manager.device)
-                self.discriminator_opt.to(manager.device)
+                self.generator_opt.cuda()
+                self.discriminator_opt.cuda()
 
                 self.manager.get_logger('train').info(
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
