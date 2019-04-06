@@ -245,6 +245,9 @@ class IllumiganModel(BaseModel):
         # Compute gradients
         self.discriminator_loss.backward()
 
+    def get_L1_loss(self):
+        return self.generator_l1_loss.item()
+
 
     def get_generator_loss(self):
         return self.generator_loss.item()
