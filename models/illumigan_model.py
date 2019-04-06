@@ -29,6 +29,8 @@ class IllumiganModel(BaseModel):
         if self.is_cuda_ready:
             self.generator_net = torch.nn.DataParallel(
                 self.generator_net).cuda()
+            self.discriminator_net = torch.nn.DataParallel(
+                self.discriminator_net).cuda()
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
