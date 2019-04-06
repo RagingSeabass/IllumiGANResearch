@@ -20,10 +20,10 @@
 #BSUB -R "select[gpu32gb]"
 
 ### Ask for NVLINK - Meaning: 
-### BSUB -R "select[sxm2]"
+#BSUB -R "select[sxm2]"
 
 ### -- Select the resources: 1 gpu in exclusive proce   ss mode --
-#BSUB -gpu "num=1:mode=exclusive_process"
+#BSUB -gpu "num=4:mode=exclusive_process"
 
 ### -- set walltime limit: hh:mm --  maximum 24 hours for GPU-queues right now
 #BSUB -W 24:00
