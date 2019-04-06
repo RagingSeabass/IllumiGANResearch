@@ -33,13 +33,13 @@ loss = Average()
 train_start_time = time.time()  # timer for entire epoch
 loss.reset()
 
-for i, (x, y) in enumerate(dataloader):
+for i, (x, x_processed, y) in enumerate(dataloader):
 
     total_iterations += 1
 
     # Get the only element in the batch
 
-    model.set_input(x, y)
+    model.set_input(x, x_processed, y)
     model.test()
 
     loss.update(model.get_L1_loss())
