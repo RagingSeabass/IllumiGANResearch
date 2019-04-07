@@ -8,7 +8,7 @@
     "images": true,
     "save_images": 1000,
     "gpu_ids": [
-        0,1,2,3
+        0,1,2
     ],
     "debug": true,
     "load_dir": ""
