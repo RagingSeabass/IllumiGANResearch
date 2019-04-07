@@ -223,7 +223,7 @@ class IllumiganModel(BaseModel):
         self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
 
         # L1 Loss
-        self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
+        self.generator_l1_loss = self.generator_l1(self.fake_y, self.y) * 100
         # Overall loss of generator_net
         self.generator_loss = self.GAN_loss_generator + self.generator_l1_loss
         # Compute gradients
@@ -243,7 +243,7 @@ class IllumiganModel(BaseModel):
         fake_loss = self.GAN_loss.compute(fake_prediction, 0.0)
 
         # Overall loss of discriminator_net
-        self.discriminator_loss = real_loss + fake_loss
+        self.discriminator_loss = (real_loss + fake_loss) * 0.5
         # Compute gradients
         self.discriminator_loss.backward()
 
