@@ -3,7 +3,7 @@
     "lr_policy": "linear",
     "b1": 0.5,
     "b2": 0.999,
-    "batch_size": 8,
+    "batch_size": 4,
     "epoch_iterations": 10000,
     "epoch_decaying_iterations": 0,
     "epoch": 0, 
