@@ -26,12 +26,7 @@ class IllumiganModel(BaseModel):
         # Define discriminator network
         self.discriminator_net = Discriminator()
 
-        if self.is_cuda_ready:
-            self.generator_net = torch.nn.DataParallel(
-                self.generator_net).cuda()
-            self.discriminator_net = torch.nn.DataParallel(
-                self.discriminator_net).cuda()
-
+        
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
 
@@ -62,6 +57,12 @@ class IllumiganModel(BaseModel):
 
                 self.load_network(manager)
 
+                if self.is_cuda_ready:
+                    self.generator_net = torch.nn.DataParallel(
+                        self.generator_net).cuda()
+                    self.discriminator_net = torch.nn.DataParallel(
+                        self.discriminator_net).cuda()
+
                 for state in self.generator_opt.state.values():
                     for k, v in state.items():
                         if isinstance(v, torch.Tensor):
@@ -71,6 +72,7 @@ class IllumiganModel(BaseModel):
                     for k, v in state.items():
                         if isinstance(v, torch.Tensor):
                             state[k] = v.cuda()
+                
 
                 self.generator_net.to(manager.device)
                 self.discriminator_net.to(manager.device)
@@ -79,6 +81,12 @@ class IllumiganModel(BaseModel):
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
             else:
+
+                if self.is_cuda_ready:
+                    self.generator_net = torch.nn.DataParallel(
+                        self.generator_net).cuda()
+                    self.discriminator_net = torch.nn.DataParallel(
+                        self.discriminator_net).cuda()
 
                 # Create new model and send it to device
                 self.generator_net = init_network(
