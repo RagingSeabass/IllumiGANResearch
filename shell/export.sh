@@ -68,4 +68,4 @@ pip3 install -U pip
 # install 
 pip3 install -r requirements.txt
 
-python export.py
+python export.py $NEW_UUID "server"
