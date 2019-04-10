@@ -57,8 +57,9 @@ class IllumiganModel(BaseModel):
 
                 self.load_network(manager)
                 
-                if self.is_cuda_ready:
-                    self.generator_net.cuda()
+                self.generator_net.cuda()
+                #if self.is_cuda_ready:
+                    
                     #self.generator_net = torch.nn.DataParallel(
                     #    self.generator_net).cuda()
                     #self.discriminator_net = torch.nn.DataParallel(
@@ -75,8 +76,8 @@ class IllumiganModel(BaseModel):
                             state[k] = v.cuda()
                 
 
-                self.generator_net.to(manager.device)
-                self.discriminator_net.to(manager.device)
+                #self.generator_net.to(manager.device)
+                #self.discriminator_net.to(manager.device)
 
                 self.manager.get_logger('train').info(
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
