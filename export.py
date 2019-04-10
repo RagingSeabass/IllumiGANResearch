@@ -14,7 +14,7 @@ if len(sys.argv) > 2:
 
 # Temporary defined options
 
-
+cudnn.benchmark = True
 # ------- 
 
 options = './experiments/base_model/local_options.json'
