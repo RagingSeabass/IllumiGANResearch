@@ -38,5 +38,5 @@ model = IllumiganModel(manager=manager)
 
 # Create the right input shape (e.g. for an image)
 dummy_input = torch.randn(1, 4, 2832, 4240)
-x = torch.floatTensor(x)
+x = torch.tensor(x)
 torch.onnx.export(model.generator_net, x, "Illumigan.onnx")
