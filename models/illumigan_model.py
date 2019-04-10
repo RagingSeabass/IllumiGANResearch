@@ -57,7 +57,7 @@ class IllumiganModel(BaseModel):
 
                 self.load_network(manager)
 
-                if self.is_cuda_ready:
+                #if self.is_cuda_ready:
                     #self.generator_net = torch.nn.DataParallel(
                     #    self.generator_net).cuda()
                     #self.discriminator_net = torch.nn.DataParallel(
