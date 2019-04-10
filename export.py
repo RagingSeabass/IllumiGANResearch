@@ -4,7 +4,7 @@ from utils import Average, TrainManager
 import os
 import sys
 import time
-
+import torch.backends.cudnn as cudnn
 
 base_dir = "_default/"
 
