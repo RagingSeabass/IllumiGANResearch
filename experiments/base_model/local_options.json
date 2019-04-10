@@ -11,5 +11,5 @@
         0
     ],
     "debug": true,
-    "load_dir": ""
+    "load_dir": "./benchmarks/23150852/checkpoints/"
 }

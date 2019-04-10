@@ -143,18 +143,24 @@ class IllumiganModel(BaseModel):
         load_ds = os.path.join(self.load_dir, filename_ds)
 
         checkpoint_gn = torch.load(load_gn, map_location=manager.device)
-        checkpoint_ds = torch.load(load_ds, map_location=manager.device)
+        #checkpoint_ds = torch.load(load_ds, map_location=manager.device)
 
-        self.generator_net.load_state_dict(checkpoint_gn['gen_state_dict'])
-        self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        for k, v in checkpoint_gn['net_state_dict'].items():
+            name = k[7:] # remove `module.`
+            new_state_dict[name] = v
 
-        self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
-        self.discriminator_opt.load_state_dict(checkpoint_ds['disc_opt_state_dict'])
+        self.generator_net.load_state_dict(new_state_dict)
+        #self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
+
+        #self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
+        #self.discriminator_opt.load_state_dict(checkpoint_ds['disc_opt_state_dict'])
         
-        self.generator_schedular.load_state_dict(
-            checkpoint_gn['schedular_state_dict'])
-        self.discriminator_schedular.load_state_dict(
-            checkpoint_ds['schedular_state_dict'])
+        #self.generator_schedular.load_state_dict(
+        #    checkpoint_gn['schedular_state_dict'])
+        #self.discriminator_schedular.load_state_dict(
+        #    checkpoint_ds['schedular_state_dict'])
 
     def save_networks(self, epochs):
         """Save the different models into the same"""
