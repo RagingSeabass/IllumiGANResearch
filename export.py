@@ -28,10 +28,13 @@ manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
 
+dataset = ARWDataset(manager, 'short', 'long')
+
+x, x_processed, y = dataset[0];
 
 model = IllumiganModel(manager=manager)
 
 # Create the right input shape (e.g. for an image)
 dummy_input = torch.randn(1, 4, 2832, 4240)
 
-torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
+torch.onnx.export(model.generator_net, x, "Illumigan.onnx")
