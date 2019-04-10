@@ -147,11 +147,11 @@ class IllumiganModel(BaseModel):
 
         from collections import OrderedDict
         new_state_dict = OrderedDict()
-        for k, v in checkpoint_gn['net_state_dict'].items():
+        for k, v in state_dict.items():
             name = k[7:] # remove `module.`
             new_state_dict[name] = v
 
-        self.generator_net.load_state_dict(new_state_dict)
+        self.generator_net.load_state_dict(checkpoint_gn['net_state_dict'])
         #self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
 
         #self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
