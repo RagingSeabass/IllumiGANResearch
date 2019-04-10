@@ -5,6 +5,8 @@ import os
 import sys
 import time
 import torch.backends.cudnn as cudnn
+from data.arw_dataset import ARWDataset
+
 
 base_dir = "_default/"
 
