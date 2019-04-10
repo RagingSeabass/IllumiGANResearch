@@ -55,7 +55,7 @@ dummy_input = torch.randn(1, 4, 256, 256).to(manager.device)
 torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
 
-model = onnx.load('Illumigan.onnx')
+model = onnx.load('./Illumigan.onnx')
 cml = convert(model)
 
-cml.save('Illumigan.mlmodel')
+cml.save('./Illumigan.mlmodel')
