@@ -12,7 +12,7 @@ from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
 
-from onnx import onnx_pb
+import onnx;
 from onnx_coreml import convert
 
 base_dir = "_default/"
@@ -56,6 +56,6 @@ torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
 
 model = onnx.load('Illumigan.onnx')
-cml = onnx_coreml.convert(model)
+cml = convert(model)
 
 cml.save('Illumigan.mlmodel')
