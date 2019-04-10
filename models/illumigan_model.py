@@ -56,8 +56,9 @@ class IllumiganModel(BaseModel):
                 self.discriminator_schedular = get_lr_scheduler(self.discriminator_opt, manager.get_hyperparams())
 
                 self.load_network(manager)
-
-                #if self.is_cuda_ready:
+                
+                if self.is_cuda_ready:
+                    self.generator_net.cuda()
                     #self.generator_net = torch.nn.DataParallel(
                     #    self.generator_net).cuda()
                     #self.discriminator_net = torch.nn.DataParallel(
