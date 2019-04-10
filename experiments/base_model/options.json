@@ -8,7 +8,7 @@
     "images": true,
     "save_images": 1000,
     "gpu_ids": [
-        0,1
+        0
     ],
     "debug": true,
     "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/marts/23150852/checkpoints"
