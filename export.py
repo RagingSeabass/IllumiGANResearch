@@ -47,6 +47,6 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
 model = IllumiganModel(manager=manager)
 
 
-dummy_input = torch.randn(1, 4, 256, 256)
+dummy_input = torch.randn(1, 4, 256, 256).to(manager.device)
 
 torch.onnx.export(model.generator_net, dummy_input, "test.onnx")
