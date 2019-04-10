@@ -35,7 +35,7 @@ if server:
     options = './experiments/base_model/options.json'
     hyperparams = './experiments/base_model/params.json'
     
-
+# working code
 manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
@@ -49,4 +49,4 @@ model = IllumiganModel(manager=manager)
 
 dummy_input = torch.randn(1, 4, 256, 256).to(manager.device)
 
-torch.onnx.export(model.generator_net, dummy_input, "test.onnx")
+torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
