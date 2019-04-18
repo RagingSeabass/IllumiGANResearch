@@ -128,6 +128,13 @@ class IllumiganModel(BaseModel):
 
             self.load_network(manager)
 
+            if self.is_cuda_ready:
+                    self.generator_net = torch.nn.DataParallel(
+                        self.generator_net).cuda()
+                    self.discriminator_net = torch.nn.DataParallel(
+                        self.discriminator_net).cuda()
+
+
             self.manager.get_logger('test').info(
                 f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
