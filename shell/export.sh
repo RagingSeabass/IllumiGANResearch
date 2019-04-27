@@ -40,8 +40,8 @@ NEW_UUID=$(date +"%d%H%M%S")
 
 ### -- Specify the output and error file. %J is the job-id --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o ./output/_bsub/%J.out
-#BSUB -e ./output/_bsub/%J.err
+BSUB -o ./output/_bsub/%J.out
+BSUB -e ./output/_bsub/%J.err
 # -- end of LSF options --
 
 module unload cuda

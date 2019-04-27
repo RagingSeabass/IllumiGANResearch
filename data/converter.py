@@ -5,10 +5,10 @@ import imageio
 
 
 
-x1_files = glob.glob('train/long/*.ARW')
-x2_files = glob.glob('train/short/*.ARW')
-x3_files = glob.glob('test/long/*.ARW')
-x4_files = glob.glob('train/short/*.ARW')
+x1_files = glob.glob('data/train/long/*.ARW')
+x2_files = glob.glob('data/train/short/*.ARW')
+x3_files = glob.glob('data/test/long/*.ARW')
+x4_files = glob.glob('data/train/short/*.ARW')
 
 for f in x1_files:
     with rawpy.imread(f) as raw:
