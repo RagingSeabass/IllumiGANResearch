@@ -142,9 +142,9 @@ class JPGDataset(Dataset):
 
         if self.manager.is_train:
             
-            x_image = self.x_images[pair.ratio_key][index]
-            x_image_processed = self.x_images_processed[pair.ratio_key][index]
-            y_image = self.y_images[index]
+            x_image = self.x_images[pair.ratio_key][pair.index]
+            x_image_processed = self.x_images_processed[pair.ratio_key][pair.index]
+            y_image = self.y_images[pair.index]
             
             transform_list = []
             if self.transform_image:
@@ -162,8 +162,8 @@ class JPGDataset(Dataset):
 
         else:
             
-            x_image = self.x_images[pair.ratio_key][index]
-            y_image = self.y_images[index]
+            x_image = self.x_images[pair.ratio_key][pair.index]
+            y_image = self.y_images[pair.index]
             
             transform_list = []
             transform_list.append(transforms.ToTensor())
