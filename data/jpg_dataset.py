@@ -1,14 +1,14 @@
 import os.path
 import glob
 from torch.utils.data import Dataset
-from .arw_image import ARW
 import numpy as np
 import torch
+from torchvision import transforms
 import scipy.io
+from PIL import Image
 
 
-
-class ARWDataset(Dataset):
+class JPGDataset(Dataset):
     """ 
         ARW Dataset. 
         Dataset with a pair of images
@@ -28,12 +28,14 @@ class ARWDataset(Dataset):
 
     number_of_pairs = 0
 
-    def __init__(self, manager, x_folder, y_folder):
+    transform_image = False
+
+    def __init__(self, manager, x_folder, y_folder, transforms=False):
         super().__init__()
 
         self.manager = manager
         self.data_dir = manager.get_data_dir()
-
+        self.transform_image = transforms;
         self.patch_size = manager.get_hyperparams().get("patch_size")
 
         # Sanity checks 
@@ -49,18 +51,17 @@ class ARWDataset(Dataset):
         self.x_path = f"{self.data_dir}{x_folder}/"
         self.y_path = f"{self.data_dir}{y_folder}/"
 
-        x_data = glob.glob(f'{self.x_path}*.ARW')
+        x_data = glob.glob(f'{self.x_path}*.jpg')
         self.x_ids = np.unique([int(os.path.basename(res)[0:5]) for res in x_data])
 
-        y_data = glob.glob(f'{self.y_path}*.ARW')
+        y_data = glob.glob(f'{self.y_path}*.jpg')
         self.y_ids = np.unique([int(os.path.basename(res)[0:5]) for res in y_data])
 
         max_size = manager.get_options().get("max_dataset_size")
         if max_size != 0 and not isinstance(max_size, int):
             raise Exception("Max size must be int")
         
-        # If there is a max limit to the data size, we randomly pick an amount of them 
-
+        # If there is a max limit to the data size
         if max_size:
             self.x_ids = np.random.choice(self.x_ids, max_size)
             self.y_images = np.array([None] * max_size)
@@ -70,7 +71,7 @@ class ARWDataset(Dataset):
             self.x_images_processed['100'] = np.array([None] * max_size)
             self.x_images_processed['250'] = np.array([None] * max_size)
             self.x_images_processed['300'] = np.array([None] * max_size) 
-            self.xy_pairs = np.array([None] * (max_size*self.pair_types))
+            self.xy_pairs = np.array([None] * (max_size * self.pair_types))
         else:
             self.y_images = np.array([None] * len(self.x_ids)) 
             self.x_images['100'] = np.array([None] * len(self.x_ids))
@@ -83,6 +84,7 @@ class ARWDataset(Dataset):
         
         self.load()    
 
+        # Final check
         if len(self.y_ids) < manager.get_hyperparams().get('batch_size'):
             raise Exception('Batch size must not be larger than number of data points!')
 
@@ -91,22 +93,22 @@ class ARWDataset(Dataset):
     def load(self):
         """
             Load images from the x and y paths.
-            Images must be ARW files and have XXXXX_00_XX.ARW naming
+            Images must be JPG files and have XXXXX_00_XX.jpg naming
         """
         self.number_of_pairs = 0
         for index, x_id in enumerate(self.x_ids):
             
-            x_files = glob.glob(self.x_path + '%05d_00*.ARW'%x_id)
-            y_files = glob.glob(self.y_path + '%05d_00*.ARW'%x_id)
+            x_files = glob.glob(self.x_path + '%05d_00*.jpg'%x_id)
+            y_files = glob.glob(self.y_path + '%05d_00*.jpg'%x_id)
 
             y_exposure = self.get_exposure(y_files[0])   
 
             # post process out image 
-            arw = ARW(y_files[0])
-            arw.postprocess()
-            self.y_images[index] = arw
+            jpg = Image.open(y_files[0])       
+            self.y_images[index] = np.array(jpg, dtype=np.float32)
 
             for x_path in x_files:
+                
                 x_exposure = self.get_exposure(x_path)
 
                 ratio = min(y_exposure/x_exposure, 300)
@@ -115,16 +117,11 @@ class ARWDataset(Dataset):
                 self.xy_pairs[self.number_of_pairs] = ExposureImagePair(x_path, index, ratio_key)
 
                 # Pack image into 4 channels
-                arw = ARW(x_path)
-                arw.pack(ratio)
-
-                self.x_images[ratio_key][index] = arw
-
-                # Postprocessed x-image used for discriminator training
-                arw = ARW(x_path)
-                arw.postprocess()
-
-                self.x_images_processed[ratio_key][index] = arw
+                
+                # post process out image 
+                jpg = Image.open(x_path)   
+                self.x_images[ratio_key][index] = jpg
+                self.x_images_processed[ratio_key][index] = jpg
 
                 self.number_of_pairs += 1
 
@@ -144,61 +141,36 @@ class ARWDataset(Dataset):
         # returns X, Y
 
         if self.manager.is_train:
-            return self.get_image_patch(pair.index, pair.ratio_key)        
+            
+            x_image = self.x_images[pair.ratio_key][index].get()
+            x_image_processed = self.x_images_processed[pair.ratio_key][index].get()
+            y_image = self.y_images[index].get()
+            
+            transform_list = []
+            if self.transform_image:
+                transform_list.append(transforms.RandomCrop(254))
+                if np.random.randint(2) == 1:
+                    transform_list.append(transforms.RandomHorizontalFlip(1))
+                if np.random.randint(2) == 1:
+                    transform_list.append(transforms.RandomVerticalFlip(1))
+                transform_list.append(transforms.ToTensor())
+                transform_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
+
+            tt = transforms.Compose(transform_list)
+
+            return tt(x_image), tt(x_image_processed), tt(y_image)
+
         else:
-            return self.get_image(pair.index, pair.ratio_key)
+            
+            x_image = self.x_images[pair.ratio_key][index].get()
+            y_image = self.y_images[index].get()
+            
+            transform_list = []
+            transform_list.append(transforms.ToTensor())
 
-    def get_image(self, index, ratio_key):
-        
-        x_image = self.x_images[ratio_key][index].get()
-        y_image = self.y_images[index].get()
-        
-        x_patch = np.minimum(x_image,1.0)
-        y_patch  = np.maximum(y_image, 0.0)
+            tt = transforms.Compose(transform_list)
 
-        # Unpack before returning
-        return x_patch, y_patch
-
-    def get_image_patch(self, index, ratio_key):
-        """Get an image patch"""
-
-        x_image = self.x_images[ratio_key][index].get()
-        x_images_processed = self.x_images_processed[ratio_key][index].get()
-        y_image = self.y_images[index].get()
-    
-        H, W, D = x_image.shape
-
-        xx = np.random.randint(0, W - self.patch_size)
-        yy = np.random.randint(0, H - self.patch_size)
-
-        x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
-        x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
-        
-        y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
-
-        # Data augmentations
-        if np.random.randint(2) == 1:  # random flip
-            x_patch = np.flip(x_patch, axis=1)
-            x_patch_processed = np.flip(x_patch_processed, axis=1)
-            y_patch = np.flip(y_patch, axis=1)
-        if np.random.randint(2) == 1:
-            x_patch = np.flip(x_patch, axis=2)
-            x_patch_processed = np.flip(x_patch_processed, axis=2)
-            y_patch = np.flip(y_patch, axis=2)
-
-        # Rotate image 90 deg
-        if np.random.randint(2) == 1:  # random transpose
-            x_patch = np.transpose(x_patch, (1, 0, 2))
-            x_patch_processed = np.transpose(x_patch_processed, (1, 0, 2))
-            y_patch = np.transpose(y_patch, (1, 0, 2))
-
-        x_patch = np.minimum(x_patch,1.0)
-        x_patch_processed = np.minimum(x_patch_processed, 1.0)
-        
-        y_patch  = np.maximum(y_patch, 0.0)
-
-        # Unpack before returning
-        return x_patch, x_patch_processed, y_patch
+            return tt(x_image), tt(y_image)
 
     def __len__(self):
         """We return the total number of counted pairs"""
