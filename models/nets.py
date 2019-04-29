@@ -23,12 +23,7 @@ class GeneratorUNetV1(nn.Module):
         self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0)
         self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)
         self.outc = OutConvBLock(32, 3)
-<<<<<<< HEAD
-
-=======
         
->>>>>>> JPGVersion
-
     def forward(self, x):
         x1 = self.inc(x)
         x2 = self.d1(x1)
