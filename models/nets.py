@@ -35,7 +35,7 @@ class GeneratorUNetV1(nn.Module):
         x = self.u3(x, x2)
         x = self.u4(x, x1)
         x = self.outc(x)
-        x = nn.functional.pixel_shuffle(x, 2)
+        x = nn.functional.pixel_shuffle(x, 1)
 
         return x
 
