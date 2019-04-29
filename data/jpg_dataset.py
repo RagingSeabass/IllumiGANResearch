@@ -149,7 +149,7 @@ class JPGDataset(Dataset):
             transform_x_list = []
             transform_y_list = []
             if self.transform_image:
-                transform_x_list.append(transforms.RandomCrop(128))
+                transform_x_list.append(transforms.RandomCrop(256))
                 transform_y_list.append(transforms.RandomCrop(256))
                 
                 if np.random.randint(2) == 1:
