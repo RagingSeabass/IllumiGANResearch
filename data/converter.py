@@ -12,7 +12,7 @@ x4_files = glob.glob('data/test/short/*.ARW')
 
 for f in x1_files:
     with rawpy.imread(f) as raw:
-        rgb = raw.postprocess(use_camera_wb=False, half_size=False, no_auto_bright=False, output_bps=16)
+        rgb = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=False, output_bps=16)
         imageio.imsave(f[:-4]+'.jpg', rgb)
 
 #for f in x2_files:
@@ -22,7 +22,7 @@ for f in x1_files:
 
 for f in x3_files:
     with rawpy.imread(f) as raw:
-        rgb = raw.postprocess(use_camera_wb=False, half_size=False, no_auto_bright=False, output_bps=16)
+        rgb = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=False, output_bps=16)
         imageio.imsave(f[:-4]+'.jpg', rgb)
 
 #for f in x4_files:
