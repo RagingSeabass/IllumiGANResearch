@@ -22,8 +22,8 @@ class GeneratorUNetV1(nn.Module):
         self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=True, dropout=0.5)
         self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0)
         self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)
-        self.outc = OutConvBLock(32, 12)
-        self.shuffle = pixel_shuffle(2)
+        self.outc = OutConvBLock(32, 3)
+        
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -36,7 +36,7 @@ class GeneratorUNetV1(nn.Module):
         x = self.u3(x, x2)
         x = self.u4(x, x1)
         x = self.outc(x)
-        return self.shuffle(x)
+        return x
 
 
 class Discriminator(nn.Module):
