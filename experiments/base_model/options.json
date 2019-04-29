@@ -3,7 +3,7 @@
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
     "num_workers": 4,
-    "max_dataset_size": 0,
+    "max_dataset_size": 10,
     "save": 500,
     "images": true,
     "save_images": 1000,
