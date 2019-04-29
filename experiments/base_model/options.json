@@ -3,7 +3,7 @@
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
     "num_workers": 4,
-    "max_dataset_size": 32,
+    "max_dataset_size": 10,
     "save": 500,
     "images": true,
     "save_images": 1000,
@@ -11,5 +11,5 @@
         0
     ],
     "debug": false,
-    "load_dir": ""
+    "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/29135140/checkpoints"
 }

@@ -28,7 +28,6 @@ if len(sys.argv) > 2:
     base_dir = str(sys.argv[1])
     server = True
 
-
 # ------- 
 
 options = './experiments/base_model/local_options.json'
