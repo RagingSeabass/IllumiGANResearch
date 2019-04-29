@@ -16,7 +16,6 @@ class BaseModel(ABC):
         
         self.is_cuda_ready = torch.cuda.is_available()
 
-        
         self.save_dir = manager.get_save_dir()
         self.load_dir = manager.get_load_dir()
                 

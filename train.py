@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from data.arw_dataset import ARWDataset
+from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
@@ -40,12 +41,10 @@ manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
 
-dataset = ARWDataset(manager, 'short', 'long')
-dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
-    'batch_size'), shuffle=True, num_workers=0)
+dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
-
 
 total_iterations = 0    # total iterations
 epoch_loss_generator = Average()

@@ -104,7 +104,7 @@ class JPGDataset(Dataset):
             y_exposure = self.get_exposure(y_files[0])   
 
             # post process out image 
-            jpg = Image.open(y_files[0])       
+            jpg = Image.open(y_files[0]).convert('RGB')  
             self.y_images[index] = np.array(jpg, dtype=np.float32)
 
             for x_path in x_files:
@@ -119,7 +119,7 @@ class JPGDataset(Dataset):
                 # Pack image into 4 channels
                 
                 # post process out image 
-                jpg = Image.open(x_path)   
+                jpg = Image.open(x_path).convert('RGB')
                 self.x_images[ratio_key][index] = jpg
                 self.x_images_processed[ratio_key][index] = jpg
 

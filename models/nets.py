@@ -91,6 +91,7 @@ class SingleConvBlock(nn.Module):
         
         model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias)]
+        
         if normalize == 'batch':
                 model.append(nn.BatchNorm2d(out_ch))
         elif normalize == 'instance':
@@ -208,7 +209,6 @@ class GAN_loss(nn.Module):
             0.0: torch.tensor(0.0).to(device),
             1.0: torch.tensor(1.0).to(device)
         }
-
 
     def create_target(self, size, target):
         # Create target tensor of size
