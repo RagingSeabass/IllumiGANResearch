@@ -149,8 +149,8 @@ class JPGDataset(Dataset):
             transform_x_list = []
             transform_y_list = []
             if self.transform_image:
-                transform_x_list.append(transforms.RandomCrop(256))
-                transform_y_list.append(transforms.RandomCrop(512))
+                transform_x_list.append(transforms.RandomCrop(128))
+                transform_y_list.append(transforms.RandomCrop(256))
                 
                 if np.random.randint(2) == 1:
                     transform_x_list.append(transforms.RandomHorizontalFlip(1))
@@ -168,7 +168,7 @@ class JPGDataset(Dataset):
             tx = transforms.Compose(transform_x_list)
             ty = transforms.Compose(transform_y_list)
 
-            return tx(x_image).contiguous(), ty(x_image_processed).contiguous(), ty(y_image).contiguous()
+            return tx(x_image), ty(x_image_processed), ty(y_image)
        
         else:
             

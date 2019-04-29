@@ -12,6 +12,8 @@ from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
+cudnn.enabled = True
+cudnn.benchmark = True
 
 base_dir = "_default/"
 server = False
