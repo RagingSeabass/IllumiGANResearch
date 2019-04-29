@@ -11,6 +11,9 @@ from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
+cudnn.enabled = True
+cudnn.benchmark = True
+
 
 import onnx;
 from onnx_coreml import convert
@@ -25,9 +28,6 @@ if len(sys.argv) > 2:
     base_dir = str(sys.argv[1])
     server = True
 
-# Temporary defined options
-
-cudnn.benchmark = True
 
 # ------- 
 
