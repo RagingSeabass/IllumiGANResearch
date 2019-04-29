@@ -168,8 +168,8 @@ class JPGDataset(Dataset):
             tx = transforms.Compose(transform_x_list)
             ty = transforms.Compose(transform_y_list)
 
-            return tx(x_image), ty(x_image_processed), ty(y_image)
-
+            return tx(x_image).contiguous(), ty(x_image_processed).contiguous(), ty(y_image).contiguous()
+       
         else:
             
             x_image = self.x_images[pair.ratio_key][pair.index]
@@ -180,7 +180,7 @@ class JPGDataset(Dataset):
 
             tt = transforms.Compose(transform_list)
 
-            return tt(x_image), tt(y_image)
+            return tt(x_image).contiguous(), tt(y_image).contiguous()
 
     def __len__(self):
         """We return the total number of counted pairs"""

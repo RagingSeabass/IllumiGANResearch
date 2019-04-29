@@ -25,7 +25,7 @@ if len(sys.argv) > 2:
 
 # Temporary defined options
 
-cudnn.benchmark = True
+# cudnn.benchmark = True
 
 # ------- 
 
