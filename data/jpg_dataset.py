@@ -148,7 +148,7 @@ class JPGDataset(Dataset):
             
             transform_list = []
             if self.transform_image:
-                transform_list.append(transforms.RandomCrop(254))
+                transform_list.append(transforms.RandomCrop(256))
                 if np.random.randint(2) == 1:
                     transform_list.append(transforms.RandomHorizontalFlip(1))
                 if np.random.randint(2) == 1:

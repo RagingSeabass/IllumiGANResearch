@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from data.arw_dataset import ARWDataset
+from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
@@ -43,14 +43,13 @@ manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
 
-dataset = ARWDataset(manager, 'short', 'long')
+dataset = JPGDataset(manager, 'short', 'long', transforms=True)
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
     'batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
 
-
-dummy_input = torch.randn(1, 4, 256, 256).to(manager.device)
+dummy_input = torch.randn(1, 3, 256, 256).to(manager.device)
 torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
 
