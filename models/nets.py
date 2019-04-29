@@ -23,7 +23,7 @@ class GeneratorUNetV1(nn.Module):
         self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0)
         self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)
         self.outc = OutConvBLock(32, 12)
-        self.shuffle = nn.PixelShuffle(2)
+        self.shuffle = pixel_shuffle(2)
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -224,5 +224,27 @@ class GAN_loss(nn.Module):
         loss = self.loss(t_prediction, t_target)
         return loss
 
+class pixel_shuffle(nn.Module):
+    def __init__(self, scale_factor):
+        super(pixel_shuffle, self).__init__()
+        self.scale_factor = scale_factor
+
+    def forward(self, input):
+        scale_factor = self.scale_factor
+        _, in_channels, in_height, in_width = input.shape
+
+        in_channels = int(in_channels)
+        in_height = int(in_height)
+        in_width = int(in_width)
+
+        out_channels = in_channels // (scale_factor * scale_factor)
+        out_height = in_height * scale_factor
+        out_width = in_width * scale_factor
+
+        if scale_factor >= 1:
+            input_view = input.view([-1, out_channels, scale_factor, scale_factor, in_height, in_width])
+            shuffle_out = input_view.permute(0, 1, 4, 2, 5, 3)
+
+        return shuffle_out.contiguous().view([-1, out_channels, out_height, out_width])
 
 
