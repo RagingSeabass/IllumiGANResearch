@@ -105,7 +105,7 @@ class JPGDataset(Dataset):
 
             # post process out image 
             jpg = Image.open(y_files[0]).convert('RGB')  
-            self.y_images[index] = np.array(jpg, dtype=np.float32)
+            self.y_images[index] = jpg
 
             for x_path in x_files:
                 
