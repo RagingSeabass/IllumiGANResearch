@@ -58,7 +58,8 @@ Without noise, the mapping is deterministic.
 
 
 
-TODO: 
 
-- Remove use of getattr
+TODO 05/05 
 
+- Clean up 
+- Save images to comapare JPG to ARW 

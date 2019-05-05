@@ -1,14 +1,11 @@
 import rawpy
 import numpy as np
 
-
-
 class ARW():
     """"""
 
     path = ''
     data = None
-    
     
     def __init__(self, path):
         self.path = path

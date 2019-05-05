@@ -222,28 +222,3 @@ class GAN_loss(nn.Module):
         # Compute loss
         loss = self.loss(t_prediction, t_target)
         return loss
-
-class pixel_shuffle(nn.Module):
-    def __init__(self, scale_factor):
-        super(pixel_shuffle, self).__init__()
-        self.scale_factor = scale_factor
-
-    def forward(self, input):
-        scale_factor = self.scale_factor
-        _, in_channels, in_height, in_width = input.shape
-
-        in_channels = int(in_channels)
-        in_height = int(in_height)
-        in_width = int(in_width)
-
-        out_channels = in_channels // (scale_factor * scale_factor)
-        out_height = in_height * scale_factor
-        out_width = in_width * scale_factor
-
-        if scale_factor >= 1:
-            input_view = input.view([-1, out_channels, scale_factor, scale_factor, in_height, in_width])
-            shuffle_out = input_view.permute(0, 1, 4, 2, 5, 3)
-
-        return shuffle_out.contiguous().view([-1, out_channels, out_height, out_width])
-
-

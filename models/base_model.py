@@ -1,11 +1,15 @@
+import os
 from abc import ABC, abstractmethod
+from collections import OrderedDict
+
+import scipy.io
 import torch
 import torch.nn as nn
-from . import utils
-from collections import OrderedDict
-import os
-import scipy.io
+
 from data.arw_image import ARW
+
+from . import utils
+
 
 class BaseModel(ABC):
     
@@ -48,5 +52,3 @@ class BaseModel(ABC):
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights"""
         pass
-
-

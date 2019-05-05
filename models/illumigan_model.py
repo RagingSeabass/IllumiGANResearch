@@ -17,8 +17,6 @@ class IllumiganModel(BaseModel):
     def __init__(self, manager):
         super().__init__(manager)
 
-        self.norm_layer = ""
-
         # Define generator network
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
@@ -36,7 +34,11 @@ class IllumiganModel(BaseModel):
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
 
-        if manager.is_train:
+
+        if manager.is_train:            
+            ###
+            # NETWORK IS GETTING TRAINED
+            ###
 
              # Get optimizer after we init network
             self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
@@ -49,36 +51,37 @@ class IllumiganModel(BaseModel):
 
             # We initialize a network to be trained
             if manager.resume_training:
+                
+                ###
+                # Continue training
+                ###
 
                 self.generator_schedular = get_lr_scheduler(self.generator_opt, manager.get_hyperparams())
                 self.discriminator_schedular = get_lr_scheduler(self.discriminator_opt, manager.get_hyperparams())
 
                 self.load_network(manager)
-                
-                self.generator_net.cuda()
-                self.discriminator_net.cuda()
 
                 # Move everything to the GPU
+                # Test this
                 for state in self.generator_opt.state.values():
                     for k, v in state.items():
                         if isinstance(v, torch.Tensor):
-                            state[k] = v.cuda()
+                            state[k] = v.to(manager.device)
                 
                 for state in self.discriminator_opt.state.values():
                     for k, v in state.items():
                         if isinstance(v, torch.Tensor):
-                            state[k] = v.cuda()
-                
+                            state[k] = v.to(manager.device)
+
+
                 self.manager.get_logger('train').info(
                     f"Loaded model at checkpoint {manager.get_hyperparams().get('epoch')}")
 
             else:
 
-                #if self.is_cuda_ready:
-                #    self.generator_net = torch.nn.DataParallel(
-                #        self.generator_net).cuda()
-                #    self.discriminator_net = torch.nn.DataParallel(
-                #        self.discriminator_net).cuda()
+                ###
+                # New training
+                ###
 
                 # Create new model and send it to device
                 self.generator_net = init_network(
@@ -96,11 +99,12 @@ class IllumiganModel(BaseModel):
 
                 self.manager.get_logger('train').info(f"Created new model")
 
-            #self.generator_net.train()
-            #self.discriminator_net.train()
-
         else:
             
+            ###
+            # Testing model
+            ###
+
             # Get optimizer after we init network
             self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
                                                     lr=lr,
@@ -136,12 +140,6 @@ class IllumiganModel(BaseModel):
         checkpoint_gn = torch.load(load_gn, map_location=manager.device)
         checkpoint_ds = torch.load(load_ds, map_location=manager.device)
 
-        #from collections import OrderedDict
-        #new_state_dict = OrderedDict()
-        #for k, v in checkpoint_gn['net_state_dict'].items():
-        #    name = k[7:] # remove `module.`
-        #    new_state_dict[name] = v
-
         self.generator_net.load_state_dict(checkpoint_gn['gen_state_dict'])
         self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
 
@@ -152,6 +150,9 @@ class IllumiganModel(BaseModel):
             checkpoint_gn['schedular_state_dict'])
         self.discriminator_schedular.load_state_dict(
             checkpoint_ds['schedular_state_dict'])
+                    
+        self.generator_net.to(manager.device)
+        self.discriminator_net.to(manager.device)
 
     def save_networks(self, epochs):
         """Save the different models into the same"""
@@ -160,32 +161,27 @@ class IllumiganModel(BaseModel):
         save_gn = os.path.join(self.save_dir, save_filename_gn)
         save_ds = os.path.join(self.save_dir, save_filename_ds)
 
-        # Load from data parallelize
-        if len(self.gpus) > 1:
-            generator_net = self.generator_net.module
-            discriminator_net = self.discriminator_net.module
-        else:
-            generator_net = self.generator_net
-            discriminator_net = self.discriminator_net
-
         torch.save({
-            'gen_state_dict': generator_net.state_dict(),
+            'gen_state_dict': self.generator_net.state_dict(),
             'gen_opt_state_dict': self.generator_opt.state_dict(),
             'schedular_state_dict': self.generator_schedular.state_dict()
         }, save_gn)
 
         torch.save({
-            'disc_state_dict': discriminator_net.state_dict(),
+            'disc_state_dict': self.discriminator_net.state_dict(),
             'disc_opt_state_dict': self.discriminator_opt.state_dict(),
             'schedular_state_dict': self.discriminator_schedular.state_dict()
         }, save_ds)
 
         # Move models back to gpu after save
-        if self.is_cuda_ready:
-            self.generator_net.cuda()
-            self.discriminator_net.cuda()
+        
+        self.generator_net.to(self.manager.device)
+        self.discriminator_net.to(self.manager.device)
 
     def save_visuals(self, num, epoch):
+        
+        # This needs to be tested!!! 
+
         if not os.path.isdir(self.manager.get_img_dir() + str(epoch) + '/'):
             os.makedirs(self.manager.get_img_dir() + str(epoch) + '/')
 
@@ -204,6 +200,7 @@ class IllumiganModel(BaseModel):
                 (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
             scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
                 self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
+
 
     def set_input(self, x, x_processed, y):
         """Takes input of form X Y and sends it to the GPU"""
@@ -250,7 +247,6 @@ class IllumiganModel(BaseModel):
 
     def get_L1_loss(self):
         return self.generator_l1_loss.item()
-
 
     def get_generator_loss(self):
         return self.generator_loss.item()
