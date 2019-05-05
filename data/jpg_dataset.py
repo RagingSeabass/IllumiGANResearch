@@ -159,7 +159,6 @@ class JPGDataset(Dataset):
                     transform_x_list.append(transforms.RandomVerticalFlip(1))
                     transform_y_list.append(transforms.RandomVerticalFlip(1))
 
-
                 transform_x_list.append(transforms.ToTensor())
                 transform_y_list.append(transforms.ToTensor())
                 transform_x_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
