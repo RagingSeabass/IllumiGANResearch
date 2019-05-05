@@ -5,8 +5,8 @@
     "num_workers": 0,
     "max_dataset_size": 4,
     "save": 10,
-    "images": false,
-    "save_images": 5,
+    "images": true,
+    "save_images": 2,
     "gpu_ids": [
         0
     ],

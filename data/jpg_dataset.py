@@ -149,8 +149,8 @@ class JPGDataset(Dataset):
             transform_x_list = []
             transform_y_list = []
             if self.transform_image:
-                transform_x_list.append(transforms.RandomCrop(128))
-                transform_y_list.append(transforms.RandomCrop(128))
+                transform_x_list.append(transforms.RandomCrop(self.patch_size))
+                transform_y_list.append(transforms.RandomCrop(self.patch_size))
                 
                 if np.random.randint(2) == 1:
                     transform_x_list.append(transforms.RandomHorizontalFlip(1))
@@ -163,8 +163,7 @@ class JPGDataset(Dataset):
                 transform_x_list.append(transforms.ToTensor())
                 transform_y_list.append(transforms.ToTensor())
                 transform_x_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
-                #transform_y_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
-            
+                
             tx = transforms.Compose(transform_x_list)
             ty = transforms.Compose(transform_y_list)
 

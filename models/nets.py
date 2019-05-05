@@ -95,7 +95,7 @@ class SingleConvBlock(nn.Module):
         elif normalize == 'instance':
             model.append(nn.InstanceNorm2d(out_ch))
 
-        model.append(nn.ELU())
+        model.append(nn.LeakyReLU(0,2))
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
@@ -115,28 +115,28 @@ class DoubleConvBlock(nn.Module):
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.BatchNorm2d(out_ch))
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
 
         elif normalize == 'instance':
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
             model.append(nn.InstanceNorm2d(out_ch))
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
         else:
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
             model.append(nn.Conv2d(out_ch, out_ch, kernel_size=3,
                                    stride=1, padding=1, bias=bias))
-            model.append(nn.ELU())
+            model.append(nn.LeakyReLU(0,2))
 
         if dropout > 0:
             model.append(nn.Dropout(dropout))
@@ -182,8 +182,8 @@ class UpBlock(nn.Module):
 class OutConvBLock(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(OutConvBLock, self).__init__()
-        self.f = nn.Conv2d(in_ch, out_ch, kernel_size=1,
-                           stride=1, padding=0, bias=True)
+        self.f = nn.Conv2d(in_ch, out_ch, kernel_size=3,
+                           stride=1, padding=1, bias=True)
         self.h = nn.Tanh()
 
     def forward(self, x):

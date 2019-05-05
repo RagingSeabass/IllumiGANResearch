@@ -7,11 +7,13 @@ import torch.optim as optim
 from torchsummary import summary
 import numpy as np
 
+from PIL import Image
 from data.arw_image import ARW
 from models.base_model import BaseModel
 from models.nets import GeneratorUNetV1, Discriminator, GAN_loss
 from models.utils import get_lr_scheduler, init_network
 
+from .utils import tensor2img
 
 class IllumiganModel(BaseModel):
     def __init__(self, manager):
@@ -188,18 +190,23 @@ class IllumiganModel(BaseModel):
         for i, y in enumerate(self.y):
             # path to original img
             # 3, 1024, 1024 (Crop)
-            real_y_rgb = y.data.cpu().numpy()               
+            real_y_rgb = tensor2img(y)            
 
             # 3, 1024, 1024 (Crop)
-            fake_y_rgb = self.fake_y[i].data.cpu().numpy()
+            fake_y_rgb = tensor2img(self.fake_y[i])
+            #fake_y_rgb = self.fake_y[i].data.cpu().numpy()
 
-            real_y_rgb = real_y_rgb.transpose(1, 2, 0) * 225
-            fake_y_rgb = fake_y_rgb.transpose(1, 2, 0) * 225
+            #real_y_rgb = real_y_rgb.transpose(1, 2, 0) * 225
+            #fake_y_rgb = fake_y_rgb.transpose(1, 2, 0) * 225
 
             temp = np.concatenate(
                 (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
-            scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
-                self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
+            
+            image_pil = Image.fromarray(temp)
+            image_pil.save(self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
+            
+            #scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
+            #    self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
 
 
     def set_input(self, x, x_processed, y):
