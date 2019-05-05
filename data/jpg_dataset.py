@@ -146,28 +146,28 @@ class JPGDataset(Dataset):
             x_image_processed = self.x_images_processed[pair.ratio_key][pair.index]
             y_image = self.y_images[pair.index]
             
-            transform_x_list = []
-            transform_y_list = []
+            transform_list = []
+            #transform_y_list = []
             if self.transform_image:
-                transform_x_list.append(transforms.RandomCrop(self.patch_size))
-                transform_y_list.append(transforms.RandomCrop(self.patch_size))
+                transform_list.append(transforms.RandomCrop(self.patch_size))
+                #transform_y_list.append(transforms.RandomCrop(self.patch_size))
                 
                 if np.random.randint(2) == 1:
-                    transform_x_list.append(transforms.RandomHorizontalFlip(1))
-                    transform_y_list.append(transforms.RandomHorizontalFlip(1))
+                    transform_list.append(transforms.RandomHorizontalFlip(1))
+                    #transform_y_list.append(transforms.RandomHorizontalFlip(1))
                 if np.random.randint(2) == 1:
-                    transform_x_list.append(transforms.RandomVerticalFlip(1))
-                    transform_y_list.append(transforms.RandomVerticalFlip(1))
+                    transform_list.append(transforms.RandomVerticalFlip(1))
+                    #transform_y_list.append(transforms.RandomVerticalFlip(1))
 
 
-                transform_x_list.append(transforms.ToTensor())
-                transform_y_list.append(transforms.ToTensor())
-                transform_x_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
+                transform_list.append(transforms.ToTensor())
+                #transform_y_list.append(transforms.ToTensor())
+                transform_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
                 
-            tx = transforms.Compose(transform_x_list)
-            ty = transforms.Compose(transform_y_list)
+            tt = transforms.Compose(transform_list)
+            ##ty = transforms.Compose(transform_y_list)
 
-            return tx(x_image), ty(x_image_processed), ty(y_image)
+            return tt(x_image), tt(x_image_processed), tt(y_image)
        
         else:
             

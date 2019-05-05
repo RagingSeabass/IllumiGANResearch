@@ -194,19 +194,12 @@ class IllumiganModel(BaseModel):
 
             # 3, 1024, 1024 (Crop)
             fake_y_rgb = tensor2img(self.fake_y[i])
-            #fake_y_rgb = self.fake_y[i].data.cpu().numpy()
-
-            #real_y_rgb = real_y_rgb.transpose(1, 2, 0) * 225
-            #fake_y_rgb = fake_y_rgb.transpose(1, 2, 0) * 225
 
             temp = np.concatenate(
                 (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
             
             image_pil = Image.fromarray(temp)
             image_pil.save(self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
-            
-            #scipy.misc.toimage(temp, high=255, low=0, cmin=0, cmax=255).save(
-            #    self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
 
 
     def set_input(self, x, x_processed, y):
