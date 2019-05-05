@@ -12,9 +12,6 @@ from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 
-cudnn.enabled = True
-cudnn.benchmark = True
-
 base_dir = "_default/"
 server = False
 
@@ -24,10 +21,10 @@ if len(sys.argv) > 1:
 if len(sys.argv) > 2:
     base_dir = str(sys.argv[1])
     server = True
+    cudnn.enabled = True
+    cudnn.benchmark = True
 
 # Temporary defined options
-
-# cudnn.benchmark = True
 
 # ------- 
 

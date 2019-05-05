@@ -86,11 +86,11 @@ class IllumiganModel(BaseModel):
                 # Create new model and send it to device
                 self.generator_net = init_network(
                     self.generator_net, gpu_ids=self.gpus)
-                self.generator_net.cuda()
+                self.generator_net.to(manager.device)
 
                 self.discriminator_net = init_network(
                     self.discriminator_net, gpu_ids=self.gpus)
-                self.discriminator_net.cuda()
+                self.discriminator_net.to(manager.device)
                 
                 self.generator_schedular = get_lr_scheduler(
                     self.generator_opt, manager.get_hyperparams())

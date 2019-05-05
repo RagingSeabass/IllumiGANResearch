@@ -20,7 +20,7 @@
 #BSUB -R "select[gpu32gb]"
 
 ### Ask for NVLINK - Meaning: 
-#BSUB -R "select[sxm2]"
+### BSUB -R "select[sxm2]"
 
 ### -- Select the resources: 1 gpu in exclusive proce   ss mode --
 #BSUB -gpu "num=1:mode=exclusive_process"
@@ -58,7 +58,6 @@ module load cudnn/v7.4.2.24-prod-cuda-9.2
 nvidia-smi
 
 /appl/cuda/9.2/samples/bin/x86_64/linux/release/deviceQuery
-
 
 export PYTHONPATH=
 python3 -m venv env
