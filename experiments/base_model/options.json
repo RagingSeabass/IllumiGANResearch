@@ -4,9 +4,9 @@
     "validation_dir": "./data/validation",
     "num_workers": 0,
     "max_dataset_size": 0,
-    "save": 500,
+    "save": 250,
     "images": true,
-    "save_images": 1000,
+    "save_images": 250,
     "gpu_ids": [
         0
     ],
