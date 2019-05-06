@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import torch
 from torchvision import transforms
+from torchvision.transforms.functional import crop
 import scipy.io
 from PIL import Image
 
@@ -146,10 +147,28 @@ class JPGDataset(Dataset):
             x_image_processed = self.x_images_processed[pair.ratio_key][pair.index]
             y_image = self.y_images[pair.index]
             
+            width, height = x_image.size
+
+            xx = np.random.randint(0, width - self.patch_size)
+            yy = np.random.randint(0, height - self.patch_size)
+
+            x_np = np.array(x_image)
+            x_p_np = np.array(x_image_processed)
+            y_np = np.array(y_image)
+
+            mult = 2
+            x_patch = x_np[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+            x_patch_processed = x_p_np[yy * mult:yy * mult + self.patch_size * mult, xx * mult:xx * mult + self.patch_size * mult, :]     
+            y_patch  = y_np[yy * mult:yy * mult + self.patch_size * mult, xx * mult:xx * mult + self.patch_size * mult, :]
+
+            x_image = Image.fromarray(x_patch)
+            x_image_processed = Image.fromarray(x_patch_processed)
+            y_image = Image.fromarray(y_patch)
+
             transform_list = []
             #transform_y_list = []
             if self.transform_image:
-                transform_list.append(transforms.RandomCrop(self.patch_size))
+                #transform_list.append(transforms.RandomCrop(self.patch_size))
                 #transform_y_list.append(transforms.RandomCrop(self.patch_size))
                 
                 if np.random.randint(2) == 1:
