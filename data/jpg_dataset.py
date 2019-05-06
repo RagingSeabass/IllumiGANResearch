@@ -119,9 +119,10 @@ class JPGDataset(Dataset):
 
                 # Pack image into 4 channels
                 
-                # post process out image 
+                # LETS HALF THE SIZES OF THE INPUT
                 jpg = Image.open(x_path)
-                self.x_images[ratio_key][index] = np.asarray(jpg)
+                W, H = jpg.size
+                self.x_images[ratio_key][index] = np.asarray(jpg.resize((round(W/2),round(H/2)), Image.ANTIALIAS))
                 self.x_images_processed[ratio_key][index] = np.asarray(jpg)
 
                 self.number_of_pairs += 1
@@ -148,8 +149,7 @@ class JPGDataset(Dataset):
             y_image = self.y_images[pair.index]
             
             H, W, D = x_image.shape
-
-
+            
             xx = np.random.randint(0, W - self.patch_size)
             yy = np.random.randint(0, H - self.patch_size)
 
@@ -163,7 +163,6 @@ class JPGDataset(Dataset):
             yy2x = yy * mult
             yyps2x = yy2x + self.patch_size * mult
 
-
             x_patch = x_image[yy : yyps, xx : xxps, :]
             x_patch_processed = x_image_processed[yy2x : yyps2x, xx2x : xxps2x, :]     
             y_patch  = y_image[yy2x : yyps2x, xx2x : xxps2x, :]
@@ -173,11 +172,8 @@ class JPGDataset(Dataset):
             y_image = Image.fromarray(y_patch)
 
             transform_list = []
-            #transform_y_list = []
             if self.transform_image:
-                #transform_list.append(transforms.RandomCrop(self.patch_size))
-                #transform_y_list.append(transforms.RandomCrop(self.patch_size))
-                
+
                 if np.random.randint(2) == 1:
                     transform_list.append(transforms.RandomHorizontalFlip(1))
                     #transform_y_list.append(transforms.RandomHorizontalFlip(1))
