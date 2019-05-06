@@ -14,15 +14,15 @@ from utils import Average, TrainManager
 
 base_dir = "_default/"
 server = False
-
+cudnn.enabled = True
+cudnn.benchmark = True
 if len(sys.argv) > 1:
     base_dir = str(sys.argv[1])
 
 if len(sys.argv) > 2:
     base_dir = str(sys.argv[1])
     server = True
-    cudnn.enabled = True
-    cudnn.benchmark = True
+
 
 # Temporary defined options
 
