@@ -105,8 +105,8 @@ class JPGDataset(Dataset):
             y_exposure = self.get_exposure(y_files[0])   
 
             # post process out image 
-            jpg = Image.open(y_files[0]).convert('RGB')  
-            self.y_images[index] = jpg
+            jpg = Image.open(y_files[0])
+            self.y_images[index] = np.asarray(jpg)
 
             for x_path in x_files:
                 
@@ -120,9 +120,9 @@ class JPGDataset(Dataset):
                 # Pack image into 4 channels
                 
                 # post process out image 
-                jpg = Image.open(x_path).convert('RGB')
-                self.x_images[ratio_key][index] = jpg
-                self.x_images_processed[ratio_key][index] = jpg
+                jpg = Image.open(x_path)
+                self.x_images[ratio_key][index] = np.asarray(jpg)
+                self.x_images_processed[ratio_key][index] = np.asarray(jpg)
 
                 self.number_of_pairs += 1
 
@@ -147,19 +147,26 @@ class JPGDataset(Dataset):
             x_image_processed = self.x_images_processed[pair.ratio_key][pair.index]
             y_image = self.y_images[pair.index]
             
-            width, height = x_image.size
+            H, W, D = x_image.shape
 
-            xx = np.random.randint(0, width - self.patch_size)
-            yy = np.random.randint(0, height - self.patch_size)
 
-            x_np = np.array(x_image)
-            x_p_np = np.array(x_image_processed)
-            y_np = np.array(y_image)
+            xx = np.random.randint(0, W - self.patch_size)
+            yy = np.random.randint(0, H - self.patch_size)
+
+            xxps = xx + self.patch_size
+            yyps = yy + self.patch_size
 
             mult = 2
-            x_patch = x_np[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
-            x_patch_processed = x_p_np[yy * mult:yy * mult + self.patch_size * mult, xx * mult:xx * mult + self.patch_size * mult, :]     
-            y_patch  = y_np[yy * mult:yy * mult + self.patch_size * mult, xx * mult:xx * mult + self.patch_size * mult, :]
+            
+            xx2x = xx * mult
+            xxps2x = xx2x + self.patch_size * mult
+            yy2x = yy * mult
+            yyps2x = yy2x + self.patch_size * mult
+
+
+            x_patch = x_image[yy : yyps, xx : xxps, :]
+            x_patch_processed = x_image_processed[yy2x : yyps2x, xx2x : xxps2x, :]     
+            y_patch  = y_image[yy2x : yyps2x, xx2x : xxps2x, :]
 
             x_image = Image.fromarray(x_patch)
             x_image_processed = Image.fromarray(x_patch_processed)
