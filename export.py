@@ -48,11 +48,11 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
 
 model = IllumiganModel(manager=manager)
 
+
 dummy_input = torch.randn(1, 3, 256, 256).to(manager.device)
+
 torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
-
-model = onnx.load('./Illumigan.onnx')
-cml = convert(model)
-
-cml.save('./Illumigan.mlmodel')
+onnx_model = onnx.load('./Illumigan.onnx')
+mlmodel = convert(onnx_model)
+mlmodel.save('coreml_model.mlmodel')

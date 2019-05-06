@@ -122,7 +122,7 @@ class JPGDataset(Dataset):
                 # LETS HALF THE SIZES OF THE INPUT
                 jpg = Image.open(x_path)
                 W, H = jpg.size
-                self.x_images[ratio_key][index] = np.asarray(jpg.resize((round(W/2),round(H/2)), Image.ANTIALIAS))
+                self.x_images[ratio_key][index] = np.asarray(jpg.resize((round(W/3),round(H/3)), Image.ANTIALIAS))
                 self.x_images_processed[ratio_key][index] = np.asarray(jpg)
 
                 self.number_of_pairs += 1
@@ -156,7 +156,7 @@ class JPGDataset(Dataset):
             xxps = xx + self.patch_size
             yyps = yy + self.patch_size
 
-            mult = 2
+            mult = 3
             
             xx2x = xx * mult
             xxps2x = xx2x + self.patch_size * mult
@@ -176,19 +176,18 @@ class JPGDataset(Dataset):
 
                 if np.random.randint(2) == 1:
                     transform_list.append(transforms.RandomHorizontalFlip(1))
-                    #transform_y_list.append(transforms.RandomHorizontalFlip(1))
+                    
                 if np.random.randint(2) == 1:
                     transform_list.append(transforms.RandomVerticalFlip(1))
-                    #transform_y_list.append(transforms.RandomVerticalFlip(1))
+                    
 
 
                 transform_list.append(transforms.ToTensor())
-                #transform_y_list.append(transforms.ToTensor())
+                
                 transform_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
                 
             tt = transforms.Compose(transform_list)
-            ##ty = transforms.Compose(transform_y_list)
-
+            
             return tt(x_image), tt(x_image_processed), tt(y_image)
        
         else:
