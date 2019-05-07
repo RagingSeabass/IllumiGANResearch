@@ -3,7 +3,7 @@ from torch.nn import init
 import torch
 import numpy as np
 from PIL import Image
-
+from torchvision import transforms
 
 def get_lr_scheduler(optim, hyperparameters):
     """Returns the learning rate scheduler"""
@@ -44,14 +44,18 @@ def init_network(net, gpu_ids=[]):
 def tensor2img(input_img):
     if not isinstance(input_img, np.ndarray):
         if isinstance(input_img, torch.Tensor):  # get the data from a variable
-            image_tensor = input_img.data
+            
+            loader = transforms.Compose([transforms.ToPILImage()])
+            return np.asarray(loader(input_img))
+        
         else:
             return input_img
 
-        image_numpy = image_tensor.cpu().float().numpy()  # convert it into a numpy array
+        #image_numpy = image_tensor.cpu().float().numpy()  # convert it into a numpy array
 
         # FROM C,H,W to H,W,C
-        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) * 255.0  # post-processing: tranpose and scaling
+
+        #image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2 * 255.0  # post-processing: tranpose and scaling
     else:  # if it is a numpy array, do nothing
         image_numpy = input_img
     return image_numpy.astype(np.uint8)
