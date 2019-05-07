@@ -45,6 +45,7 @@ def tensor2img(input_img):
     if not isinstance(input_img, np.ndarray):
         if isinstance(input_img, torch.Tensor):  # get the data from a variable
             
+            input_img =input_img.cpu()
             loader = transforms.Compose([transforms.ToPILImage()])
             return np.asarray(loader(input_img))
         
@@ -52,9 +53,7 @@ def tensor2img(input_img):
             return input_img
 
         #image_numpy = image_tensor.cpu().float().numpy()  # convert it into a numpy array
-
         # FROM C,H,W to H,W,C
-
         #image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2 * 255.0  # post-processing: tranpose and scaling
     else:  # if it is a numpy array, do nothing
         image_numpy = input_img
