@@ -56,10 +56,23 @@ but often found the output did not vary significantly as a function of z.
 Conditional GANs do not need noise as long as the input is sufficiently complex so that the input can kind of play the role of noise. 
 Without noise, the mapping is deterministic.
 
+Things we need to test:
+ - Continue to train model 
 
 
+Things we want to try: 
+ - Add intermidiate layers 
+ - Pixelshuffle 3 and 2 
+ - Dropout 
+ - (Instance vs Batch normalizeation)
 
-TODO 05/05 
+Things we need to do 
+ - Write report 
+ - Implement core ml model in app
 
-- Clean up 
-- Save images to comapare JPG to ARW 
+
+Take things of when done and stored safely
+
+Currently running 
+ - 06123439 (First 24h)
+    - 

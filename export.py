@@ -48,11 +48,19 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
 
 model = IllumiganModel(manager=manager)
 
-
-dummy_input = torch.randn(1, 3, 256, 256).to(manager.device)
+dummy_input = torch.randn(1, 3, 512, 512).to(manager.device)
 
 torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
 onnx_model = onnx.load('./Illumigan.onnx')
-mlmodel = convert(onnx_model)
-mlmodel.save('coreml_model.mlmodel')
+
+scale = 2/255.0
+args = dict(
+    is_bgr=False,
+    red_bias = -1,
+    green_bias = -1, 
+    blue_bias = -1,
+    image_scale = scale
+)
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
+mlmodel.save('Illumigan.mlmodel')

@@ -13,7 +13,7 @@ JPGvsARW/
 
 env/
 venv/
-
+*.onnx
 .vscode/
 
 benchmarks

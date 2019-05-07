@@ -47,7 +47,7 @@ model = IllumiganModel(manager=manager)
 
 total_iterations = 0    # total iterations
 epoch_loss_generator = Average()
-epoch_loss_discriminator = Average()
+#epoch_loss_discriminator = Average()
 
 manager.get_logger("train").info(f"Started training | Iteration {total_iterations}")
 
@@ -63,7 +63,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     epoch_start_time = time.time()  # timer for entire epoch
 
     epoch_loss_generator.reset()
-    epoch_loss_discriminator.reset()
+    #epoch_loss_discriminator.reset()
     
     for i, (x, x_processed, y) in enumerate(dataloader):
         
@@ -77,8 +77,8 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         
         model.optimize_parameters()
 
-        epoch_loss_generator.update(model.get_generator_loss())
-        epoch_loss_discriminator.update(model.get_discriminator_loss())
+        epoch_loss_generator.update(model.get_L1_loss())
+        #epoch_loss_discriminator.update(model.get_discriminator_loss())
 
         # Save previes of model images
     
@@ -86,7 +86,10 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
             model.save_visuals(i, epoch)
 
     manager.get_logger("train").info(
-        f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: {epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
+        f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
+
+    #manager.get_logger("train").info(
+    #    f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: { epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
 
     # cache our model every <save_epoch_freq> epochs
     if epoch % manager.options.get("save") == 0:

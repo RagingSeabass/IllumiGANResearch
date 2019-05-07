@@ -106,6 +106,8 @@ class JPGDataset(Dataset):
 
             # post process out image 
             jpg = Image.open(y_files[0])
+ 
+            # SHAPE IS H,W,C
             self.y_images[index] = np.asarray(jpg)
 
             for x_path in x_files:
@@ -122,7 +124,8 @@ class JPGDataset(Dataset):
                 # LETS HALF THE SIZES OF THE INPUT
                 jpg = Image.open(x_path)
                 W, H = jpg.size
-                self.x_images[ratio_key][index] = np.asarray(jpg.resize((round(W/3),round(H/3)), Image.ANTIALIAS))
+
+                self.x_images[ratio_key][index] = np.asarray(jpg.resize((round(W/2),round(H/2)), Image.ANTIALIAS))
                 self.x_images_processed[ratio_key][index] = np.asarray(jpg)
 
                 self.number_of_pairs += 1
@@ -156,7 +159,7 @@ class JPGDataset(Dataset):
             xxps = xx + self.patch_size
             yyps = yy + self.patch_size
 
-            mult = 3
+            mult = 2
             
             xx2x = xx * mult
             xxps2x = xx2x + self.patch_size * mult
@@ -167,25 +170,43 @@ class JPGDataset(Dataset):
             x_patch_processed = x_image_processed[yy2x : yyps2x, xx2x : xxps2x, :]     
             y_patch  = y_image[yy2x : yyps2x, xx2x : xxps2x, :]
 
+
+            # Data augmentations
+            #if np.random.randint(2) == 1:  # random flip
+            #    x_patch = np.flip(x_patch, axis=1)
+            #    x_patch_processed =  np.flip(x_patch_processed, axis=1)
+            #    y_patch = np.flip(y_patch, axis=1)
+            #if np.random.randint(2) == 1:
+            #    x_patch = np.flip(x_patch, axis=2)
+            #    x_patch_processed =  np.flip(x_patch_processed, axis=2)
+            #    y_patch = np.flip(y_patch, axis=2)
+
+            # Rotate image 90 deg
+            #if np.random.randint(2) == 1:  # random transpose
+            #    x_patch = np.transpose(x_patch, (1, 0, 2))
+            #    x_patch_processed = np.transpose(x_patch_processed, (1, 0, 2))
+            #    y_patch = np.transpose(y_patch, (1, 0, 2))
+
+
+            # Net takes C,H,W ( WE TRANSPOSE IT )
+#            x_patch = np.transpose(x_patch, (2,0,1))
+#            x_patch_processed = np.transpose(x_patch_processed, (2,0,1))
+#            y_patch = np.transpose(y_patch, (2, 0, 1))
+
             x_image = Image.fromarray(x_patch)
             x_image_processed = Image.fromarray(x_patch_processed)
             y_image = Image.fromarray(y_patch)
 
             transform_list = []
-            if self.transform_image:
-
-                if np.random.randint(2) == 1:
-                    transform_list.append(transforms.RandomHorizontalFlip(1))
-                    
-                if np.random.randint(2) == 1:
-                    transform_list.append(transforms.RandomVerticalFlip(1))
-                    
-
-
-                transform_list.append(transforms.ToTensor())
-                
-                transform_list.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
-                
+            if np.random.randint(2) == 1:
+                transform_list.append(transforms.RandomHorizontalFlip(1))
+            if np.random.randint(2) == 1:
+                transform_list.append(transforms.RandomVerticalFlip(1))
+            
+            # Converts a PIL Image or numpy.ndarray (H x W x C) in the range
+            # [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0]
+            transform_list.append(transforms.ToTensor())
+            
             tt = transforms.Compose(transform_list)
             
             return tt(x_image), tt(x_image_processed), tt(y_image)

@@ -24,8 +24,8 @@ class GeneratorUNetV1(nn.Module):
         self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=True, dropout=0)
         self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0)
         self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)
-        self.outc = OutConvBLock(32, 27)
-        self.shuffle = nn.PixelShuffle(3)
+        self.outc = OutConvBLock(32, 12)
+        self.shuffle = nn.PixelShuffle(2)
         
     def forward(self, x):
         x1 = self.inc(x)
