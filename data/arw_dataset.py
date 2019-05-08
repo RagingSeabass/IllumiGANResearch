@@ -169,14 +169,22 @@ class ARWDataset(Dataset):
     
         H, W, D = x_image.shape
 
-        xx = np.random.randint(0, W - self.patch_size)
-        yy = np.random.randint(0, H - self.patch_size)
+        #xx = np.random.randint(0, W - self.patch_size)
+        #yy = np.random.randint(0, H - self.patch_size)
 
-        x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        xx = np.random.randint(0, W/2 - self.patch_size/2)
+        yy = np.random.randint(0, H/2 - self.patch_size/2)
+
+        p = round(self.patch_size/2)
+
+        x_patch = x_image[xx:xx + (p), xx:xx + (p), :]
+        #x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
         
-        
-        x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
-        y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        x_patch_processed = x_images_processed[yy * 4:yy * 4 + self.patch_size * 2, xx * 4:xx * 4 + self.patch_size * 2, :]
+        y_patch  = y_image[yy * 4:yy * 4 + self.patch_size * 2, xx * 4:xx * 4 + self.patch_size * 2, :]
+
+        #x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        #y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
         # Data augmentations
         if np.random.randint(2) == 1:  # random flip
@@ -202,9 +210,6 @@ class ARWDataset(Dataset):
         x_patch = np.transpose(x_patch, (2, 0, 1))
         x_patch_processed = np.transpose(x_patch_processed, (2,0,1))
         y_patch = np.transpose(y_patch, (2, 0, 1))
-
-        # x_processed = x_processed.permute(0, 3, 1, 2).to(self.manager.device)
-        # y = y.permute(0, 3, 1, 2).to(self.manager.device)
 
         # Unpack before returning
         return x_patch, x_patch_processed, y_patch
