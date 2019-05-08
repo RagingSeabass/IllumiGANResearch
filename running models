@@ -65,16 +65,27 @@ Things we want to try:
  - Pixelshuffle 3 and 2 
  - Dropout 
  - (Instance vs Batch normalizeation)
+ - 
 
 Things we need to do 
  - Write report 
  - Implement core ml model in app
 
-
 Take things of when done and stored safely
+
+
 
 Currently running 
  - 06123439 (First 24h) (GAN)
     - 
+
+
+Tunings: 
+- Ratio on Generator (100, 50, 20, 10)
+- Patchdiscriminator vs discrimiator 
+- Batch size (1, 8 16)
+- Fine tunin epocs 
+- Learning rate
+
 
 
