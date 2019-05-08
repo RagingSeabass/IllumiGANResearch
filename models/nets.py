@@ -12,15 +12,15 @@ class GeneratorUNetV1(nn.Module):
         super(GeneratorUNetV1, self).__init__()
 
         self.norm = norm_layer
-        self.inc = DoubleConvBlock(3, 32, normalize=norm_layer, bias=True, dropout=0)
+        self.inc = DoubleConvBlock(4, 32, normalize=norm_layer, bias=True, dropout=0)
         self.d1 = DownBlock(32, 64, normalize=norm_layer, bias=True, dropout=0)
         self.d2 = DownBlock(64, 128, normalize=norm_layer, bias=True, dropout=0)
         self.d3 = DownBlock(128, 256, normalize=norm_layer, bias=True, dropout=0)
-        self.d4 = DownBlock(256, 512, normalize=norm_layer, bias=True, dropout=0.5)
+        self.d4 = DownBlock(256, 512, normalize=norm_layer, bias=True, dropout=0)
 
         # TODO: Try intermidiate steps
 
-        self.u1 = UpBlock(512, 256, normalize=norm_layer, bias=True, dropout=0.5)
+        self.u1 = UpBlock(512, 256, normalize=norm_layer, bias=True, dropout=0)
         self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=True, dropout=0)
         self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0)
         self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)

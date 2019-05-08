@@ -104,6 +104,7 @@ class ARWDataset(Dataset):
             # post process out image 
             arw = ARW(y_files[0])
             arw.postprocess()
+
             self.y_images[index] = arw
 
             for x_path in x_files:
@@ -197,6 +198,13 @@ class ARWDataset(Dataset):
         x_patch_processed = np.minimum(x_patch_processed, 1.0)
         
         y_patch  = np.maximum(y_patch, 0.0)
+
+        x_patch = np.transpose(x_patch, (2, 0, 1))
+        x_patch_processed = np.transpose(x_patch_processed, (2,0,1))
+        y_patch = np.transpose(y_patch, (2, 0, 1))
+
+        # x_processed = x_processed.permute(0, 3, 1, 2).to(self.manager.device)
+        # y = y.permute(0, 3, 1, 2).to(self.manager.device)
 
         # Unpack before returning
         return x_patch, x_patch_processed, y_patch

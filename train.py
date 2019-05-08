@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
+from data.arw_dataset import ARWDataset
 from data.jpg_dataset import JPGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
@@ -40,14 +41,15 @@ manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
 
-dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+#dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+dataset = ARWDataset(manager, 'short', 'long')
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
 
 total_iterations = 0    # total iterations
 epoch_loss_generator = Average()
-#epoch_loss_discriminator = Average()
+epoch_loss_discriminator = Average()
 
 manager.get_logger("train").info(f"Started training | Iteration {total_iterations}")
 
@@ -63,7 +65,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     epoch_start_time = time.time()  # timer for entire epoch
 
     epoch_loss_generator.reset()
-    #epoch_loss_discriminator.reset()
+    epoch_loss_discriminator.reset()
     
     for i, (x, x_processed, y) in enumerate(dataloader):
         
@@ -77,19 +79,19 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         
         model.optimize_parameters()
 
-        epoch_loss_generator.update(model.get_L1_loss())
-        #epoch_loss_discriminator.update(model.get_discriminator_loss())
+        epoch_loss_generator.update(model.get_generator_loss())
+        epoch_loss_discriminator.update(model.get_discriminator_loss())
 
         # Save previes of model images
     
         if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
             model.save_visuals(i, epoch)
 
-    manager.get_logger("train").info(
-        f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
-
     #manager.get_logger("train").info(
-    #    f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: { epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
+    #    f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
+
+    manager.get_logger("train").info(
+        f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: { epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
 
     # cache our model every <save_epoch_freq> epochs
     if epoch % manager.options.get("save") == 0:
