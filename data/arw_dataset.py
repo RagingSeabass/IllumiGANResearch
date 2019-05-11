@@ -94,8 +94,12 @@ class ARWDataset(Dataset):
             Images must be ARW files and have XXXXX_00_XX.ARW naming
         """
         self.number_of_pairs = 0
+        count = 0
         for index, x_id in enumerate(self.x_ids):
             
+            print(f"Loading round : {count}")
+            count = count + 1
+
             x_files = glob.glob(self.x_path + '%05d_00*.ARW'%x_id)
             y_files = glob.glob(self.y_path + '%05d_00*.ARW'%x_id)
 
