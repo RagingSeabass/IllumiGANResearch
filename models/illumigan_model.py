@@ -20,6 +20,7 @@ class IllumiganModel(BaseModel):
         super().__init__(manager)
 
         # Define generator network
+        self.norm_layer = ''
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
@@ -194,7 +195,7 @@ class IllumiganModel(BaseModel):
 
             # 3, 1024, 1024 (Crop)
             fake_y_rgb = tensor2img(self.fake_y[i])
-
+            
             temp = np.concatenate(
                 (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
             

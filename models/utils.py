@@ -51,10 +51,6 @@ def tensor2img(input_img):
         
         else:
             return input_img
-
-        #image_numpy = image_tensor.cpu().float().numpy()  # convert it into a numpy array
-        # FROM C,H,W to H,W,C
-        #image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2 * 255.0  # post-processing: tranpose and scaling
     else:  # if it is a numpy array, do nothing
         image_numpy = input_img
     return image_numpy.astype(np.uint8)
