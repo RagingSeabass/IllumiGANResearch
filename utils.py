@@ -77,6 +77,7 @@ class BaseManager():
 
 
         self.load_dir = self.options.get("load_dir")
+        print(self.load_dir)
 
         # Create folders
         if not os.path.isdir(self.base_save_dir + self.model_checkpoints):
