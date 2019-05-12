@@ -25,7 +25,6 @@ if len(sys.argv) > 2:
     server = True
 
 
-
 # Temporary defined options
 
 # ------- 
