@@ -99,9 +99,8 @@ class ARWDataset(Dataset):
         count = 0
         for index, x_id in enumerate(self.x_ids):
             
-            print(f"Loading round : {count}")
-            count = count + 1
-
+            self.manager.get_logger("system").info(f"Loaded {self.number_of_pairs} image pairs")
+            
             x_files = glob.glob(self.x_path + '%05d_00*.ARW'%x_id)
             y_files = glob.glob(self.y_path + '%05d_00*.ARW'%x_id)
 
