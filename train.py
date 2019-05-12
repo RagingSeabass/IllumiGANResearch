@@ -25,6 +25,7 @@ if len(sys.argv) > 2:
     server = True
 
 
+
 # Temporary defined options
 
 # ------- 
@@ -40,6 +41,8 @@ if server:
 manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
+
+manager.get_logger("system").info(f"Started loading data")
 
 #dataset = JPGDataset(manager, 'short', 'long', transforms=True)
 dataset = ARWDataset(manager, 'short', 'long')

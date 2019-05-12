@@ -81,12 +81,14 @@ class ARWDataset(Dataset):
             self.x_images_processed['300'] = np.array([None] * len(self.x_ids)) 
             self.xy_pairs = np.array([None] * (len(self.x_ids)*self.pair_types))
         
+        manager.get_logger("system").info(f"Begin ARW dataset | 0 image pairs")
+
         self.load()    
 
         if len(self.y_ids) < manager.get_hyperparams().get('batch_size'):
             raise Exception('Batch size must not be larger than number of data points!')
 
-        manager.get_logger("system").info(f"Loaded ARW dataset | {self.number_of_pairs} image pairs")
+        manager.get_logger("system").info(f"End ARW dataset | {self.number_of_pairs} image pairs")
 
     def load(self):
         """
