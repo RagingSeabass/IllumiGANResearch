@@ -24,14 +24,14 @@ class IllumiganModel(BaseModel):
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
-        self.discriminator_net = Discriminator()
-        #self.discriminator_net = PatchDiscriminator(input_nc=6)
+        #self.discriminator_net = Discriminator()
+        self.discriminator_net = PatchDiscriminator(input_nc=6)
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
 
         # Define GAN loss
-        self.GAN_loss = GAN_loss(loss='BCE', device=manager.device)
+        self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
