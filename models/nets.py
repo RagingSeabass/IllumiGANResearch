@@ -40,7 +40,6 @@ class GeneratorUNetV1(nn.Module):
         x = self.outc(x)
         return self.shuffle(x)
 
-
 class Discriminator(nn.Module):
     def __init__(self, norm_layer='instance'):
         super().__init__()
