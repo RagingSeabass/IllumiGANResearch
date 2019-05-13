@@ -17,8 +17,8 @@ class ARW():
         img = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
         #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
-        #self.data = np.float32( img / 65535.0 )
-        self.data = 2*np.float32( img / 65535.0 )-1
+        self.data = np.float32( img / 65535.0 )
+        #self.data = 2*np.float32( img / 65535.0 )-1
 
     def pack(self, ratio):
         raw = rawpy.imread(self.path)
@@ -29,8 +29,8 @@ class ARW():
         # 512 is hardware specific to the camera
         # This normalizes the images!
 
-        raw_matix = 2*(np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level))-1
-        #raw_matix = np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level)
+        #raw_matix = 2*(np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level))-1
+        raw_matix = np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level)
         raw_matix = np.expand_dims(raw_matix, axis=2)
 
         img_shape = raw_matix.shape
