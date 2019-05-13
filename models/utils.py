@@ -45,9 +45,11 @@ def tensor2img(input_img):
     if not isinstance(input_img, np.ndarray):
         if isinstance(input_img, torch.Tensor):  # get the data from a variable
             
-            input_img = input_img.cpu().float()
-            loader = transforms.Compose([transforms.ToPILImage()])
-            return np.asarray(loader(input_img))
+            input_img = np.asarray(input_img.cpu().float())
+            input_img = ((input_img+1)/2)*255
+
+            #loader = transforms.Compose([transforms.ToPILImage()])
+            return Image.fromarray(input_img)  #np.asarray(loader(input_img))
         
         else:
             return input_img
