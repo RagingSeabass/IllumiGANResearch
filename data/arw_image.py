@@ -18,7 +18,7 @@ class ARW():
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
         #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
         #self.data = np.float32( img / 65535.0 )
-        self.data = 2*np.float32( img / 65535.0 )-1
+        self.data = np.float32( img / 65535.0 )
 
     def pack(self, ratio):
         raw = rawpy.imread(self.path)
