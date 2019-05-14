@@ -49,7 +49,7 @@ class Discriminator(nn.Module):
         self.c3 = SingleConvBlock(128, 256, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
         self.c4 = SingleConvBlock(256, 512, kernel_size=4, stride=2, bias=False, normalize=norm_layer)
         self.c5 = SingleConvBlock(512, 1, kernel_size=4, stride=1, padding=0, bias=False)
-        self.out = nn.Sigmoid()
+        #self.out = nn.Sigmoid()
 
     def forward(self, x):
         x = self.c1(x)
@@ -57,7 +57,7 @@ class Discriminator(nn.Module):
         x = self.c3(x)
         x = self.c4(x)
         x = self.c5(x)
-        x = self.out(x)
+        #x = self.out(x)
 
         return x
 
