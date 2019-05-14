@@ -35,6 +35,8 @@ class IllumiganModel(BaseModel):
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
+        lr_dis = manager.get_hyperparams().get('lr') * 5
+        
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
 
@@ -50,7 +52,7 @@ class IllumiganModel(BaseModel):
                                                     betas=betas)
             
             self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
-                                            lr=lr,
+                                            lr=lr_dis,
                                             betas=betas)
 
             # We initialize a network to be trained
