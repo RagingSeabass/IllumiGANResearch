@@ -18,7 +18,8 @@ class ARW():
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
         #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
         self.data = np.float32( img / 65535.0 )
-        #self.data = 2*np.float32( img / 65535.0 )-1
+        #print(np.amin(self.data)) 0 - 1 range
+        #print(np.amax(self.data)) 0 - 1 range
 
     def pack(self, ratio):
         raw = rawpy.imread(self.path)
@@ -29,7 +30,6 @@ class ARW():
         # 512 is hardware specific to the camera
         # This normalizes the images!
 
-        #raw_matix = 2*(np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level))-1
         raw_matix = np.maximum(raw_matix - self.black_level, 0) / (16383 - self.black_level)
         raw_matix = np.expand_dims(raw_matix, axis=2)
 
