@@ -1,5 +1,5 @@
 {
-    "lr": 0.00001,
+    "lr": 0.00002,
     "lr_policy": "linear",
     "b1": 0.5,
     "b2": 0.999,
@@ -7,5 +7,7 @@
     "epoch_iterations": 6000,
     "epoch_decaying_iterations": 2000,
     "epoch": 0,    
-    "patch_size": 256
+    "patch_size": 256,
+    "norm": "batch",
+    "dis": "patch"
 }

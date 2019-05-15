@@ -20,19 +20,20 @@ class IllumiganModel(BaseModel):
         super().__init__(manager)
 
         # Define generator network
-        #self.norm_layer = ''
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
-        self.discriminator_net = Discriminator()
-        #self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
 
+        if manager.get_hyperparams().get("dis") == 'patch':
+            self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
+        else:
+            discriminator_net = Discriminator()
+    
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
 
         # Define GAN loss
         self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
-
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
@@ -47,18 +48,18 @@ class IllumiganModel(BaseModel):
             # NETWORK IS GETTING TRAINED
             ###
 
-            # Get optimizer after we init network
-            self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
-                                                    lr=lr,
-                                                    betas=betas)
-            
-            self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
-                                            lr=lr_dis,
-                                            betas=betas)
-
             # We initialize a network to be trained
             if manager.resume_training:
                 
+                # 
+                self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                                        lr=lr,
+                                                        betas=betas)
+                
+                self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                                lr=lr_dis,
+                                                betas=betas)
+
                 ###
                 # Continue training
                 ###
@@ -91,14 +92,22 @@ class IllumiganModel(BaseModel):
                 ###
 
                 # Create new model and send it to device
-                self.generator_net = init_network(
-                    self.generator_net, gpu_ids=self.gpus)
+                self.generator_net = init_network(self.generator_net)
                 self.generator_net.to(manager.device)
 
-                self.discriminator_net = init_network(
-                    self.discriminator_net, gpu_ids=self.gpus)
+                self.discriminator_net = init_network(self.discriminator_net)
                 self.discriminator_net.to(manager.device)
                 
+                # Get optimizer after we init network
+                self.generator_opt = torch.optim.Adam(self.generator_net.parameters(),
+                                                        lr=lr,
+                                                        betas=betas)
+                
+                self.discriminator_opt = torch.optim.Adam(self.discriminator_net.parameters(),
+                                                lr=lr_dis,
+                                                betas=betas)
+
+
                 self.generator_schedular = get_lr_scheduler(
                     self.generator_opt, manager.get_hyperparams())
                 self.discriminator_schedular = get_lr_scheduler(
@@ -299,7 +308,7 @@ class IllumiganModel(BaseModel):
                 g['lr'] = 1e-5
 
         self.manager.get_logger('system').info(
-            f"lr update | {self.generator_opt.param_groups[0]['lr']}")
+            f"lr | {self.generator_opt.param_groups[0]['lr']}")
 
     def update_learning_rate(self):
         """Update learning rate"""
@@ -307,7 +316,7 @@ class IllumiganModel(BaseModel):
         self.discriminator_schedular.step()
         
         self.manager.get_logger('system').info(
-            f"lr update | {self.generator_opt.param_groups[0]['lr']}")
+            f"lr | {self.generator_opt.param_groups[0]['lr']}")
 
     def test(self):
         with torch.no_grad():  # disable back prop

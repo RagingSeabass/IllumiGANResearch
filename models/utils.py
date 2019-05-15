@@ -12,12 +12,9 @@ def get_lr_scheduler(optim, hyperparameters):
         def lamda_(epoch):
             """Define lamda function for scheduler"""
             return 1.0 - max(0, epoch - hyperparameters.get("epoch_iterations")) / float(hyperparameters.get("epoch_decaying_iterations") + 1)     
-        scheduler = lr_scheduler.LambdaLR(optimizer=optim, lr_lambda=lamda_)
+        return lr_scheduler.LambdaLR(optimizer=optim, lr_lambda=lamda_)
     else:
         return NotImplementedError('lr_policy not implemented')
-
-    return scheduler
-
 
 def init_weights(net):
     """Initialize weights in a network"""
@@ -34,7 +31,8 @@ def init_weights(net):
 
     net.apply(init_func) # apply initialization
 
-def init_network(net, gpu_ids=[]):
+
+def init_network(net):
     """Initialize network"""
     init_weights(net)
     return net
