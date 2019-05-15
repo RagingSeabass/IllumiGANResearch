@@ -20,7 +20,7 @@ class IllumiganModel(BaseModel):
         super().__init__(manager)
 
         # Define generator network
-        self.norm_layer = ''
+        #self.norm_layer = ''
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
@@ -33,9 +33,10 @@ class IllumiganModel(BaseModel):
         # Define GAN loss
         self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
 
+
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
-        lr_dis = manager.get_hyperparams().get('lr') #* 5
+        lr_dis = manager.get_hyperparams().get('lr') * 0.1
         
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
