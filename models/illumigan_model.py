@@ -24,8 +24,8 @@ class IllumiganModel(BaseModel):
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
-        self.discriminator_net = Discriminator()
-        #self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
+        #self.discriminator_net = Discriminator()
+        self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
