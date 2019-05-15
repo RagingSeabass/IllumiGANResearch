@@ -24,8 +24,8 @@ class IllumiganModel(BaseModel):
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
-        self.discriminator_net = Discriminator()
-        #self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
+        #self.discriminator_net = Discriminator()
+        self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
@@ -149,13 +149,13 @@ class IllumiganModel(BaseModel):
         self.generator_net.load_state_dict(checkpoint_gn['gen_state_dict'])
         self.generator_opt.load_state_dict(checkpoint_gn['gen_opt_state_dict'])
 
-        self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
-        self.discriminator_opt.load_state_dict(checkpoint_ds['disc_opt_state_dict'])
+        #self.discriminator_net.load_state_dict(checkpoint_ds['disc_state_dict'])
+        #self.discriminator_opt.load_state_dict(checkpoint_ds['disc_opt_state_dict'])
         
-        self.generator_schedular.load_state_dict(
-            checkpoint_gn['schedular_state_dict'])
-        self.discriminator_schedular.load_state_dict(
-            checkpoint_ds['schedular_state_dict'])
+        #self.generator_schedular.load_state_dict(
+        #    checkpoint_gn['schedular_state_dict'])
+        #self.discriminator_schedular.load_state_dict(
+        #    checkpoint_ds['schedular_state_dict'])
                     
         self.generator_net.to(manager.device)
         self.discriminator_net.to(manager.device)
