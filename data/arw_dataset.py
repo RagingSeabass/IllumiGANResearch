@@ -178,10 +178,11 @@ class ARWDataset(Dataset):
         yy = np.random.randint(0, H - self.patch_size)
 
         x_patch = x_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        x_patch_processed = x_images_processed[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        y_patch = y_image[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
         
-        
-        x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
-        y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        #x_patch_processed = x_images_processed[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
+        #y_patch  = y_image[yy * 2:yy * 2 + self.patch_size * 2, xx * 2:xx * 2 + self.patch_size * 2, :]
 
         # Data augmentations
         if np.random.randint(2) == 1:  # random flip

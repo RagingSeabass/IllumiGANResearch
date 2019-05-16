@@ -86,7 +86,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
 
         # Save previes of model images
     
-        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
+        if manager.options.get("save_images") and epoch % manager.options.get("save_image_epoch") == 0:
             model.save_visuals(i, epoch)
 
     #manager.get_logger("train").info(
@@ -96,11 +96,11 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: { epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
 
     # cache our model every <save_epoch_freq> epochs
-    if epoch % manager.options.get("save") == 0:
+    if epoch % manager.options.get("save_epoch") == 0:
         manager.get_logger("system").info(
             f"Saved model for Epoch {epoch} | Iteration {total_iterations}")
 
-        if manager.options.get("images") and epoch % manager.options.get("save_images") == 0:
+        if manager.options.get("save_images") and epoch % manager.options.get("save_image_epoch") == 0:
             manager.get_logger("system").info(
                 f"Saved images for Epoch {epoch} | Iteration {total_iterations}")
 

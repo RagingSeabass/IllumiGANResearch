@@ -11,33 +11,81 @@ class GeneratorUNetV1(nn.Module):
     def __init__(self, norm_layer='instance'):
         super(GeneratorUNetV1, self).__init__()
 
-        self.norm = norm_layer
-        
-        self.inc = DoubleConvBlock(4, 32, normalize=norm_layer, bias=True, dropout=0)
-        self.d1 = DownBlock(32, 64, normalize=norm_layer, bias=True, dropout=0)
-        self.d2 = DownBlock(64, 128, normalize=norm_layer, bias=True, dropout=0.5)
-        self.d3 = DownBlock(128, 256, normalize=norm_layer, bias=True, dropout=0.5)
-        self.d4 = DownBlock(256, 512, normalize=norm_layer, bias=True, dropout=0.5)
+        ## ENCODE
 
-        self.u1 = UpBlock(512, 256, normalize=norm_layer, bias=True, dropout=0.5)
-        self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=True, dropout=0.5)
-        self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=True, dropout=0.5)
-        self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=True, dropout=0)
-        self.outc = OutConvBLock(32, 12)
-        self.shuffle = nn.PixelShuffle(2)
+        #self.norm = norm_layer
+        
+        self.d0 = FirstDownConvBlock(4,64, bias=False)
+        self.d1 = DownBlockV2(64, 128, normalize=norm_layer, bias=False, dropout=0) # 64,128x128
+        self.d2 = DownBlockV2(128, 256, normalize=norm_layer, bias=False, dropout=0) # 128,64x64
+        self.d3 = DownBlockV2(256, 512, normalize=norm_layer, bias=False, dropout=0) # 256,32x32
+
+        self.d4 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,8x8
+        self.d5 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,4x4
+        self.d6 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,2x2
+        
+        self.d7 = DownBlockInner(512, 512, bias=False, dropout=0.0) # 512, 1x1
+
+        ## DECODE
+
+        self.u7 = UpBlockInner(512, 512, normalize=norm_layer, bias=False, dropout=0.0)    
+
+        self.u6 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u5 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u4 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
+
+        self.u3 = UpBlockV2(512, 256, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.5)
+
+        self.u0 = LastUpBlock(64, 3, bias=False, dropout=0.0)
+
+
+        # self.inc = DoubleConvBlock(4, 32, normalize=norm_layer, bias=False, dropout=0)
+        # self.d1 = DownBlock(32, 64, normalize=norm_layer, bias=False, dropout=0)
+        # self.d2 = DownBlock(64, 128, normalize=norm_layer, bias=False, dropout=0.5)
+        # self.d3 = DownBlock(128, 256, normalize=norm_layer, bias=False, dropout=0.5)
+        # self.d4 = DownBlock(256, 512, normalize=norm_layer, bias=False, dropout=0.5)
+
+        # self.u1 = UpBlock(512, 256, normalize=norm_layer, bias=False, dropout=0.5)
+        # self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=False, dropout=0.5)
+        # self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=False, dropout=0.5)
+        # self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=False, dropout=0)
+        # self.outc = OutConvBLock(32, 12)
+        # self.shuffle = nn.PixelShuffle(2)
         
     def forward(self, x):
-        x1 = self.inc(x)
-        x2 = self.d1(x1)
-        x3 = self.d2(x2)
-        x4 = self.d3(x3)
-        x5 = self.d4(x4)
-        x = self.u1(x5, x4)
-        x = self.u2(x, x3)
+        
+        x0 = self.d0(x)
+        x1 = self.d1(x0)
+        x2 = self.d2(x1)
+        x3 = self.d3(x2)
+        x4 = self.d4(x3)
+        x5 = self.d5(x4)
+        x6 = self.d6(x5)
+        x7 = self.d7(x6)
+        
+        x = self.u7(x7, x6)
+        x = self.u6(x, x5)
+        x = self.u5(x, x4)
+        x = self.u4(x, x3)
         x = self.u3(x, x2)
-        x = self.u4(x, x1)
-        x = self.outc(x)
-        return self.shuffle(x)
+        x = self.u2(x, x1)
+        x = self.u1(x, x0)
+        x = self.u0(x)
+        
+        return x        
+        # x1 = self.inc(x)
+        # x2 = self.d1(x1)
+        # x3 = self.d2(x2)
+        # x4 = self.d3(x3)
+        # x5 = self.d4(x4)
+        # x = self.u1(x5, x4)
+        # x = self.u2(x, x3)
+        # x = self.u3(x, x2)
+        # x = self.u4(x, x1)
+        # x = self.outc(x)
+        # return self.shuffle(x)
 
 class Discriminator(nn.Module):
     def __init__(self, norm_layer='instance'):
@@ -149,11 +197,35 @@ class SingleConvBlock(nn.Module):
         x = self.model(x)
         return x
 
+class LastUpBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, bias=True, dropout=0):
+        super(LastUpBlock, self).__init__()
+        self.f = nn.Sequential(
+                nn.ReLU(True),
+                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias),
+                nn.Sigmoid()
+            )
+
+
+    def forward(self, x):
+        return self.f(x)
+
+class FirstDownConvBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, bias=True, dropout=0):
+        super(FirstDownConvBlock, self).__init__()
+        model = [nn.Conv2d(in_ch, out_ch, kernel_size=4,
+                               stride=2, padding=1, bias=bias)]
+
+        self.model = nn.Sequential(*model)
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
 
 class DoubleConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
         super(DoubleConvBlock, self).__init__()
-
         if normalize == 'batch':
             model = [nn.Conv2d(in_ch, out_ch, kernel_size=3,
                                stride=1, padding=1, bias=bias)]
@@ -190,6 +262,102 @@ class DoubleConvBlock(nn.Module):
         x = self.model(x)
         return x
 
+class UpBlockInner(nn.Module):
+    def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
+        super(UpBlockInner, self).__init__()
+        if normalize == 'batch':
+            norm = nn.BatchNorm2d(out_ch)
+        elif normalize == 'instance':
+            norm = nn.InstanceNorm2d(out_ch)
+        else:
+            norm = None
+        
+        if norm:
+            self.f = nn.Sequential(
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias),
+                norm
+            )
+        else:
+            self.f = nn.Sequential(
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias)
+            )
+
+    def forward(self, x1, x2):
+        x = self.f(x1)
+        return torch.cat([x2, x], dim=1)
+
+class DownBlockInner(nn.Module):
+    def __init__(self, in_ch, out_ch, bias=True, dropout=0):
+        super(DownBlockInner, self).__init__()
+        self.f = nn.Sequential(
+                nn.LeakyReLU(0.2, True),
+                nn.Conv2d(in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias),
+            )
+
+    def forward(self, x):
+            return self.f(x)
+
+
+class UpBlockV2(nn.Module):
+    def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
+        super(UpBlockV2, self).__init__()
+        if normalize == 'batch':
+            norm = nn.BatchNorm2d(out_ch)
+        elif normalize == 'instance':
+            norm = nn.InstanceNorm2d(out_ch)
+        else:
+            norm = None
+        
+        if norm:
+            self.f = nn.Sequential(
+                nn.ReLU(True),
+                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias),
+                norm
+            )
+        else:
+            self.f = nn.Sequential(
+                nn.ReLU(True),
+                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias)
+            )
+    def forward(self, x1, x2):
+        x = self.f(x1)
+        return torch.cat([x2, x], dim=1)
+
+
+
+class DownBlockV2(nn.Module):
+    def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):
+        super(DownBlockV2, self).__init__()
+        if normalize == 'batch':
+            norm = nn.BatchNorm2d(out_ch)
+        elif normalize == 'instance':
+            norm = nn.InstanceNorm2d(out_ch)
+        else:
+            norm = None
+        
+        if norm:
+            self.f = nn.Sequential(
+                nn.LeakyReLU(0.2, True),
+                nn.Conv2d(in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias),
+                norm
+            )
+        else:
+            self.f = nn.Sequential(
+                nn.LeakyReLU(0.2, True),
+                nn.Conv2d(in_ch, out_ch, kernel_size=4,
+                                stride=2, padding=1, bias=bias)
+            )
+
+    def forward(self, x):
+        return self.f(x)
 
 class DownBlock(nn.Module):
     def __init__(self, in_ch, out_ch, normalize=None, bias=True, dropout=0):

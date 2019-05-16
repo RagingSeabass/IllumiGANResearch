@@ -14,7 +14,7 @@ class BaseModel(ABC):
     def __init__(self, manager):
 
         self.manager = manager
-        self.gpus = manager.get_options().get("gpu_ids")
+        #self.gpus = manager.get_options().get("gpu_ids")
         
         self.is_cuda_ready = torch.cuda.is_available()
 

@@ -8,5 +8,6 @@
     "epoch_decaying_iterations": 25,
     "epoch": 0,    
     "patch_size": 256,
-    "norm": "batch"
+    "norm": "batch",
+    "dis": "patch"
 }

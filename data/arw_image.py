@@ -1,5 +1,7 @@
 import rawpy
 import numpy as np
+from PIL import Image
+import scipy.io
 
 class ARW():
     """"""
@@ -14,7 +16,12 @@ class ARW():
     def postprocess(self):
         raw = rawpy.imread(self.path)
         # Spits out a 16 bit image! 
-        img = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
+        #img = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
+        img = raw.postprocess(use_camera_wb=True, half_size=True, no_auto_bright=True, output_bps=16)
+        
+        #scipy.misc.toimage(img).save("img1.jpg")
+        #scipy.misc.toimage(img2).save("img2.jpg")
+
         # Normalize image (by dividing with 2^16 = 65535) and wrap in list
         #self.data = np.expand_dims( np.float32( img / 65535.0 ) , axis = 0)
         self.data = np.float32( img / 65535.0 )
