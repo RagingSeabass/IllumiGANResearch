@@ -231,7 +231,7 @@ class IllumiganModel(BaseModel):
         self.generator_loss = self.generator_l1_loss  + self.GAN_loss_generator
         
         # Compute gradients
-        self.generator_l1_loss.backward()
+        self.generator_loss.backward()
 
     def d_backward(self):
         # Calculate loss on pair of real images
