@@ -36,7 +36,7 @@ class IllumiganModel(BaseModel):
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
-        lr_dis = manager.get_hyperparams().get('lr') * 0.1
+        lr_dis = manager.get_hyperparams().get('lr')
         
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
