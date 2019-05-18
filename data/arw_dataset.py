@@ -159,8 +159,17 @@ class ARWDataset(Dataset):
         x_image = self.x_images[ratio_key][index].get()
         y_image = self.y_images[index].get()
         
-        x_patch = np.minimum(x_image,1.0)
-        y_patch  = np.maximum(y_image, 0.0)
+        H, W, D = x_image.shape
+
+        xx = np.random.randint(0, W - 2048)
+        yy = np.random.randint(0, H - 1024)
+        
+        x_patch = x_image[yy:yy + 1024, xx:xx + 2048, :]
+        #x_patch_processed = x_images_processed[yy:yy + self.patch_size, xx:xx + self.patch_size, :]
+        y_patch = y_image[yy:yy + 1024, xx:xx + 2048, :]
+
+        x_patch = np.minimum(x_patch, 1.0)
+        y_patch  = np.maximum(y_patch, 0.0)
 
         x_patch = np.transpose(x_patch, (2, 0, 1))
         y_patch = np.transpose(y_patch, (2, 0, 1))

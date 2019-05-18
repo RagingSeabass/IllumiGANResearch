@@ -13,12 +13,27 @@ from utils import Average, TestManager
 
 base_dir = "_default"
 
+server = False
+
 if len(sys.argv) > 1:
     base_dir = str(sys.argv[1])
 
+if len(sys.argv) > 2:
+    base_dir = str(sys.argv[1])
+    server = True
+
+options = './experiments/base_model/local_options.json'
+hyperparams = './experiments/base_model/local_params.json'
+
+if server:
+    options = './experiments/base_model/test_options.json'
+    hyperparams = './experiments/base_model/test_params.json'
+    
+
+
 manager = TestManager(base_dir=base_dir,
-                      options_f_dir='./experiments/base_model/test_options.json',
-                      hyperparams_f_dir='./experiments/base_model/test_params.json')
+                      options_f_dir=options,
+                      hyperparams_f_dir=hyperparams)
 
 dataset = ARWDataset(manager, 'short', 'long')
 

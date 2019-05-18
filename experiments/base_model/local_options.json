@@ -2,7 +2,7 @@
     "train_dir": "./data/train",
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
-    "load_dir": "",
+    "load_dir": "output/_default/checkpoints/",
     "max_dataset_size": 3,
     "save_epoch": 5,
     "save_image_epoch": 10,
