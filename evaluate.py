@@ -39,7 +39,7 @@ for i, (x, y) in enumerate(dataloader):
 
     # Get the only element in the batch
 
-    model.set_input(x, x,  y)
+    model.set_input(x, x, y)
     model.test()
 
     loss.update(model.get_L1_loss())

@@ -2,13 +2,10 @@
     "train_dir": "./data/train",
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
-    "num_workers": 0,
+    "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/16202758/checkpoints",
     "max_dataset_size": 0,
-    "save": 250,
-    "images": true,
-    "gpu_ids": [
-        0
-    ],
-    "debug": true,
-    "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/11103058/checkpoints"
+    "save_epoch": 0,
+    "save_image_epoch": 0,
+    "save_images": true,
+    "debug": false
 }

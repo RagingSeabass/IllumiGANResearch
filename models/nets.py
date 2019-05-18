@@ -204,7 +204,8 @@ class LastUpBlock(nn.Module):
                 nn.ReLU(True),
                 nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
                                 stride=2, padding=1, bias=bias),
-                nn.Tanh()
+                #nn.Tanh()
+                nn.Sigmoid()
             )
 
 

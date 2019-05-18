@@ -1,11 +1,13 @@
 {
-    "lr": 0.0001,
+    "lr": 0.00002,
     "lr_policy": "linear",
     "b1": 0.5,
     "b2": 0.999,
     "batch_size": 1,
-    "epoch_iterations": 2000,
-    "epoch_decaying_iterations": 2000,
-    "epoch": 6000,    
-    "patch_size": 512
+    "epoch_iterations": 10,
+    "epoch_decaying_iterations": 0,
+    "epoch": 8000,    
+    "patch_size": 256,
+    "norm": "batch",
+    "dis": "patch"
 }
