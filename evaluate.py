@@ -60,7 +60,7 @@ for i, (x, y) in enumerate(dataloader):
     loss.update(model.get_L1_loss())
 
     # Save previes of model images
-    if manager.options.get("images"):
+    if manager.options.get("save_images"):
         model.save_visuals(i, 'test')
 
     manager.get_logger("test").info(
