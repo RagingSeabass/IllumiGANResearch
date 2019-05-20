@@ -20,7 +20,7 @@ class IllumiganModel(BaseModel):
         super().__init__(manager)
 
         # Define generator network
-        self.norm_layer = 'batch'
+        self.norm_layer = ''
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
