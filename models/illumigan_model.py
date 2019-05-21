@@ -38,7 +38,7 @@ class IllumiganModel(BaseModel):
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
         lr_dis = manager.get_hyperparams().get('lr')
-        
+
         betas = (manager.get_hyperparams().get('b1'),
                  manager.get_hyperparams().get('b2'))
 
@@ -235,7 +235,7 @@ class IllumiganModel(BaseModel):
         self.GAN_loss_generator = self.GAN_loss.compute(fake_prediction, 1)
 
         # L1 Loss
-        self.generator_l1_loss = self.generator_l1(self.fake_y, self.y) * 100
+        self.generator_l1_loss = self.generator_l1(self.fake_y, self.y) * 50
         # Overall loss of generator_net
         self.generator_loss = self.generator_l1_loss  + self.GAN_loss_generator
         
