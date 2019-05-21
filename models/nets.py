@@ -30,13 +30,13 @@ class GeneratorUNetV1(nn.Module):
 
         self.u7 = UpBlockInner(512, 512, normalize=norm_layer, bias=False, dropout=0.0)    
 
-        self.u6 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u5 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u4 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u6 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u5 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u4 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
 
-        self.u3 = UpBlockV2(512, 256, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u3 = UpBlockV2(512, 256, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.0)
 
         self.u0 = LastUpBlock(64, 3, bias=False, dropout=0.0)
 
@@ -204,8 +204,8 @@ class LastUpBlock(nn.Module):
                 nn.ReLU(True),
                 nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
                                 stride=2, padding=1, bias=bias),
-                nn.Tanh()
-                #nn.Sigmoid()
+                #nn.Tanh()
+                nn.Sigmoid()
             )
 
 
