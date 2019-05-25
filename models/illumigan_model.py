@@ -28,7 +28,7 @@ class IllumiganModel(BaseModel):
         #self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
 
         # Define loss function
-        self.generator_l1 = torch.nn.L1Loss()
+        self.generator_l1 = torch.nn.BCEWithLogitsLoss()
 
         # Define GAN loss
         self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
