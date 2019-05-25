@@ -56,7 +56,7 @@ for i, x in enumerate(dataloader):
     model.set_input(x, x, x)
     model.test()
 
-    loss.update(model.get_L1_loss())
+    #loss.update(model.get_L1_loss())
 
     # Save previes of model images
     if manager.options.get("save_images"):
