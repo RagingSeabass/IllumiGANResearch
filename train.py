@@ -43,7 +43,7 @@ manager = TrainManager(base_dir=base_dir,
 
 manager.get_logger("system").info(f"Started loading data")
 
-#dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+
 dataset = ARWDataset(manager, 'short', 'long')
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
@@ -88,9 +88,6 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     
         if manager.options.get("save_images") and epoch % manager.options.get("save_image_epoch") == 0:
             model.save_visuals(i, epoch)
-
-    #manager.get_logger("train").info(
-    #    f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
 
     manager.get_logger("train").info(
         f"Epoch {epoch} | Loss G: {epoch_loss_generator.average()} D: { epoch_loss_discriminator.average()} | Time {time.time() - epoch_start_time} | Iteration {total_iterations}")
