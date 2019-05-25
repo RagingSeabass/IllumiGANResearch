@@ -30,30 +30,16 @@ class GeneratorUNetV1(nn.Module):
 
         self.u7 = UpBlockInner(512, 512, normalize=norm_layer, bias=False, dropout=0.0)    
 
-        self.u6 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u5 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u4 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u6 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u5 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u4 = UpBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0)
 
-        self.u3 = UpBlockV2(512, 256, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.5)
-        self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.5)
+        self.u3 = UpBlockV2(512, 256, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.0)
+        self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.0)
 
         self.u0 = LastUpBlock(64, 3, bias=False, dropout=0.0)
 
-
-        # self.inc = DoubleConvBlock(4, 32, normalize=norm_layer, bias=False, dropout=0)
-        # self.d1 = DownBlock(32, 64, normalize=norm_layer, bias=False, dropout=0)
-        # self.d2 = DownBlock(64, 128, normalize=norm_layer, bias=False, dropout=0.5)
-        # self.d3 = DownBlock(128, 256, normalize=norm_layer, bias=False, dropout=0.5)
-        # self.d4 = DownBlock(256, 512, normalize=norm_layer, bias=False, dropout=0.5)
-
-        # self.u1 = UpBlock(512, 256, normalize=norm_layer, bias=False, dropout=0.5)
-        # self.u2 = UpBlock(256, 128, normalize=norm_layer, bias=False, dropout=0.5)
-        # self.u3 = UpBlock(128, 64, normalize=norm_layer, bias=False, dropout=0.5)
-        # self.u4 = UpBlock(64, 32, normalize=norm_layer, bias=False, dropout=0)
-        # self.outc = OutConvBLock(32, 12)
-        # self.shuffle = nn.PixelShuffle(2)
-        
     def forward(self, x):
         
         x0 = self.d0(x)
@@ -75,17 +61,7 @@ class GeneratorUNetV1(nn.Module):
         x = self.u0(x)
         
         return x        
-        # x1 = self.inc(x)
-        # x2 = self.d1(x1)
-        # x3 = self.d2(x2)
-        # x4 = self.d3(x3)
-        # x5 = self.d4(x4)
-        # x = self.u1(x5, x4)
-        # x = self.u2(x, x3)
-        # x = self.u3(x, x2)
-        # x = self.u4(x, x1)
-        # x = self.outc(x)
-        # return self.shuffle(x)
+  
 
 class Discriminator(nn.Module):
     def __init__(self, norm_layer='instance'):
