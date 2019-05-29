@@ -42,9 +42,11 @@ for file in files:
 
 plt.figure(1)
 plt.subplot(121)
-plt.plot(epochs, lossGs)
+plt.plot(epochs, lossGs, label='training loss')
+plt.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5], label='test loss')
 plt.xlabel('Epochs')
 plt.ylabel('L1 loss')
+plt.legend()
 plt.title('Generator loss')
 
 plt.subplot(122)

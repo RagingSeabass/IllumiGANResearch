@@ -31,7 +31,7 @@ class IllumiganModel(BaseModel):
         self.generator_l1 = torch.nn.L1Loss()
 
         # Define GAN loss
-        self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
+        self.GAN_loss = GAN_loss(loss='BCE', device=manager.device)
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
@@ -230,7 +230,7 @@ class IllumiganModel(BaseModel):
         self.generator_loss = self.generator_l1_loss  + self.GAN_loss_generator
         
         # Compute gradients
-        self.generator_l1_loss.backward()
+        self.generator_loss.backward()
 
     def d_backward(self):
         # Calculate loss on pair of real images
