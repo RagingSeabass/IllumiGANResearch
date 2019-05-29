@@ -3,10 +3,8 @@
 import re
 import matplotlib.pyplot as plt
 
-
 files = ['../../../exp1/train1.log','../../../exp1/train2.log', '../../../exp1/train3.log', '../../../exp1/train4.log']
 #lines = [line.rstrip('\n') for line in open(file)]
-
 
 epochs = []
 lossGs = []
@@ -43,14 +41,20 @@ for file in files:
 
 
 plt.figure(1)
-plt.subplot(211)
+plt.subplot(121)
 plt.plot(epochs, lossGs)
+plt.xlabel('Epochs')
+plt.ylabel('L1 loss')
+plt.title('Generator loss')
 
-plt.subplot(212)
+plt.subplot(122)
 plt.plot(epochs, lossDs)
+
+plt.xlabel('Epochs')
+plt.ylabel('GANloss')
+plt.title('Discriminator loss')
+
 plt.show()
-
-
 
 
 
