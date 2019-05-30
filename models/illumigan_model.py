@@ -25,7 +25,7 @@ class IllumiganModel(BaseModel):
 
         # Define discriminator network
         #self.discriminator_net = Discriminator()
-        self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=2)
+        self.discriminator_net = PatchDiscriminator(input_nc=6, ndf=64, n_layers=3)
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
@@ -228,7 +228,7 @@ class IllumiganModel(BaseModel):
         self.generator_loss = self.generator_l1_loss  + self.GAN_loss_generator
         
         # Compute gradients
-        self.generator_l1_loss.backward()
+        self.generator_loss.backward()
 
     def d_backward(self):
         # Calculate loss on pair of real images

@@ -229,11 +229,11 @@ class OutConvBLock(nn.Module):
         
         self.f = nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=True)
         #self.h = nn.Tanh()
-        self.h = nn.Sigmoid()
+        #self.h = nn.Sigmoid()
 
     def forward(self, x):
         x = self.f(x)
-        x = self.h(x)
+        #x = self.h(x)
         return x
 
 
