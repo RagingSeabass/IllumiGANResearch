@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 from data.arw_image import ARW
 from models.base_model import BaseModel
-from models.nets import GeneratorUNetV1, Discriminator, GAN_loss
+from models.nets import GeneratorUNetV1, Discriminator, GAN_loss, PatchDiscriminator
 from models.utils import get_lr_scheduler, init_network
 
 from .utils import tensor2img
@@ -24,7 +24,7 @@ class IllumiganModel(BaseModel):
         self.generator_net = GeneratorUNetV1(norm_layer=self.norm_layer)
 
         # Define discriminator network
-        self.discriminator_net = Discriminator()
+        self.discriminator_net = PatchDiscriminator(3)
 
         # Define loss function
         self.generator_l1 = torch.nn.L1Loss()
