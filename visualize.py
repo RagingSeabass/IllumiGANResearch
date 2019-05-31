@@ -43,20 +43,24 @@ for file in files:
 plt.figure(1)
 
 ax1 = plt.subplot(121)
-ax1.plot(epochs, lossGs, 'b', label='train loss')
+p1 = ax1.plot(epochs, lossGs, 'royalblue', label='train loss')
 ax1.set_xlabel('Epochs')
 ax1.set_ylabel('L1 loss (train)')
 
 ax2 = ax1.twinx()
-ax2.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [1, 0.056, 0.046, 0.05, 0.05, 0.05, 0.05, 0.05], 'r', label='test loss')
+p2 = ax2.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [0.1, 0.056, 0.046, 0.05, 0.05, 0.05, 0.05, 0.05], 'firebrick', label='test loss')
 ax2.set_ylabel('L1 loss (test)')
 
-plt.legend()
+# added these three lines
+lns = p1+p2
+labs = [l.get_label() for l in lns]
+plt.legend(lns, labs, loc=0)
+
 plt.title('Generator loss')
 
 
 plt.subplot(122)
-plt.plot(epochs, lossDs)
+plt.plot(epochs, lossDs, 'royalblue')
 
 plt.xlabel('Epochs')
 plt.ylabel('GANloss')
