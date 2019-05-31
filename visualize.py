@@ -3,7 +3,7 @@
 import re
 import matplotlib.pyplot as plt
 
-files = ['../../../exp1/train1.log','../../../exp1/train2.log', '../../../exp1/train3.log', '../../../exp1/train4.log']
+files = ['../../../exp2/train.log']
 #lines = [line.rstrip('\n') for line in open(file)]
 
 epochs = []

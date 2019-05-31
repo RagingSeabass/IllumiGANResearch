@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from data.jpg_dataset import JPGDataset
+from data.png_dataset import PNGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 import torch.backends.cudnn as cudnn
@@ -42,7 +42,7 @@ manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
                        hyperparams_f_dir=hyperparams)
 
-dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+dataset = PNGDataset(manager, 'in', 'out', transforms=True)
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
     'batch_size'), shuffle=True, num_workers=0)
 
@@ -54,13 +54,28 @@ torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
 onnx_model = onnx.load('./Illumigan.onnx')
 
-scale = 2/255.0
+
+# If we normalize between -1 and 1 
+# use this scale 
+#scale = 2/255.0
+#args = dict(
+#    is_bgr=False,
+#    red_bias = -1,
+#    green_bias = -1, 
+#    blue_bias = -1,
+#    image_scale = scale
+#)
+
+# IF we normalize between 0 and 1 and input
+# use this scale
+scale = 1/255.0
 args = dict(
     is_bgr=False,
-    red_bias = -1,
-    green_bias = -1, 
-    blue_bias = -1,
+    red_bias = 0,
+    green_bias = 0, 
+    blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
+# This is what makes it an image class
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) 
 mlmodel.save('Illumigan.mlmodel')

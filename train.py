@@ -9,7 +9,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from data.arw_dataset import ARWDataset
-from data.jpg_dataset import JPGDataset
+from data.png_dataset import PNGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 
@@ -43,8 +43,8 @@ manager = TrainManager(base_dir=base_dir,
 
 manager.get_logger("system").info(f"Started loading data")
 
-#dataset = JPGDataset(manager, 'short', 'long', transforms=True)
-dataset = ARWDataset(manager, 'short', 'long')
+dataset = PNGDataset(manager, 'in', 'out', transforms=True)
+#dataset = ARWDataset(manager, 'short', 'long')
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
@@ -69,7 +69,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
     epoch_loss_generator.reset()
     epoch_loss_discriminator.reset()
     
-    for i, (x, x_processed, y) in enumerate(dataloader):
+    for i, (x, xp, y) in enumerate(dataloader):
         
         data_start_time = time.time()
         t_data = data_start_time - epoch_start_time
@@ -77,7 +77,7 @@ for epoch in range(manager.get_hyperparams().get('epoch'),              # Starti
         total_iterations += manager.get_hyperparams().get('batch_size')
         
         # Get the only element in the batch
-        model.set_input(x, x_processed, y)
+        model.set_input(x, xp, y)
         
         model.optimize_parameters()
 
