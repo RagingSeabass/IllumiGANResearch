@@ -41,13 +41,19 @@ for file in files:
 
 
 plt.figure(1)
-plt.subplot(121)
-plt.plot(epochs, lossGs, label='training loss')
-plt.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5], label='test loss')
-plt.xlabel('Epochs')
-plt.ylabel('L1 loss')
+
+ax1 = plt.subplot(121)
+ax1.plot(epochs, lossGs, 'b', label='train loss')
+ax1.set_xlabel('Epochs')
+ax1.set_ylabel('L1 loss (train)')
+
+ax2 = ax1.twinx()
+ax2.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [1, 0.056, 0.046, 0.05, 0.05, 0.05, 0.05, 0.05], 'r', label='test loss')
+ax2.set_ylabel('L1 loss (test)')
+
 plt.legend()
 plt.title('Generator loss')
+
 
 plt.subplot(122)
 plt.plot(epochs, lossDs)
