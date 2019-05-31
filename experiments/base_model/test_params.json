@@ -6,7 +6,7 @@
     "batch_size": 1,
     "epoch_iterations": 10,
     "epoch_decaying_iterations": 0,
-    "epoch": 500,    
+    "epoch": 1000,    
     "patch_size": 256,
     "norm": "batch",
     "dis": "patch"

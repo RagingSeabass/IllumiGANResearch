@@ -20,11 +20,11 @@ class GeneratorUNetV1(nn.Module):
         self.d2 = DownBlockV2(128, 256, normalize=norm_layer, bias=False, dropout=0) # 128,64x64
         self.d3 = DownBlockV2(256, 512, normalize=norm_layer, bias=False, dropout=0) # 256,32x32
 
-        self.d4 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,8x8
-        self.d5 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,4x4
-        self.d6 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,2x2
+        self.d4 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,16x16
+        self.d5 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,8x8
+        self.d6 = DownBlockV2(512, 512, normalize=norm_layer, bias=False, dropout=0.0) # 512,4x4
         
-        self.d7 = DownBlockInner(512, 512, bias=False, dropout=0.0) # 512, 1x1
+        self.d7 = DownBlockInner(512, 512, bias=False, dropout=0.0) # 512, 2x2
 
         ## DECODE
 
