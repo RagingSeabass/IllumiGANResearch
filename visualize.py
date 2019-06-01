@@ -52,7 +52,7 @@ ax1.set_xlabel('Epochs')
 ax1.set_ylabel('L1 loss (train)')
 
 ax2 = ax1.twinx()
-p2 = ax2.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [0.1, 0.051, 0.046, 0.043, 0.042, 0.041, 0.041, 0.037], 'firebrick', label='test loss')
+p2 = ax2.plot([0, 1000, 1500, 2000, 2500, 3000, 3500, 4000], [0.2, 0.0545, 0.0512, 0.0463, 0.0496, 0.0484, 0.0482, 0.0486], 'firebrick', label='test loss')
 ax2.set_ylabel('L1 loss (test)')
 
 # added these three lines
