@@ -33,7 +33,7 @@ class IllumiganModel(BaseModel):
         self.generator_l1 = torch.nn.L1Loss()
 
         # Define GAN loss
-        self.GAN_loss = GAN_loss(loss='BCEWithLogitsLoss', device=manager.device)
+        self.GAN_loss = GAN_loss(loss='BCE', device=manager.device)
 
         # Define generator optimzer
         lr = manager.get_hyperparams().get('lr')
