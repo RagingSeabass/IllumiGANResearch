@@ -314,19 +314,42 @@ class UpBlockV2(nn.Module):
         else:
             norm = None
         
-        if norm:
-            self.f = nn.Sequential(
-                nn.ReLU(True),
-                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias),
-                norm
-            )
+        if(dropout > 0):
+            d = nn.Dropout(dropout)
         else:
-            self.f = nn.Sequential(
-                nn.ReLU(True),
-                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias)
-            )
+            d = None
+
+        if norm:
+            if d:
+                self.f = nn.Sequential(
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                    stride=2, padding=1, bias=bias),
+                    norm,
+                    d
+                )
+            else:
+                self.f = nn.Sequential(
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                    stride=2, padding=1, bias=bias),
+                    norm
+                )
+        else:
+            if d:
+                self.f = nn.Sequential(
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                    stride=2, padding=1, bias=bias),
+                    d
+                )
+            else:
+                self.f = nn.Sequential(
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
+                                    stride=2, padding=1, bias=bias)
+                )
+                
     def forward(self, x1, x2):
         x = self.f(x1)
         return torch.cat([x2, x], dim=1)
