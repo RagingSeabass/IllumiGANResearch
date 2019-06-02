@@ -6,6 +6,6 @@
     "batch_size": 1,
     "epoch_iterations": 2000,
     "epoch_decaying_iterations": 2000,
-    "epoch": 2000,    
+    "epoch": 1000,    
     "patch_size": 256
 }
