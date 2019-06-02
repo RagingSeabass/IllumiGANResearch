@@ -131,6 +131,8 @@ class PNGDataset(Dataset):
 
                 self.number_of_pairs += 1
 
+            manager.get_logger("system").info(f"Loaded PNG dataset | {self.number_of_pairs} image pairs")
+
     def get_exposure(self, path):
         """Get exposure from title"""
         _, fn = os.path.split(path)
