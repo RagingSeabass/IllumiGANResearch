@@ -61,6 +61,7 @@ def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False):
     for output in spec.description.output: 
         if output.name != feature_name: 
             continue
+        print(output.type)
         if output.type.WhichOneof('Type') != 'multiArrayType': 
             raise ValueError("%s is not a multiarray type" % output.name) 
         array_shape = tuple(output.type.multiArrayType.shape) 
