@@ -147,8 +147,8 @@ new_layer.output.append('image_output')
 output_description  = next(x for x in spec.description.output if x.name==last_layer.output[0])
 print(output_description)
 
-# Update it to use the new layer as output
-output_description.name = new_layer.name
+# Update it to use the new layer as outputsd
+output_description.name = new_layer.name 
 
 spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
@@ -156,7 +156,7 @@ spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 last_layer = spec_layers[-1]
 print(last_layer)
 # Mark the new layer as image
-convert_multiarray_output_to_image(spec, 'convert_to_image', is_bgr=False)
+#convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
 
 updated_model = coremltools.models.MLModel(spec)
  
@@ -164,7 +164,7 @@ updated_model.author = 'Magnus'
 updated_model.license = 'None'
 updated_model.short_description = 'Illumigan'
 updated_model.input_description['0'] = 'Input Image'
-updated_model.output_description['convert_to_image'] = 'Predicted Image'
+updated_model.output_description[output_description.name] = 'Predicted Image'
  
 model_file_name = 'Illumigan2.mlmodel'
 updated_model.save(model_file_name)
