@@ -163,7 +163,6 @@ class ARWDataset(Dataset):
         y_patch  = np.maximum(y_image, 0.0)
 
         x_patch = np.transpose(x_patch, (2, 0, 1))
-        x_patch_processed = np.transpose(x_patch_processed, (2,0,1))
         y_patch = np.transpose(y_patch, (2, 0, 1))
 
         # Unpack before returning
