@@ -84,7 +84,7 @@ class PNGDataset(Dataset):
             self.x_images_processed['0'] = np.array([None] * len(self.x_ids))
             self.x_images_processed['1'] = np.array([None] * len(self.x_ids))
             self.x_images_processed['2'] = np.array([None] * len(self.x_ids)) 
-            self.x_images_processed['4'] = np.array([None] * len(self.x_ids)) 
+            self.x_images_processed['3'] = np.array([None] * len(self.x_ids)) 
             self.xy_pairs = np.array([None] * (len(self.x_ids)*self.pair_types))
         
         self.load()    
