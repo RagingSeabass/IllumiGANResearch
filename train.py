@@ -9,7 +9,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from data.arw_dataset import ARWDataset
-from data.jpg_dataset import JPGDataset
+from data.png_dataset import PNGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
 
@@ -44,7 +44,8 @@ manager = TrainManager(base_dir=base_dir,
 manager.get_logger("system").info(f"Started loading data")
 
 #dataset = JPGDataset(manager, 'short', 'long', transforms=True)
-dataset = ARWDataset(manager, 'short', 'long')
+#dataset = ARWDataset(manager, 'short', 'long')
+dataset = PNGDataset(manager, 'in', 'out', transforms=True)
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
