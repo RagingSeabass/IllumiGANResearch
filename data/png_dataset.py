@@ -107,6 +107,7 @@ class PNGDataset(Dataset):
             y_files = glob.glob(self.y_path + f'{x_id}.png')
 
             # post process out image 
+            print(x_files)
             png = Image.open(y_files[0])
  
             # SHAPE IS H,W,C
