@@ -64,6 +64,7 @@ def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False):
         print(output.type)
         if output.type.WhichOneof('Type') != 'multiArrayType': 
             raise ValueError("%s is not a multiarray type" % output.name) 
+        print(output.type.multiArrayType.shape)
         array_shape = tuple(output.type.multiArrayType.shape) 
         channels, height, width = array_shape 
         from coremltools.proto import FeatureTypes_pb2 as ft 
@@ -81,22 +82,22 @@ def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False):
  
 
 # working code
-manager = TrainManager(base_dir=base_dir,
-                      options_f_dir=options,
-                      hyperparams_f_dir=hyperparams)
+# manager = TrainManager(base_dir=base_dir,
+#                       options_f_dir=options,
+#                       hyperparams_f_dir=hyperparams)
 
-#dataset = JPGDataset(manager, 'short', 'long', transforms=True)
-dataset = PNGDataset(manager, 'in', 'out', transforms=True)
-dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
-   'batch_size'), shuffle=True, num_workers=0)
+# #dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+# dataset = PNGDataset(manager, 'in', 'out', transforms=True)
+# dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
+#    'batch_size'), shuffle=True, num_workers=0)
 
-model = IllumiganModel(manager=manager)
+# model = IllumiganModel(manager=manager)
 
-dummy_input = torch.randn(1, 3, 1024, 1024).to(manager.device)
+# dummy_input = torch.randn(1, 3, 1024, 1024).to(manager.device)
 
-torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
+# torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
-onnx_model = onnx.load('./Illumigan.onnx')
+# onnx_model = onnx.load('./Illumigan.onnx')
 
 # If we normalize between -1 and 1 
 # use this scale 
@@ -119,8 +120,8 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args)#, image_output_names=['133']) # This is what makes it an image lol 
-mlmodel.save('Illumigan.mlmodel')
+# mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args)#, image_output_names=['133']) # This is what makes it an image lol 
+# mlmodel.save('Illumigan.mlmodel')
 
 coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
 spec = coreml_model.get_spec()
