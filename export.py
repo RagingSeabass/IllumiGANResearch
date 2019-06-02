@@ -151,7 +151,7 @@ output_description.name = new_layer.name
 
 
 # Mark the new layer as image
-convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
+#convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
 
 updated_model = coremltools.models.MLModel(spec)
  
