@@ -36,7 +36,49 @@ hyperparams = './experiments/base_model/local_params.json'
 if server:
     options = './experiments/base_model/options.json'
     hyperparams = './experiments/base_model/params.json'
-    
+
+# Function to mark the layer as output
+# https://forums.developer.apple.com/thread/81571#241998
+def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False): 
+    """ 
+    Convert an output multiarray to be represented as an image 
+    This will modify the Model_pb spec passed in. 
+    Example: 
+        model = coremltools.models.MLModel('MyNeuralNetwork.mlmodel') 
+        spec = model.get_spec() 
+        convert_multiarray_output_to_image(spec,'imageOutput',is_bgr=False) 
+        newModel = coremltools.models.MLModel(spec) 
+        newModel.save('MyNeuralNetworkWithImageOutput.mlmodel') 
+    Parameters 
+    ---------- 
+    spec: Model_pb 
+        The specification containing the output feature to convert 
+    feature_name: str 
+        The name of the multiarray output feature you want to convert 
+    is_bgr: boolean 
+        If multiarray has 3 channels, set to True for RGB pixel order or false for BGR 
+    """
+    for output in spec.description.output: 
+        if output.name != feature_name: 
+            continue
+        if output.type.WhichOneof('Type') != 'multiArrayType': 
+            raise ValueError("%s is not a multiarray type" % output.name) 
+        array_shape = tuple(output.type.multiArrayType.shape) 
+        channels, height, width = array_shape 
+        from coremltools.proto import FeatureTypes_pb2 as ft 
+        if channels == 1: 
+            output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('GRAYSCALE') 
+        elif channels == 3: 
+            if is_bgr: 
+                output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('BGR') 
+            else: 
+                output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('RGB') 
+        else: 
+            raise ValueError("Channel Value %d not supported for image inputs" % channels) 
+        output.type.imageType.width = width 
+        output.type.imageType.height = height 
+ 
+
 # working code
 manager = TrainManager(base_dir=base_dir,
                        options_f_dir=options,
@@ -121,44 +163,3 @@ updated_model.output_description[output_description.name] = 'Predicted Image'
 model_file_name = 'Illumigan2.mlmodel'
 updated_model.save(model_file_name)
 
-# Function to mark the layer as output
-# https://forums.developer.apple.com/thread/81571#241998
-def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False): 
-    """ 
-    Convert an output multiarray to be represented as an image 
-    This will modify the Model_pb spec passed in. 
-    Example: 
-        model = coremltools.models.MLModel('MyNeuralNetwork.mlmodel') 
-        spec = model.get_spec() 
-        convert_multiarray_output_to_image(spec,'imageOutput',is_bgr=False) 
-        newModel = coremltools.models.MLModel(spec) 
-        newModel.save('MyNeuralNetworkWithImageOutput.mlmodel') 
-    Parameters 
-    ---------- 
-    spec: Model_pb 
-        The specification containing the output feature to convert 
-    feature_name: str 
-        The name of the multiarray output feature you want to convert 
-    is_bgr: boolean 
-        If multiarray has 3 channels, set to True for RGB pixel order or false for BGR 
-    """
-    for output in spec.description.output: 
-        if output.name != feature_name: 
-            continue
-        if output.type.WhichOneof('Type') != 'multiArrayType': 
-            raise ValueError("%s is not a multiarray type" % output.name) 
-        array_shape = tuple(output.type.multiArrayType.shape) 
-        channels, height, width = array_shape 
-        from coremltools.proto import FeatureTypes_pb2 as ft 
-        if channels == 1: 
-            output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('GRAYSCALE') 
-        elif channels == 3: 
-            if is_bgr: 
-                output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('BGR') 
-            else: 
-                output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('RGB') 
-        else: 
-            raise ValueError("Channel Value %d not supported for image inputs" % channels) 
-        output.type.imageType.width = width 
-        output.type.imageType.height = height 
- 
