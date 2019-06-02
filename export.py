@@ -85,7 +85,7 @@ manager = TrainManager(base_dir=base_dir,
                       options_f_dir=options,
                       hyperparams_f_dir=hyperparams)
 
-dataset = JPGDataset(manager, 'short', 'long', transforms=True)
+#dataset = JPGDataset(manager, 'short', 'long', transforms=True)
 dataset = PNGDataset(manager, 'in', 'out', transforms=True)
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
    'batch_size'), shuffle=True, num_workers=0)
