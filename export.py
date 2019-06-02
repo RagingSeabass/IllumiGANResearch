@@ -66,7 +66,7 @@ def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False):
             raise ValueError("%s is not a multiarray type" % output.name) 
         print(output.type.multiArrayType.shape)
         array_shape = tuple(output.type.multiArrayType.shape) 
-        channels, height, width = array_shape 
+        channels, height, width = 3, 1024, 1024 
         from coremltools.proto import FeatureTypes_pb2 as ft 
         if channels == 1: 
             output.type.imageType.colorSpace = ft.ImageFeatureType.ColorSpace.Value('GRAYSCALE') 
