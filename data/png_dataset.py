@@ -124,9 +124,9 @@ class PNGDataset(Dataset):
                 png = Image.open(x_path).convert('RGB')
                 W, H = png.size 
 
-                #self.x_images[ratio_key][index] = np.asarray(png)
+                self.x_images[ratio_key][index] = np.asarray(png)
                 
-                self.x_images[ratio_key][index] = np.asarray(png.resize((round(W/2),round(H/2)), Image.ANTIALIAS))
+                #self.x_images[ratio_key][index] = np.asarray(png.resize((round(W/2),round(H/2)), Image.ANTIALIAS))
                 self.x_images_processed[ratio_key][index] = np.asarray(png)
 
                 self.number_of_pairs += 1
@@ -160,17 +160,10 @@ class PNGDataset(Dataset):
             xxps = xx + self.patch_size
             yyps = yy + self.patch_size
 
-            mult = 2
-            
-            xx2x = xx * mult
-            xxps2x = xx2x + self.patch_size * mult
-            yy2x = yy * mult
-            yyps2x = yy2x + self.patch_size * mult
-
             x_patch = x_image[yy : yyps, xx : xxps, :]
             
-            y_patch  = y_image[yy2x : yyps2x, xx2x : xxps2x, :]
-            x_patch_processed = x_image_processed[yy2x : yyps2x, xx2x : xxps2x, :]     
+            y_patch  = y_image[yy : yyps, xx : xxps, :]
+            x_patch_processed = x_image_processed[yy : yyps, xx : xxps, :]     
             
             x_image = Image.fromarray(x_patch)
             x_image_processed = Image.fromarray(x_patch_processed)

@@ -15,7 +15,7 @@ class GeneratorUNetV1(nn.Module):
 
         #self.norm = norm_layer
         
-        self.d0 = FirstDownConvBlock(4,64, bias=False)
+        self.d0 = FirstDownConvBlock(3,64, bias=False)
         self.d1 = DownBlockV2(64, 128, normalize=norm_layer, bias=False, dropout=0) # 64,128x128
         self.d2 = DownBlockV2(128, 256, normalize=norm_layer, bias=False, dropout=0) # 128,64x64
         self.d3 = DownBlockV2(256, 512, normalize=norm_layer, bias=False, dropout=0) # 256,32x32
