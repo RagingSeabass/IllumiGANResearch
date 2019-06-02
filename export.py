@@ -81,22 +81,22 @@ def convert_multiarray_output_to_image(spec, feature_name, is_bgr=False):
  
 
 # working code
-manager = TrainManager(base_dir=base_dir,
-                       options_f_dir=options,
-                       hyperparams_f_dir=hyperparams)
+#manager = TrainManager(base_dir=base_dir,
+#                       options_f_dir=options,
+#                       hyperparams_f_dir=hyperparams)
 
 #dataset = JPGDataset(manager, 'short', 'long', transforms=True)
-dataset = PNGDataset(manager, 'in', 'out', transforms=True)
-dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
-    'batch_size'), shuffle=True, num_workers=0)
+#dataset = PNGDataset(manager, 'in', 'out', transforms=True)
+#dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
+#    'batch_size'), shuffle=True, num_workers=0)
 
-model = IllumiganModel(manager=manager)
+#model = IllumiganModel(manager=manager)
 
-dummy_input = torch.randn(1, 3, 1024, 1024).to(manager.device)
+#dummy_input = torch.randn(1, 3, 1024, 1024).to(manager.device)
 
-torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
+#torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
 
-onnx_model = onnx.load('./Illumigan.onnx')
+#onnx_model = onnx.load('./Illumigan.onnx')
 
 # If we normalize between -1 and 1 
 # use this scale 
@@ -119,8 +119,8 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names=['133']) # This is what makes it an image lol 
-mlmodel.save('Illumigan.mlmodel')
+#mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names=['133']) # This is what makes it an image lol 
+#mlmodel.save('Illumigan.mlmodel')
 
 coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
 spec = coreml_model.get_spec()
@@ -128,7 +128,7 @@ spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
 # find the current output layer and save it for later reference
 last_layer = spec_layers[-1]
- 
+print(last_layer)
 # add the post-processing layer
 new_layer = spec_layers.add()
 new_layer.name = 'convert_to_image'
@@ -144,22 +144,27 @@ new_layer.input.append(last_layer.output[0])
 new_layer.output.append('image_output')
  
 # Find the original model's output description
-output_description = next(x for x in spec.description.output if x.name==last_layer.output[0])
- 
+output_description  = next(x for x in spec.description.output if x.name==last_layer.output[0])
+print(output_description)
+
 # Update it to use the new layer as output
 output_description.name = new_layer.name
 
+spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
+# find the current output layer and save it for later reference
+last_layer = spec_layers[-1]
+print(last_layer)
 # Mark the new layer as image
-convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
+convert_multiarray_output_to_image(spec, 'convert_to_image', is_bgr=False)
 
 updated_model = coremltools.models.MLModel(spec)
  
 updated_model.author = 'Magnus'
 updated_model.license = 'None'
 updated_model.short_description = 'Illumigan'
-updated_model.input_description['image'] = 'Input Image'
-updated_model.output_description[output_description.name] = 'Predicted Image'
+updated_model.input_description['0'] = 'Input Image'
+updated_model.output_description['convert_to_image'] = 'Predicted Image'
  
 model_file_name = 'Illumigan2.mlmodel'
 updated_model.save(model_file_name)

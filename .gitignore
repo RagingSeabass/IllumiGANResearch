@@ -5,6 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
+*.mlmodel
+*.onnx 
 
 data/test/
 data/train/
