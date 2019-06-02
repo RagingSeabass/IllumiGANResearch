@@ -158,7 +158,7 @@ updated_model = coremltools.models.MLModel(spec)
 updated_model.author = 'Magnus'
 updated_model.license = 'None'
 updated_model.short_description = 'Illumigan'
-updated_model.input_description['image'] = 'Input Image'
+updated_model.input_description['0'] = 'Input Image'
 updated_model.output_description[output_description.name] = 'Predicted Image'
  
 model_file_name = 'Illumigan2.mlmodel'
