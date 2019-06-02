@@ -25,12 +25,12 @@ data_folders = [r['Prefix'] for r in resp_cont]
 # Create matching local folder structure
 for f in data_folders:
     for n in xy_names:
-        if not os.path.isdir(f'data/{f}{n}'):
-            os.makedirs(f'data/{f}{n}')
+        if not os.path.isdir(f'{f}{n}'):
+            os.makedirs(f'{f}{n}')
 
 for folder in data_folders:
     # Download from x and y folders
-    prefixes = [f'data/{folder}{n}' for n in xy_names]
+    prefixes = [f'{folder}{n}' for n in xy_names]
 
     for prefix in prefixes:     
         # Get image names
