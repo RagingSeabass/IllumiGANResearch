@@ -321,4 +321,4 @@ class IllumiganModel(BaseModel):
     def test(self):
         with torch.no_grad():  # disable back prop
             self.forward()
-            #self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
+            self.generator_l1_loss = self.generator_l1(self.fake_y, self.y)
