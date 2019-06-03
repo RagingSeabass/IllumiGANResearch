@@ -3,10 +3,8 @@
 import re
 import matplotlib.pyplot as plt
 
-
-files = ['output/_default/reports/train.log']
+files = ['../../../expextras/train_pro_1.log']
 #lines = [line.rstrip('\n') for line in open(file)]
-
 
 epochs = []
 lossGs = []
@@ -43,14 +41,32 @@ for file in files:
 
 
 plt.figure(1)
-plt.subplot(211)
-plt.plot(epochs, lossGs)
 
-plt.subplot(212)
-plt.plot(epochs, lossDs)
+ax1 = plt.subplot(121)
+p1 = ax1.plot(epochs, lossGs, 'royalblue', label='train loss')
+ax1.set_xlabel('Epochs')
+ax1.set_ylabel('L1 loss (train)')
+
+ax2 = ax1.twinx()
+#p2 = ax2.plot([0, 1000, 1500, 2000], [0.1, 0.0373, 0.0361, 0.0344], 'firebrick', label='test loss')
+#ax2.set_ylabel('L1 loss (test)')
+
+# added these three lines
+lns = p1#+p2
+labs = [l.get_label() for l in lns]
+plt.legend(lns, labs, loc=0)
+
+plt.title('Generator loss')
+
+
+plt.subplot(122)
+plt.plot(epochs, lossDs, 'royalblue')
+
+plt.xlabel('Epochs')
+plt.ylabel('GANloss')
+plt.title('Discriminator loss')
+
 plt.show()
-
-
 
 
 
