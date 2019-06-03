@@ -49,7 +49,7 @@ loss = Average()
 train_start_time = time.time()  # timer for entire epoch
 loss.reset()
 
-for i, (x, y) in enumerate(dataloader):
+for i, x in enumerate(dataloader):
 
     total_iterations += 1
 
