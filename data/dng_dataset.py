@@ -76,7 +76,7 @@ class DNGDataset(Dataset):
             for x_path in x_file:
                 
                 dng = DNG(x_path)
-                dng.pack(100)
+                dng.pack(100) # From github
 
                 self.x_images[index] = dng
 
