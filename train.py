@@ -44,8 +44,8 @@ manager = TrainManager(base_dir=base_dir,
 manager.get_logger("system").info(f"Started loading data")
 
 #dataset = JPGDataset(manager, 'short', 'long', transforms=True)
-#dataset = ARWDataset(manager, 'short', 'long')
-dataset = PNGDataset(manager, 'in', 'out', transforms=True)
+dataset = ARWDataset(manager, 'short', 'long')
+#dataset = PNGDataset(manager, 'in', 'out', transforms=True)
 dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get('batch_size'), shuffle=True, num_workers=0)
 
 model = IllumiganModel(manager=manager)
