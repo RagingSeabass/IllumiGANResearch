@@ -100,11 +100,16 @@ class DNGDataset(Dataset):
         x_image = self.x_images[index].get()
         
         H, W, D = x_image.shape
+        width = int(W + 208)
+        height = int(H + 208)
+        dim = (width, height)
 
-        xx = np.random.randint(0, W - 1024)
+        x_image = cv2.resize(x_image, dim)
+
+        xx = np.random.randint(0, W - 2048)
         yy = np.random.randint(0, H - 1024)
         
-        x_patch = x_image[yy:yy + 1024, xx:xx + 1024, :]
+        x_patch = x_image[yy:yy + 1024, xx:xx + 2048, :]
 
         x_patch = np.minimum(x_patch, 1.0)
         x_patch = np.transpose(x_patch, (2, 0, 1))
