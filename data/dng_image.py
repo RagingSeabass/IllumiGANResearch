@@ -30,9 +30,10 @@ class DNG():
         raw_matix = np.expand_dims(raw_matix, axis=2)
         #raw_matix = np.rot90(raw_matix)
 
+        print(raw_matix.shape)
         scale_percent = 1.1 # percent of original size
-        width = int(raw_matix.shape[1] + 208)
-        height = int(raw_matix.shape[0] + 208)
+        width = int(raw_matix.shape[0] + 208)
+        height = int(raw_matix.shape[1] + 208)
         dim = (width, height)
 
         raw_matix = cv2.resize(raw_matix, dim)

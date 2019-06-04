@@ -1,4 +1,4 @@
-from torch.optim import t
+from torch.optim import lr_scheduler
 from torch.nn import init
 import torch
 import numpy as np
