@@ -106,6 +106,8 @@ class DNGDataset(Dataset):
         
         x_patch = x_image[yy:yy + 2048, xx:xx + 1024, :]
 
+        x_patch = np.transpose(x_patch, (1, 0, 2))
+        
         x_patch = np.minimum(x_patch, 1.0)
         x_patch = np.transpose(x_patch, (2, 0, 1))
 
