@@ -99,17 +99,20 @@ class DNGDataset(Dataset):
         
         x_image = self.x_images[index].get()
         
-        H, W, D = x_image.shape
+        # Rotate image 90 deg
+        
+        x_image = np.transpose(x_image, (1, 0, 2))
+        W, H, D = x_image.shape
         width = int(W + 208)
         height = int(H + 208)
-        dim = (width, height)
+        dim = (height, width)
 
         x_image = cv2.resize(x_image, dim)
 
-        xx = np.random.randint(0, width - 2048)
-        yy = np.random.randint(0, height - 1024)
+        yy = np.random.randint(0, width - 2048)
+        xx = np.random.randint(0, height - 1024)
         
-        x_patch = x_image[yy:yy + 1024, xx:xx + 2048, :]
+        x_patch = x_image[yy:yy + 2048, xx:xx + 1024, :]
 
         x_patch = np.minimum(x_patch, 1.0)
         x_patch = np.transpose(x_patch, (2, 0, 1))
