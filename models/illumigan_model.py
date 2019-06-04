@@ -204,13 +204,13 @@ class IllumiganModel(BaseModel):
         for i, y in enumerate(self.y):
             # path to original img
             # 3, 1024, 1024 (Crop)
-            real_y_rgb = tensor2img(self.fake_y[i])            
+            real_y_rgb = tensor2img(self.x)            
 
             # 3, 1024, 1024 (Crop)
             fake_y_rgb = tensor2img(self.fake_y[i])
             
             temp = np.concatenate(
-                (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=1)
+                (real_y_rgb[:, :, :], fake_y_rgb[:, :, :]), axis=0)
             
             image_pil = Image.fromarray(temp)
             image_pil.save(self.manager.get_img_dir() + f"{epoch}/{num}_{i}.png")
