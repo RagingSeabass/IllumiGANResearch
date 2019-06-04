@@ -106,8 +106,8 @@ class DNGDataset(Dataset):
 
         x_image = cv2.resize(x_image, dim)
 
-        xx = np.random.randint(0, W - 2048)
-        yy = np.random.randint(0, H - 1024)
+        xx = np.random.randint(0, width - 2048)
+        yy = np.random.randint(0, height - 1024)
         
         x_patch = x_image[yy:yy + 1024, xx:xx + 2048, :]
 
