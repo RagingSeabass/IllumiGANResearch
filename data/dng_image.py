@@ -14,6 +14,12 @@ class DNG():
         self.path = path
         self.black_level = 535 #https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/39
  
+    def post(self):
+
+        raw = rawpy.imread(self.path)
+        self.data = raw.postprocess(use_camera_wb=True, half_size=True, no_auto_bright=True, output_bps=16)
+        
+
     def pack(self, ratio):
         
         raw = rawpy.imread(self.path)

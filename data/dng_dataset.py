@@ -18,6 +18,7 @@ class DNGDataset(Dataset):
     
     x_path = ''
     x_images = None
+    y_images = []
 
     # Define how many pair types we have 
     
@@ -49,10 +50,11 @@ class DNGDataset(Dataset):
         if max_size:
             self.x_ids = np.random.choice(self.x_ids, max_size)            
             self.x_images = np.array([None] * max_size)
+            self.y_images = np.array([None] * max_size)
             
         else:
             self.x_images = np.array([None] * len(self.x_ids))
-
+            self.y_images = np.array([None] * len(self.x_ids))
                 
         manager.get_logger("system").info(f"Begin dng dataset | 0 images")
 
@@ -72,6 +74,11 @@ class DNGDataset(Dataset):
             self.manager.get_logger("system").info(f"Loaded {self.number_of_images} images")
             
             x_file = glob.glob(self.x_path + '%05d.dng'%x_id)
+            
+            dng = DNG(x_file[0])
+            dng.post()
+            
+            self.y_images[index] = dng
 
             for x_path in x_file:
                 
@@ -79,6 +86,7 @@ class DNGDataset(Dataset):
                 dng.pack(100) # From github
 
                 self.x_images[index] = dng
+                
 
                 self.number_of_images += 1
 
@@ -98,27 +106,34 @@ class DNGDataset(Dataset):
     def get_image(self, index):
         
         x_image = self.x_images[index].get()
+        y_image = self.y_images[index].get()
         
         # Rotate image 90 deg
         
         x_image = np.transpose(x_image, (1, 0, 2))
+        #y_image = np.transpose(y_image, (1, 0, 2))
         W, H, D = x_image.shape
         width = int(W + 208)
         height = int(H + 208)
         dim = (height, width)
 
         x_image = cv2.resize(x_image, dim)
+        y_image = cv2.resize(y_image, dim)
 
         yy = np.random.randint(0, width - 2048)
         xx = np.random.randint(0, height - 1024)
         
         x_patch = x_image[yy:yy + 2048, xx:xx + 1024, :]
+        y_patch = y_image[yy:yy + 2048, xx:xx + 1024, :]
 
         x_patch = np.minimum(x_patch, 1.0)
+        y_patch  = np.maximum(y_patch, 0.0)
+        
         x_patch = np.transpose(x_patch, (2, 0, 1))
+        y_patch = np.transpose(y_patch, (2, 0, 1))
 
         # Unpack before returning
-        return x_patch
+        return x_patch, y_patch
 
     def get_image_patch(self, index):
         """Get an image patch"""
