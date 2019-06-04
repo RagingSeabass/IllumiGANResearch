@@ -37,7 +37,7 @@ class DNG():
         #dim = (width, height)
 
         #raw_matix = cv2.resize(raw_matix, dim)
-        raw_matix = np.expand_dims(raw_matix, axis=2)
+        #raw_matix = np.expand_dims(raw_matix, axis=2)
         
         #raw_matix = cv2.resize(raw_matix, dsize=(3024, 4240))
 
