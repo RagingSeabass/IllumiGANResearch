@@ -17,7 +17,7 @@ class DNG():
     def post(self):
 
         raw = rawpy.imread(self.path)
-        self.data = raw.postprocess(use_camera_wb=True, half_size=True, no_auto_bright=True)
+        self.data = raw.postprocess(half_size=True, no_auto_bright=True)
         
 
     def pack(self, ratio):

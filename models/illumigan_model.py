@@ -204,7 +204,7 @@ class IllumiganModel(BaseModel):
         for i, y in enumerate(self.y):
             # path to original img
             # 3, 1024, 1024 (Crop)
-            real_y_rgb = tensor2img(y)            
+            real_y_rgb = y         
 
             # 3, 1024, 1024 (Crop)
             fake_y_rgb = tensor2img(self.fake_y[i])
