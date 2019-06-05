@@ -4,8 +4,8 @@
     "validation_dir": "./data/validation",
     "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/05001740/checkpoints",
     "max_dataset_size": 0,
-    "save_epoch": 250,
-    "save_image_epoch": 500,
+    "save_epoch": 100,
+    "save_image_epoch": 100,
     "save_images": true,
     "debug": false
 }
