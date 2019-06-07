@@ -125,7 +125,7 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
+mlmodel = convert(onnx_model, image_input_names='0', output_image_names='133', preprocessing_args=args) # This is what makes it an image lol 
 mlmodel.save('Illumigan.mlmodel')
 
 coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
