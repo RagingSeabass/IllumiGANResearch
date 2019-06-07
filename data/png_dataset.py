@@ -199,12 +199,12 @@ class PNGDataset(Dataset):
             new_width  = 2048
             new_height = new_width * H / W 
 
-            y_image.show()
+            
             x_image = x_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
             x_image = x_image.crop((0,0,2048,1024))
             y_image = y_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
             y_image = y_image.crop((0,0,2048,1024))
-            y_image.show()
+            
 
             transform_list = []
             transform_list.append(transforms.ToTensor())
