@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from torchvision import transforms
 
 from data.png_dataset import PNGDataset
 from models.illumigan_model import IllumiganModel
@@ -17,6 +18,7 @@ cudnn.benchmark = True
 import coremltools
 import onnx;
 from onnx_coreml import convert
+from PIL import Image
 
 base_dir = "_default/"
 server = False
@@ -93,9 +95,12 @@ dataloader = DataLoader(dataset, batch_size=manager.get_hyperparams().get(
 
 model = IllumiganModel(manager=manager)
 
-dummy_input = torch.randn(1, 3, 768, 1024).to(manager.device)
+img = Image.open('data/export_resize.png')
+content_transform = transforms.Compose([transforms.ToTensor()])
+content_image = content_transform(content_image)
+content_image = content_image.unsqueeze(0).to(manager.device)
 
-torch.onnx.export(model.generator_net, dummy_input, "Illumigan.onnx")
+torch.onnx.export(model.generator_net, content_image, "Illumigan.onnx")
 
 onnx_model = onnx.load('./Illumigan.onnx')
 
