@@ -3,7 +3,7 @@
 import re
 import matplotlib.pyplot as plt
 
-files = ['../../../expextras/train_pro_1.log']
+files = ['../../../exp4+/train.log']
 #lines = [line.rstrip('\n') for line in open(file)]
 
 epochs = []
@@ -48,11 +48,11 @@ ax1.set_xlabel('Epochs')
 ax1.set_ylabel('L1 loss (train)')
 
 ax2 = ax1.twinx()
-#p2 = ax2.plot([0, 1000, 1500, 2000], [0.1, 0.0373, 0.0361, 0.0344], 'firebrick', label='test loss')
-#ax2.set_ylabel('L1 loss (test)')
+p2 = ax2.plot([0, 1000, 2000, 3000, 4000], [0.1, 0.046, 0.0414, 0.0418, 0.0421], 'firebrick', label='test loss')
+ax2.set_ylabel('L1 loss (test)')
 
 # added these three lines
-lns = p1#+p2
+lns = p1+p2
 labs = [l.get_label() for l in lns]
 plt.legend(lns, labs, loc=0)
 
