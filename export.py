@@ -97,7 +97,7 @@ model = IllumiganModel(manager=manager)
 
 img = Image.open('data/export_resize.png')
 content_transform = transforms.Compose([transforms.ToTensor()])
-content_image = content_transform(content_image)
+content_image = content_transform(img)
 content_image = content_image.unsqueeze(0).to(manager.device)
 
 torch.onnx.export(model.generator_net, content_image, "Illumigan.onnx")
