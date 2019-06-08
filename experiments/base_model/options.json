@@ -2,10 +2,10 @@
     "train_dir": "./data/train",
     "test_dir": "./data/test",
     "validation_dir": "./data/validation",
-    "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/07125925/checkpoints",
-    "max_dataset_size": 10,
-    "save_epoch": 250,
-    "save_image_epoch": 500,
+    "load_dir": "/work3/s164440/shared/IllumiGANResearch/output/08024523/checkpoints",
+    "max_dataset_size": 0,
+    "save_epoch": 100,
+    "save_image_epoch": 250,
     "save_images": true,
     "debug": false
 }
