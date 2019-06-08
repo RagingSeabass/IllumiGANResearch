@@ -6,7 +6,7 @@ import glob
 import math
 from PIL import Image
 
-imgs = glob.glob('../../../expmobile/4000/test/*.png')
+imgs = glob.glob('../../../expmobile/4500/test/*.png')
 
 def psnr(img1, img2):
     mse = np.mean( (img1 - img2) ** 2 )

@@ -209,8 +209,9 @@ class LastUpBlock(nn.Module):
         super(LastUpBlock, self).__init__()
         self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias),
+                nn.Upsample(scale_factor = 2),
+                nn.ReflectionPad2d(1),
+                nn.Conv2d(2 * in_ch, out_ch, kernel_size=3, stride=1, padding=0),
                 #nn.Tanh()
                 nn.Sigmoid()
             )
@@ -283,15 +284,17 @@ class UpBlockInner(nn.Module):
         if norm:
             self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias),
+                nn.Upsample(scale_factor = 2),
+                nn.ReflectionPad2d(1),
+                nn.Conv2d(2 * in_ch, out_ch, kernel_size=3, stride=1, padding=0),
                 norm
             )
         else:
             self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias)
+                nn.Upsample(scale_factor = 2),
+                nn.ReflectionPad2d(1),
+                nn.Conv2d(2 * in_ch, out_ch, kernel_size=3, stride=1, padding=0)
             )
 
     def forward(self, x1, x2):
@@ -324,15 +327,17 @@ class UpBlockV2(nn.Module):
         if norm:
             self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias),
+                nn.Upsample(scale_factor = 2),
+                nn.ReflectionPad2d(1),
+                nn.Conv2d(2 * in_ch, out_ch, kernel_size=3, stride=1, padding=0),
                 norm
             )
         else:
             self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.ConvTranspose2d(2 * in_ch, out_ch, kernel_size=4,
-                                stride=2, padding=1, bias=bias)
+                nn.Upsample(scale_factor = 2),
+                nn.ReflectionPad2d(1),
+                nn.Conv2d(2 * in_ch, out_ch, kernel_size=3, stride=1, padding=0),
             )
     def forward(self, x1, x2):
         x = self.f(x1)
