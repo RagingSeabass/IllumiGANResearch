@@ -104,7 +104,8 @@ content_image = content_image.unsqueeze(0).to(manager.device)
 
 testMod = nn.Sequential(model.generator_net, UnNorm())
 
-torch.onnx.export(testMod, content_image, "Illumigan.onnx")
+dummy_input = torch.randn(1, 3, 1440, 1440).to(manager.device)
+torch.onnx.export(testMod, dummy_input, "Illumigan.onnx")
 
 onnx_model = onnx.load('./Illumigan.onnx')
 
