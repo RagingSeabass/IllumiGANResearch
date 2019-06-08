@@ -197,6 +197,13 @@ class SingleConvBlock(nn.Module):
         x = self.model(x)
         return x
 
+class UnNorm(nn.Module):
+    def __init__(self):
+        super(UnNorm, self).__init__()
+
+    def forward(self, x):
+        return input * 255
+
 class LastUpBlock(nn.Module):
     def __init__(self, in_ch, out_ch, bias=True, dropout=0):
         super(LastUpBlock, self).__init__()

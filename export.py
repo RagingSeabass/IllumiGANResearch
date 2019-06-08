@@ -11,6 +11,7 @@ from torchvision import transforms
 from data.png_dataset import PNGDataset
 from models.illumigan_model import IllumiganModel
 from utils import Average, TrainManager
+from models.nets import UnNorm
 import torch.backends.cudnn as cudnn
 cudnn.enabled = True
 cudnn.benchmark = True
@@ -101,7 +102,9 @@ content_transform = transforms.Compose([transforms.ToTensor()])
 content_image = content_transform(img)
 content_image = content_image.unsqueeze(0).to(manager.device)
 
-torch.onnx.export(model.generator_net, content_image, "Illumigan.onnx")
+testMod = nn.Sequential(model.generator_net, UnNorm())
+
+torch.onnx.export(testMod, content_image, "Illumigan.onnx")
 
 onnx_model = onnx.load('./Illumigan.onnx')
 
@@ -126,7 +129,7 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names='134') # This is what makes it an image lol 
 mlmodel.save('Illumigan.mlmodel')
 
 # coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
