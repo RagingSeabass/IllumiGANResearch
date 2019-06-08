@@ -53,7 +53,7 @@ ax1.set_xlabel('Epochs')
 ax1.set_ylabel('Gen loss (train)')
 
 ax2 = ax1.twinx()
-p2 = ax2.plot([0, 1000, 2000, 3000, 4000], [0.5, 0.090, 0.101, 0.100, 0.097], 'firebrick', label='test loss')
+p2 = ax2.plot([0, 1000, 2000, 3000, 4000, 4500], [0.5, 0.090, 0.101, 0.100, 0.097, 0.0740], 'firebrick', label='test loss')
 ax2.set_ylabel('Gen L1 loss (test)')
 
 # added these three lines
@@ -72,6 +72,6 @@ plt.ylabel('GANloss')
 plt.title('Discriminator loss')
 
 plt.show()
-fig.savefig('lossmobile.png')
+fig.savefig('lossmobiletune.png')
 
 
