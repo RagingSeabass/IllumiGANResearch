@@ -136,8 +136,8 @@ spec = coreml_model.get_spec()
 coremlNewOutputs = spec.description.output.add()
 coremlNewOutputs.name = 'acti'
 # Configure it as an activation layer
-new_layer.activation.linear.alpha = 255
-new_layer.activation.linear.beta = 0
+coremlNewOutputs.activation.linear.alpha = 255
+coremlNewOutputs.activation.linear.beta = 0
 
 coremlNewParams = coremlNewOutputs.type.multiArrayType
 coremlNewParams.dataType = coremltools.proto.FeatureTypes_pb2.ArrayFeatureType.ArrayDataType.Value('DOUBLE')
