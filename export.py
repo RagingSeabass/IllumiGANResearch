@@ -126,45 +126,55 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names='133') # This is what makes it an image lol 
 mlmodel.save('Illumigan.mlmodel')
 
 coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
 spec = coreml_model.get_spec()
-spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
-# find the current output layer and save it for later reference
-last_layer = spec_layers[-1]
 
-# add the post-processing layer
-new_layer = spec_layers.add()
-new_layer.name = 'convert_to_image'
- 
+coremlNewOutputs = spec.description.output.add()
+coremlNewOutputs.name = 'acti'
 # Configure it as an activation layer
 new_layer.activation.linear.alpha = 255
 new_layer.activation.linear.beta = 0
- 
-# Use the original model's output as input to this layer
-new_layer.input.append(last_layer.output[0])
- 
-# Name the output for later reference when saving the model
-new_layer.output.append('image_output')
- 
-# Find the original model's output description
-output_description  = next(x for x in spec.description.output if x.name==last_layer.output[0])
 
-# Update it to use the new layer as outputsd
-output_description.name = new_layer.name 
-
-spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
-
-# find the current output layer and save it for later reference
-last_layer = spec_layers[-1]
-
-# Mark the new layer as image
-convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
+coremlNewParams = coremlNewOutputs.type.multiArrayType
+coremlNewParams.dataType = coremltools.proto.FeatureTypes_pb2.ArrayFeatureType.ArrayDataType.Value('DOUBLE')
 
 updated_model = coremltools.models.MLModel(spec)
+
+#spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
+
+# find the current output layer and save it for later reference
+#last_layer = spec_layers[-1]
+
+# add the post-processing layer
+#new_layer = spec_layers.add()
+#new_layer.name = 'convert_to_image'
+ 
+# Configure it as an activation layer
+#new_layer.activation.linear.alpha = 255
+#new_layer.activation.linear.beta = 0
+ 
+# Use the original model's output as input to this layer
+#new_layer.input.append(last_layer.output[0])
+ 
+# Name the output for later reference when saving the model
+#new_layer.output.append('image_output')
+ 
+# Find the original model's output description
+#output_description  = next(x for x in spec.description.output if x.name==last_layer.output[0])
+
+# Update it to use the new layer as outputsd
+#output_description.name = new_layer.name 
+
+# find the current output layer and save it for later reference
+
+# Mark the new layer as image
+#onvert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
+
+#updated_model = coremltools.models.MLModel(spec)
 #updated_model.author = 'Magnus'
 #updated_model.license = 'DTU'
 #updated_model.short_description = 'Illumigan'
