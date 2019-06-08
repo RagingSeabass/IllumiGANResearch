@@ -4,10 +4,10 @@
     "b1": 0.5,
     "b2": 0.999,
     "batch_size": 1,
-    "epoch_iterations": 5003,
-    "epoch_decaying_iterations": 0,
-    "epoch": 4500,    
-    "patch_size": 1024,
+    "epoch_iterations": 3000,
+    "epoch_decaying_iterations": 1000,
+    "epoch": 0,    
+    "patch_size": 256,
     "norm": "batch",
     "dis": "patch"
 }
