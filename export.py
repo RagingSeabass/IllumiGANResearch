@@ -126,23 +126,23 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names='133') # This is what makes it an image lol 
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
 mlmodel.save('Illumigan.mlmodel')
 
-coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
-spec = coreml_model.get_spec()
+# coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
+# spec = coreml_model.get_spec()
 
 
-coremlNewOutputs = spec.description.output.add()
-coremlNewOutputs.name = 'acti'
-# Configure it as an activation layer
-coremlNewOutputs.activation.linear.alpha = 255
-coremlNewOutputs.activation.linear.beta = 0
+# coremlNewOutputs = spec.description.output.add()
+# coremlNewOutputs.name = 'acti'
+# # Configure it as an activation layer
+# coremlNewOutputs.activation.linear.alpha = 255
+# coremlNewOutputs.activation.linear.beta = 0
 
-coremlNewParams = coremlNewOutputs.type.multiArrayType
-coremlNewParams.dataType = coremltools.proto.FeatureTypes_pb2.ArrayFeatureType.ArrayDataType.Value('DOUBLE')
+# coremlNewParams = coremlNewOutputs.type.multiArrayType
+# coremlNewParams.dataType = coremltools.proto.FeatureTypes_pb2.ArrayFeatureType.ArrayDataType.Value('DOUBLE')
 
-updated_model = coremltools.models.MLModel(spec)
+# updated_model = coremltools.models.MLModel(spec)
 
 #spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
@@ -181,6 +181,6 @@ updated_model = coremltools.models.MLModel(spec)
 #updated_model.input_description['0'] = 'Input Image'#
 #updated_model.output_description[output_description.name] = 'Predicted Image'
  
-model_file_name = 'Illumigan2.mlmodel'
-updated_model.save(model_file_name)
+# model_file_name = 'Illumigan2.mlmodel'
+# updated_model.save(model_file_name)
 
