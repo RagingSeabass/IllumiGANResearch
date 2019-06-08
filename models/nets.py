@@ -38,7 +38,7 @@ class GeneratorUNetV1(nn.Module):
         self.u2 = UpBlockV2(256, 128, normalize=norm_layer, bias=False, dropout=0.0)
         self.u1 = UpBlockV2(128, 64, normalize=norm_layer, bias=False, dropout=0.0)
 
-        self.u0 = LastUpBlock(64, 3, bias=False, dropout=0.0)
+        self.u0 = LastUpBlock(64, 12, bias=False, dropout=0.0)
 
 
         # self.inc = DoubleConvBlock(4, 32, normalize=norm_layer, bias=False, dropout=0)
@@ -209,8 +209,10 @@ class LastUpBlock(nn.Module):
         super(LastUpBlock, self).__init__()
         self.f = nn.Sequential(
                 nn.ReLU(True),
-                nn.Upsample(scale_factor = 2, mode='nearest'),
-                nn.Conv2d(2 * in_ch, out_ch, kernel_size=4, stride=2, padding=1),
+                nn.Conv2d(in_ch*2, out_ch, kernel_size=3, stride=1, padding=1),
+                nn.PixelShuffle(2),
+                #nn.Upsample(scale_factor = 2, mode='nearest'),
+                
                 #nn.Tanh()
                 nn.Sigmoid()
             )
