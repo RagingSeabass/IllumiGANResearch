@@ -20,6 +20,7 @@ import onnx;
 from onnx_coreml import convert
 from PIL import Image
 
+
 base_dir = "_default/"
 server = False
 
@@ -125,7 +126,7 @@ args = dict(
     blue_bias = 0,
     image_scale = scale
 )
-mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args, image_output_names='133') # This is what makes it an image lol 
+mlmodel = convert(onnx_model, image_input_names='0', preprocessing_args=args) # This is what makes it an image lol 
 mlmodel.save('Illumigan.mlmodel')
 
 coreml_model = coremltools.models.MLModel('Illumigan.mlmodel')
@@ -134,7 +135,7 @@ spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
 # find the current output layer and save it for later reference
 last_layer = spec_layers[-1]
-print(last_layer)
+
 # add the post-processing layer
 new_layer = spec_layers.add()
 new_layer.name = 'convert_to_image'
@@ -151,7 +152,6 @@ new_layer.output.append('image_output')
  
 # Find the original model's output description
 output_description  = next(x for x in spec.description.output if x.name==last_layer.output[0])
-print(output_description)
 
 # Update it to use the new layer as outputsd
 output_description.name = new_layer.name 
@@ -160,16 +160,16 @@ spec_layers = getattr(spec,spec.WhichOneof("Type")).layers
 
 # find the current output layer and save it for later reference
 last_layer = spec_layers[-1]
-print(last_layer)
+
 # Mark the new layer as image
 #convert_multiarray_output_to_image(spec, output_description.name, is_bgr=False)
 
 updated_model = coremltools.models.MLModel(spec)
  
 updated_model.author = 'Magnus'
-updated_model.license = 'None'
-#updated_model.short_description = 'Illumigan'
-#updated_model.input_description['0'] = 'Input Image'
+updated_model.license = 'DTU'
+updated_model.short_description = 'Illumigan'
+updated_model.input_description['0'] = 'Input Image'
 #updated_model.output_description[output_description.name] = 'Predicted Image'
  
 model_file_name = 'Illumigan2.mlmodel'
