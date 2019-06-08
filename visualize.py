@@ -3,7 +3,7 @@
 import re
 import matplotlib.pyplot as plt
 
-files = ['../../../exp4+/train.log']
+files = ['../../../expmobile/train1.log', '../../../expmobile/train2.log', '../../../expmobile/train3.log']
 #lines = [line.rstrip('\n') for line in open(file)]
 
 epochs = []
@@ -39,17 +39,22 @@ for file in files:
 
     totalIteartions += int(iterations)
 
+font = {'family' : 'normal',
+        'weight' : 'normal',
+        'size'   : 15}
 
-plt.figure(1)
+plt.rc('font', **font)
 
+fig = plt.figure(figsize=(16, 9), dpi=100, facecolor='w', edgecolor='k')
 ax1 = plt.subplot(121)
+plt.subplots_adjust(0.1,0.1,0.9,0.9,0.3,0.2)
 p1 = ax1.plot(epochs, lossGs, 'royalblue', label='train loss')
 ax1.set_xlabel('Epochs')
-ax1.set_ylabel('L1 loss (train)')
+ax1.set_ylabel('Gen loss (train)')
 
 ax2 = ax1.twinx()
-p2 = ax2.plot([0, 1000, 2000, 3000, 4000], [0.1, 0.046, 0.0414, 0.0418, 0.0421], 'firebrick', label='test loss')
-ax2.set_ylabel('L1 loss (test)')
+p2 = ax2.plot([0, 1000, 2000, 3000, 4000], [0.5, 0.090, 0.101, 0.100, 0.097], 'firebrick', label='test loss')
+ax2.set_ylabel('Gen L1 loss (test)')
 
 # added these three lines
 lns = p1+p2
@@ -67,6 +72,6 @@ plt.ylabel('GANloss')
 plt.title('Discriminator loss')
 
 plt.show()
-
+fig.savefig('lossmobile.png')
 
 
