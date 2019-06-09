@@ -3,7 +3,10 @@
 import re
 import matplotlib.pyplot as plt
 
-files = ['../../../expmobile/train1.log', '../../../expmobile/train2.log', '../../../expmobile/train3.log', '../../../expmobile/train4.log']
+#files = ['../../../exp1/train.log', '../../../exp1/train2.log', '../../../exp1/train3.log']
+#files = ['../../../exp2/train.log']
+#files = ['../../../exp3/train.log']
+files = ['../../../exp4+/train.log']
 #lines = [line.rstrip('\n') for line in open(file)]
 
 epochs = []
@@ -53,7 +56,9 @@ ax1.set_xlabel('Epochs')
 ax1.set_ylabel('Gen loss (train)')
 
 ax2 = ax1.twinx()
-p2 = ax2.plot([0, 1000, 2000, 3000, 4000, 4500, 4600, 4700, 4800], [0.5, 0.090, 0.101, 0.100, 0.097, 0.0740, 0.0503, 0.0507, 0.0499], 'firebrick', label='test loss')
+#p2 = ax2.plot([0, 1000, 2000], [0.1, 0.037, 0.034], 'firebrick', label='test loss')
+#p2 = ax2.plot([0, 1000, 2000,3000,4000], [0.08, 0.0545, 0.0463, 0.0484, 0.0509], 'firebrick', label='test loss')
+p2 = ax2.plot([0, 1000, 2000,3000,4000], [0.3, 0.046, 0.0414, 0.041, 0.042], 'firebrick', label='test loss')
 ax2.set_ylabel('Gen L1 loss (test)')
 
 # added these three lines
@@ -71,6 +76,6 @@ plt.xlabel('Epochs')
 plt.ylabel('GANloss')
 plt.title('Discriminator loss')
 
-fig.savefig('lossmobiletune.png')
-
+fig.savefig('exp4loss.png')
+plt.show()
 
