@@ -200,10 +200,10 @@ class PNGDataset(Dataset):
             new_height = new_width * H / W 
 
             
-            #x_image = x_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
-            x_image = x_image.crop((0,0,1024,1024))
-            #y_image = y_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
-            y_image = y_image.crop((0,0,1024,1024))
+            x_image = x_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
+            #x_image = x_image.crop((0,0,1024,1024))
+            y_image = y_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
+            #y_image = y_image.crop((0,0,1024,1024))
             
 
             transform_list = []

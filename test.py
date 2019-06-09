@@ -6,7 +6,7 @@ import glob
 import math
 from PIL import Image
 
-imgs = glob.glob('../../../expmobile/4000/test/*.png')
+imgs = glob.glob('../../../expmobile/4800/test/*.png')
 
 def psnr(img1, img2):
     mse = np.mean( (img1 - img2) ** 2 )
@@ -25,8 +25,8 @@ for i, gt in enumerate(imgs):
     img_gt = Image.open(gt)
     img_out = Image.open(gt)
 
-    img_gt = img_gt.crop((0,0,2048,1024))
-    img_out = img_out.crop((2048,0,4096,1024))
+    img_gt = img_gt.crop((0,0,1024,1024))
+    img_out = img_out.crop((1024,0,2048,1024))
 
     d=psnr(np.asarray(img_gt),np.asarray(img_out))
     s=ssimm(np.asarray(img_gt),np.asarray(img_out))
