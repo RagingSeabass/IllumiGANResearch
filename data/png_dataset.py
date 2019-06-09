@@ -197,7 +197,7 @@ class PNGDataset(Dataset):
             y_image = Image.fromarray(y_image)
 
             new_width  = 2048
-            new_height = 1024 #new_width * H / W 
+            new_height = new_width * H / W 
 
             
             x_image = x_image.resize((new_width, round(new_height)), Image.ANTIALIAS)
